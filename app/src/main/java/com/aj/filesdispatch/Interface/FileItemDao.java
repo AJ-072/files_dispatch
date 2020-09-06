@@ -12,7 +12,7 @@ import com.aj.filesdispatch.Entities.FileItem;
 import java.util.List;
 
 @Dao
-interface FileItemDao {
+public interface FileItemDao {
     @Insert
     void insertFileItem(FileItem item);
 
@@ -23,8 +23,8 @@ interface FileItemDao {
     void deleteFileItem(FileItem item);
 
     @Query("DELETE FROM file_item_table")
-    void deleteAll(FileItem item);
+    void deleteAll();
 
-    @Query("SELECT * FROM file_item_table WHERE fileId =  ORDER BY dateAdded DESC")
-    LiveData<List<FileItem>> getAllFilesItems(String i);
+    @Query("SELECT * FROM file_item_table WHERE fileType = :type ORDER BY dateAdded DESC")
+    LiveData<List<FileItem>> getAllFilesItems(String type);
 }

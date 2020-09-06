@@ -1,35 +1,52 @@
 package com.aj.filesdispatch.Entities;
 
-import android.os.Parcelable;
+import android.graphics.drawable.Drawable;
 
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "file_item_table")
-public class FileItem{
+public class FileItem {
 
     @PrimaryKey
     private String fileId;
     private String fileName;
     private long fileSize;
     private String fileUri;
+    private String fileType;
     private long dateAdded;
     @Ignore
-    private boolean checked=false;
+    private boolean checked = false;
     @Ignore
     private String showDes;
 
-    public FileItem(String fileId, String fileName, long fileSize, String fileUri,long dateAdded) {
+    @Ignore
+    private Drawable drawable;
+
+    public FileItem(String fileId, String fileName, long fileSize, String fileUri, String fileType, long dateAdded) {
         this.fileId = fileId;
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.fileUri = fileUri;
-        this.dateAdded=dateAdded;
+        this.fileType = fileType;
+        this.dateAdded = dateAdded;
+    }
+
+    public void setDrawable(Drawable drawable) {
+        this.drawable = drawable;
     }
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    public Drawable getDrawable() {
+        return drawable;
+    }
+
+    public String getFileType() {
+        return fileType;
     }
 
     public long getDateAdded() {
