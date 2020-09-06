@@ -172,6 +172,7 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         videoLoading.setVisibility(View.GONE);
         if (data.getCount()>0) {
+            if (videoItems.size()==0)
             for (int i=0;i<Math.min(data.getCount(),30);i++){
                 data.moveToPosition(i);
                 videoItems.add(new FileViewItem(data,"Images"));
