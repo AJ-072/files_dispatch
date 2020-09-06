@@ -131,6 +131,7 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         imageLoading.setVisibility(View.GONE);
         if (data.getCount() > 0) {
+            if (imageItems.size()==0)
             for (int i=0;i<Math.min(data.getCount(),30);i++){
                 data.moveToPosition(i);
                 imageItems.add(new FileViewItem(data,"Images"));
