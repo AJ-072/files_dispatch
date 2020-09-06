@@ -11,7 +11,7 @@ import com.aj.filesdispatch.Repository.FileItemRepository;
 
 import java.util.List;
 
-class FileItemViewModel extends AndroidViewModel {
+public class FileItemViewModel extends AndroidViewModel {
     private FileItemRepository repository;
     private LiveData<List<FileItem>> fileItems;
 
