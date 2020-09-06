@@ -70,9 +70,9 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        videoItems= new ArrayList<>();
-        context= requireContext().getApplicationContext();
-        videoAdapter = new VideoAdapter(getContext(),videoToShare);
+        videoItems = new ArrayList<>();
+        context = requireContext().getApplicationContext();
+        videoAdapter = new VideoAdapter(getContext(), videoToShare);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -84,8 +84,8 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_cli_videos, container, false);
         videoRecycler = view.findViewById(R.id.video_list);
-        noVideoText=view.findViewById(R.id.no_videos_text);
-        videoLoading=view.findViewById(R.id.video_loading);
+        noVideoText = view.findViewById(R.id.no_videos_text);
+        videoLoading = view.findViewById(R.id.video_loading);
         layoutManager = new LinearLayoutManager(context);
         LoaderManager.getInstance(this).initLoader(MEDIASTORE_LOADER_ID, null, this);
         DividerItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
@@ -171,17 +171,18 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         videoLoading.setVisibility(View.GONE);
-        if (data.getCount()>0) {
-            for (int i=0;i<Math.min(data.getCount(),30);i++){
-                data.moveToPosition(i);
-                videoItems.add(new FileViewItem(data,"Images"));
-            }
+        if (data.getCount() > 0) {
+            if (videoItems.size() < Math.min(data.getCount(), 30))
+                for (int i = 0; i < Math.min(data.getCount(), 30); i++) {
+                    data.moveToPosition(i);
+                    videoItems.add(new FileViewItem(data, "Images"));
+                }
             videoAdapter.setVideoItems(videoItems);
             noVideoText.setVisibility(View.GONE);
             videoRecycler.setVisibility(View.VISIBLE);
             videoAdapter.setVideoItems(data);
 
-        }else{
+        } else {
             noVideoText.setVisibility(View.VISIBLE);
             videoRecycler.setVisibility(View.GONE);
         }

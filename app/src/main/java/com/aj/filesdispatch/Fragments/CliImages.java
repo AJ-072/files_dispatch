@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -76,7 +75,7 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        imageItems= new ArrayList<>();
+        imageItems = new ArrayList<>();
         context = requireContext().getApplicationContext();
         DisplayMetrics metrics = new DisplayMetrics();
         requireActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
@@ -131,10 +130,11 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         imageLoading.setVisibility(View.GONE);
         if (data.getCount() > 0) {
-            for (int i=0;i<Math.min(data.getCount(),30);i++){
-                data.moveToPosition(i);
-                imageItems.add(new FileViewItem(data,"Images"));
-            }
+            if (imageItems.size() < Math.min(data.getCount(), 30))
+                for (int i = 0; i < Math.min(data.getCount(), 30); i++) {
+                    data.moveToPosition(i);
+                    imageItems.add(new FileViewItem(data, "Images"));
+                }
             imageAdapter.setImageList(imageItems);
             imageAdapter.setImageList(data);
             imageRecycler.setVisibility(View.VISIBLE);

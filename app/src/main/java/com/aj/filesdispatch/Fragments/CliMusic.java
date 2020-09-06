@@ -159,6 +159,7 @@ public class CliMusic extends Fragment implements LoaderManager.LoaderCallbacks<
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         musicLoading.setVisibility(View.GONE);
         if (data.getCount()>0){
+            if (audioList.size()<Math.min(data.getCount(),30))
             for (int i=0;i<Math.min(data.getCount(),30);i++){
                 data.moveToPosition(i);
                 audioList.add(new FileViewItem(data,"Images"));
