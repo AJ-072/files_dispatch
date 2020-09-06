@@ -1,0 +1,25 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <EditTextPreference
+        app:icon="@drawable/ic_profile_default"
+        app:key="username"
+        app:title="@string/username"
+        app:useSimpleSummaryProvider="true" />
+    <EditTextPreference
+        app:allowDividerAbove="true"
+        app:iconSpaceReserved="false"
+        app:key="destination_folder"
+        app:title="@string/des_folder"
+        app:useSimpleSummaryProvider="true" />
+    <Preference
+        app:allowDividerAbove="true"
+        app:iconSpaceReserved="false"
+        app:key="clear_history"
+        app:title="Clear All History" />
+    <CheckBoxPreference
+        app:allowDividerAbove="true"
+        app:iconSpaceReserved="false"
+        app:key="update_while_share"
+        app:summary="Receive FilesDispatch updates During Transfer "
+        app:title="Update Without Internet" />
+
+</PreferenceScreen>
