@@ -12,7 +12,6 @@ public class FileItem {
     private String fileName;
     private long fileSize;
     private String fileUri;
-
     @Ignore
     private boolean checked=false;
     @Ignore
