@@ -56,7 +56,6 @@ public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        Log.d(TAG, "onBindViewHolder: " + getItemCount());
         try {
             Glide.with(context)
                     .load(getItem(position).getDrawable()==null?
@@ -70,8 +69,7 @@ public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
         }
 
         holder.appCheck.setVisibility(getItem(position).isChecked() ? View.VISIBLE : View.INVISIBLE);
-        holder.appSize.setText(getItem(position).getShowDes()==null?
-                getItem(position).getShowDes(Converter.SizeInGMK(getItem(position).getFileSize())):getItem(position).getShowDes());
+        holder.appSize.setText(getItem(position).getShowDes());
         holder.appName.setText(getItem(position).getFileName());
     }
 

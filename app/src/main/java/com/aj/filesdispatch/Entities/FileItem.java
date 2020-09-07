@@ -7,6 +7,8 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import com.aj.filesdispatch.common.Converter;
+
 
 @Entity(tableName = "file_item_table")
 public class FileItem {
@@ -34,6 +36,7 @@ public class FileItem {
         this.fileUri = fileUri;
         this.fileType = fileType;
         this.dateAdded = dateAdded;
+        this.showDes= Converter.SizeInGMK(fileSize);
     }
 
     public Drawable getDrawable(Drawable drawable) {
