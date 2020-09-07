@@ -1,6 +1,7 @@
 package com.aj.filesdispatch.ViewModels;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -14,6 +15,7 @@ import java.util.List;
 public class FileItemViewModel extends AndroidViewModel {
     private FileItemRepository repository;
     private LiveData<List<FileItem>> fileItems;
+    private static final String TAG = "FileItemViewModel";
 
     public FileItemViewModel(@NonNull Application application) {
         super(application);
@@ -35,6 +37,11 @@ public class FileItemViewModel extends AndroidViewModel {
 
     public void deleteAll() {
         repository.deleteAllFileItem();
+    }
+
+    public void UpdateList(List<FileItem> items){
+        repository.UpdateListItems(items);
+        Log.d(TAG, "UpdateList: "+items.size());
     }
 
     public LiveData<List<FileItem>> getFileItems() {

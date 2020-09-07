@@ -1,6 +1,7 @@
 package com.aj.filesdispatch.RecyclerAdapter;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aj.filesdispatch.Entities.FileItem;
 import com.aj.filesdispatch.Interface.AddItemToShare;
 import com.aj.filesdispatch.R;
+import com.aj.filesdispatch.common.Converter;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
     private static final String TAG = "Adapter";
@@ -52,10 +56,22 @@ public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        Log.d(TAG, "onBindViewHolder: "+getItemCount());
-        //holder.appIcon.setImageDrawable(getItem(position).getDrawable());
+        Log.d(TAG, "onBindViewHolder: " + getItemCount());
+        try {
+            Glide.with(context)
+                    .load(getItem(position).getDrawable()==null?
+                            getItem(position).getDrawable(context.getPackageManager().getApplicationIcon(getItem(position).getFileId()))
+                            :getItem(position).getDrawable())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .fitCenter()
+                    .into(holder.appIcon);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
         holder.appCheck.setVisibility(getItem(position).isChecked() ? View.VISIBLE : View.INVISIBLE);
-        holder.appSize.setText(getItem(position).getShowDes());
+        holder.appSize.setText(getItem(position).getShowDes()==null?
+                getItem(position).getShowDes(Converter.SizeInGMK(getItem(position).getFileSize())):getItem(position).getShowDes());
         holder.appName.setText(getItem(position).getFileName());
     }
 

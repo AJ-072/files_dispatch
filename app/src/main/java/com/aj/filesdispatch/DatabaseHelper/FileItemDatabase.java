@@ -29,7 +29,6 @@ public abstract class FileItemDatabase extends RoomDatabase {
                     .fallbackToDestructiveMigration()
                     .addCallback(fileItemCallback)
                     .build();
-
         }
         return instance;
     }

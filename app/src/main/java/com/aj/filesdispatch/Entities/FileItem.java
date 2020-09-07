@@ -22,12 +22,12 @@ public class FileItem {
     @Ignore
     private boolean checked = false;
     @Ignore
-    private String showDes;
+    private String showDes=null;
 
     @Ignore
-    private Drawable drawable;
+    private Drawable drawable=null;
 
-    public FileItem(String fileId, String fileName, long fileSize, String fileUri, String fileType, long dateAdded) {
+    public FileItem(@NonNull String fileId, String fileName, long fileSize, String fileUri, String fileType, long dateAdded) {
         this.fileId = fileId;
         this.fileName = fileName;
         this.fileSize = fileSize;
@@ -36,16 +36,17 @@ public class FileItem {
         this.dateAdded = dateAdded;
     }
 
-    public void setDrawable(Drawable drawable) {
-        this.drawable = drawable;
+    public Drawable getDrawable(Drawable drawable) {
+        if (this.drawable == null)
+            this.drawable = drawable;
+        return this.drawable;
+    }
+    public Drawable getDrawable() {
+        return drawable;
     }
 
     public void setChecked(boolean checked) {
         this.checked = checked;
-    }
-
-    public Drawable getDrawable() {
-        return drawable;
     }
 
     public String getFileType() {
@@ -56,6 +57,7 @@ public class FileItem {
         return dateAdded;
     }
 
+    @NonNull
     public String getFileId() {
         return fileId;
     }
@@ -76,7 +78,12 @@ public class FileItem {
         return checked;
     }
 
+    public String getShowDes(String showDes) {
+        if (this.showDes==null)
+            this.showDes=showDes;
+        return this.showDes;
+    }
     public String getShowDes() {
-        return showDes;
+        return this.showDes;
     }
 }

@@ -79,6 +79,7 @@ public class CliApp extends Fragment {
         viewModel= new ViewModelProvider(this).get(FileItemViewModel.class);
         viewModel.getFileItems().observe(getViewLifecycleOwner(), fileItems -> {
            appAdapter.submitList(fileItems);
+           viewModel.UpdateList(fileItems);
             Log.d(TAG, "onCreateView: "+fileItems.size());
         });
         return view;
