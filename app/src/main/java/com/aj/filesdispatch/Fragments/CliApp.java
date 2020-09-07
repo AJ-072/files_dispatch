@@ -129,8 +129,6 @@ public class CliApp extends Fragment implements LoaderManager.LoaderCallbacks<Cu
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         appLoadig.setVisibility(View.INVISIBLE);
-        if (loader.getId() == CACHE_LOAD) {
-            this.data = data;
             if (appRecyler != null)
                 if (data != null && data.getCount() > 0) {
                     Log.d(TAG, "onLoadFinished: cached data");
@@ -144,7 +142,7 @@ public class CliApp extends Fragment implements LoaderManager.LoaderCallbacks<Cu
                 } else {
                     noAppText.setVisibility(View.VISIBLE);
                 }
-        } else {
+        /*} else {
             Log.d(TAG, "onLoadFinished: new data");
             if (this.data != null&&data!=null) {
                 Log.d(TAG, "onLoadFinished: new data not null");
@@ -197,7 +195,7 @@ public class CliApp extends Fragment implements LoaderManager.LoaderCallbacks<Cu
                 adapter.setApplists(data);
                 adapter.setApplists(appList);
             }
-
+*/
 
             /*if (data != null && data.getCount() > 0) {
                 appRecyler.setVisibility(View.VISIBLE);
@@ -210,7 +208,7 @@ public class CliApp extends Fragment implements LoaderManager.LoaderCallbacks<Cu
             } else {
                 noAppText.setVisibility(View.VISIBLE);
             }*/
-        }
+       // }
 
     }
 
@@ -255,9 +253,7 @@ public class CliApp extends Fragment implements LoaderManager.LoaderCallbacks<Cu
                             this.remove();
                             requireActivity().getOnBackPressedDispatcher().onBackPressed();
                         })
-                        .setNegativeButton("No", (dialog, which) -> {
-                            dialog.dismiss();
-                        })
+                        .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                         .create().show();
             }
         };
