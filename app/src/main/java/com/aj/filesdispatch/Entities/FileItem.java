@@ -2,14 +2,17 @@ package com.aj.filesdispatch.Entities;
 
 import android.graphics.drawable.Drawable;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+
 
 @Entity(tableName = "file_item_table")
 public class FileItem {
 
     @PrimaryKey
+    @NonNull
     private String fileId;
     private String fileName;
     private long fileSize;
