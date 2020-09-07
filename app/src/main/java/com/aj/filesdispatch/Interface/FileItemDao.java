@@ -27,4 +27,5 @@ public interface FileItemDao {
 
     @Query("SELECT * FROM file_item_table WHERE fileType = :type ORDER BY dateAdded DESC")
     LiveData<List<FileItem>> getAllFilesItems(String type);
+
 }

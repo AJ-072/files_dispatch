@@ -1,6 +1,7 @@
 package com.aj.filesdispatch.RecyclerAdapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,7 @@ public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
         this.onAppItemClick = onAppItemClick;
     }
 
+
     @NonNull
     @Override
     public AppAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -50,7 +52,8 @@ public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.appIcon.setImageDrawable(getItem(position).getDrawable());
+        Log.d(TAG, "onBindViewHolder: "+getItemCount());
+        //holder.appIcon.setImageDrawable(getItem(position).getDrawable());
         holder.appCheck.setVisibility(getItem(position).isChecked() ? View.VISIBLE : View.INVISIBLE);
         holder.appSize.setText(getItem(position).getShowDes());
         holder.appName.setText(getItem(position).getFileName());

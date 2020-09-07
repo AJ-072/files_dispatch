@@ -2,6 +2,7 @@ package com.aj.filesdispatch.DatabaseHelper;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -17,6 +18,8 @@ public abstract class FileItemDatabase extends RoomDatabase {
 
     private static FileItemDatabase instance;
 
+    private static final String TAG = "FileItemDatabase";
+
     public abstract FileItemDao fileItemDao();
 
     public static synchronized FileItemDatabase getInstance(Context context) {
@@ -26,7 +29,7 @@ public abstract class FileItemDatabase extends RoomDatabase {
                     .fallbackToDestructiveMigration()
                     .addCallback(fileItemCallback)
                     .build();
-            new populateDbAsync(instance).execute();
+
         }
         return instance;
     }
@@ -37,20 +40,4 @@ public abstract class FileItemDatabase extends RoomDatabase {
             super.onCreate(db);
         }
     };
-
-    private static class populateDbAsync extends AsyncTask<Void, Void, Void> {
-        private FileItemDao fileItemDao;
-
-        public populateDbAsync(FileItemDatabase db) {
-            this.fileItemDao = db.fileItemDao();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            for (int i = 0; i < 20; i++) {
-                fileItemDao.insertFileItem(null);
-            }
-            return null;
-        }
-    }
 }
