@@ -48,7 +48,7 @@ public class AppListRepository {
     }
 
 
-    private static class UpdateList extends AsyncTask<Void, Void, Void> {
+    static class UpdateList extends AsyncTask<Void, Void, Void> {
         private FileItemDao fileItemDao;
         private List<FileItem> fileItems;
 
