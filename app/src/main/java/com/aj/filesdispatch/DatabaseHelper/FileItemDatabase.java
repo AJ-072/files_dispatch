@@ -24,7 +24,9 @@ public abstract class FileItemDatabase extends RoomDatabase {
             instance = Room.databaseBuilder(context.getApplicationContext()
                     , FileItemDatabase.class, "file_item_database")
                     .fallbackToDestructiveMigration()
+                    .addCallback(fileItemCallback)
                     .build();
+            new populateDbAsync(instance).execute();
         }
         return instance;
     }
