@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import com.aj.filesdispatch.DatabaseHelper.FileItemDatabase;
 import com.aj.filesdispatch.Entities.FileItem;
 import com.aj.filesdispatch.Interface.FileItemDao;
+import com.aj.filesdispatch.common.Converter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,88 +41,10 @@ public class FileItemRepository {
         listLiveData = fileItemDao.getAllFilesItems(APPLICATION);
     }
 
-    public void InsertFileItems(FileItem item) {
-        new InsertFileItemsAsync(fileItemDao).execute(item);
-    }
-
-    public void updateFileItem(FileItem item) {
-        new UpdateFileItemsAsync(fileItemDao).execute(item);
-    }
-
-    public synchronized void UpdateListItems(List<FileItem> items){
-        if (updateList==null){
-            updateList= new UpdateList(fileItemDao,items);
-            updateList.execute();
-        }
-    }
-
-    public void deleteFileItem(FileItem item) {
-        new DeleteFileItemsAsync(fileItemDao).execute(item);
-    }
-
-    public void deleteAllFileItem() {
-        new DeleteAllAsync(fileItemDao).execute();
-    }
-
     public LiveData<List<FileItem>> getListLiveData() {
         return listLiveData;
     }
 
-    private static class InsertFileItemsAsync extends AsyncTask<FileItem, Void, Void> {
-        private FileItemDao fileItemDao;
-
-        InsertFileItemsAsync(FileItemDao fileItemDao) {
-            this.fileItemDao = fileItemDao;
-        }
-
-        @Override
-        protected Void doInBackground(FileItem... fileItems) {
-            fileItemDao.insertFileItem(fileItems[0]);
-            return null;
-        }
-    }
-
-    private static class UpdateFileItemsAsync extends AsyncTask<FileItem, Void, Void> {
-        private FileItemDao fileItemDao;
-
-        UpdateFileItemsAsync(FileItemDao fileItemDao) {
-            this.fileItemDao = fileItemDao;
-        }
-
-        @Override
-        protected Void doInBackground(FileItem... fileItems) {
-            fileItemDao.updateFileItem(fileItems[0]);
-            return null;
-        }
-    }
-
-    private static class DeleteFileItemsAsync extends AsyncTask<FileItem, Void, Void> {
-        private FileItemDao fileItemDao;
-
-        DeleteFileItemsAsync(FileItemDao fileItemDao) {
-            this.fileItemDao = fileItemDao;
-        }
-
-        @Override
-        protected Void doInBackground(FileItem... fileItems) {
-            fileItemDao.deleteFileItem(fileItems[0]);
-            return null;
-        }
-    }
-
-    private static class DeleteAllAsync extends AsyncTask<Void, Void, Void> {
-        private FileItemDao fileItemDao;
-
-        DeleteAllAsync(FileItemDao fileItemDao) {
-            this.fileItemDao = fileItemDao;
-        }
-
-        @Override
-        protected Void doInBackground(Void... Void) {
-            fileItemDao.deleteAll();
-            return null;
-        }
-    }
 
     private static class UpdateList extends AsyncTask<Void, Void, Void> {
         private FileItemDao fileItemDao;
@@ -147,7 +70,7 @@ public class FileItemRepository {
                         File file = new File(Objects.requireNonNull(getSourceDir(packageName)));
                         fileItemDao.insertFileItem(new FileItem(packageName
                                 ,getAppName(packageName),file.length(),
-                                file.getPath(),APPLICATION,file.lastModified()));
+                                file.getPath(),APPLICATION,file.lastModified(),Converter.SizeInGMK(file.length())));
                     }
                 }
             }else{
@@ -166,7 +89,7 @@ public class FileItemRepository {
                         if (item.getDateAdded()!=file.lastModified()){
                             fileItemDao.updateFileItem(new FileItem(packageName
                                     ,getAppName(packageName),file.length(),
-                                    file.getPath(),APPLICATION,file.lastModified()));
+                                    file.getPath(),APPLICATION,file.lastModified(),Converter.SizeInGMK(file.length())));
 
                         }
                     }else{
@@ -180,7 +103,7 @@ public class FileItemRepository {
                         File file = new File(Objects.requireNonNull(getSourceDir(pack)));
                         fileItemDao.insertFileItem(new FileItem(pack
                                 ,getAppName(pack),file.length(),
-                                file.getPath(),APPLICATION,file.lastModified()));
+                                file.getPath(),APPLICATION,file.lastModified(),Converter.SizeInGMK(file.length())));
                     }
                 }
             }
@@ -196,16 +119,6 @@ public class FileItemRepository {
         }
         return null;
     }
-
-    public Drawable getAppIcon(String pack_name) {
-        try {
-            return context.getPackageManager().getApplicationIcon(pack_name);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     private static String getSourceDir(String pack_name) {
         try {
             return context.getPackageManager().getApplicationInfo(pack_name, 0).sourceDir;

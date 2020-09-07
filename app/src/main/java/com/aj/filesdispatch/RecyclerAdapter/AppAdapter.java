@@ -2,7 +2,6 @@ package com.aj.filesdispatch.RecyclerAdapter;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aj.filesdispatch.Entities.FileItem;
 import com.aj.filesdispatch.Interface.AddItemToShare;
 import com.aj.filesdispatch.R;
-import com.aj.filesdispatch.common.Converter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
@@ -58,9 +56,9 @@ public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         try {
             Glide.with(context)
-                    .load(getItem(position).getDrawable()==null?
+                    .load(getItem(position).getDrawable() == null ?
                             getItem(position).getDrawable(context.getPackageManager().getApplicationIcon(getItem(position).getFileId()))
-                            :getItem(position).getDrawable())
+                            : getItem(position).getDrawable())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .fitCenter()
                     .into(holder.appIcon);
@@ -71,6 +69,10 @@ public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
         holder.appCheck.setVisibility(getItem(position).isChecked() ? View.VISIBLE : View.INVISIBLE);
         holder.appSize.setText(getItem(position).getShowDes());
         holder.appName.setText(getItem(position).getFileName());
+        holder.itemView.setOnClickListener(view -> {
+            getItem(position).setChecked(!getItem(position).isChecked());
+            notifyItemChanged(position);
+        });
     }
 
 

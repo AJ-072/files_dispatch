@@ -62,6 +62,7 @@ public class CliApp extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        viewModel= new ViewModelProvider(this).get(FileItemViewModel.class);
         super.onCreate(savedInstanceState);
     }
 
@@ -76,7 +77,6 @@ public class CliApp extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(),4));
         appAdapter= new AppAdapter(getContext(),appToShare);
         recyclerView.setAdapter(appAdapter);
-        viewModel= new ViewModelProvider(this).get(FileItemViewModel.class);
         viewModel.getFileItems().observe(getViewLifecycleOwner(), fileItems -> {
            appAdapter.submitList(fileItems);
            viewModel.UpdateList(fileItems);

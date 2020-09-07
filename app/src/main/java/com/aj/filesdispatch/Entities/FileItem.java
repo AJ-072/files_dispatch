@@ -21,22 +21,21 @@ public class FileItem {
     private String fileUri;
     private String fileType;
     private long dateAdded;
+    private String showDes;
+
     @Ignore
     private boolean checked = false;
     @Ignore
-    private String showDes=null;
-
-    @Ignore
     private Drawable drawable=null;
 
-    public FileItem(@NonNull String fileId, String fileName, long fileSize, String fileUri, String fileType, long dateAdded) {
+    public FileItem(@NonNull String fileId, String fileName, long fileSize, String fileUri, String fileType, long dateAdded,String showDes) {
         this.fileId = fileId;
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.fileUri = fileUri;
         this.fileType = fileType;
         this.dateAdded = dateAdded;
-        this.showDes= Converter.SizeInGMK(fileSize);
+        this.showDes=showDes;
     }
 
     public Drawable getDrawable(Drawable drawable) {
@@ -81,11 +80,6 @@ public class FileItem {
         return checked;
     }
 
-    public String getShowDes(String showDes) {
-        if (this.showDes==null)
-            this.showDes=showDes;
-        return this.showDes;
-    }
     public String getShowDes() {
         return this.showDes;
     }
