@@ -7,14 +7,10 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ListAdapter;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
-import androidx.recyclerview.widget.DiffUtil;
 
 import com.aj.filesdispatch.DatabaseHelper.FileItemDatabase;
 import com.aj.filesdispatch.Entities.FileItem;
@@ -26,16 +22,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class FileItemRepository {
+public class AppListRepository {
     private FileItemDao fileItemDao;
     private LiveData<List<FileItem>> listLiveData;
-    public static final String APPLICATION="Applications";
+    public static final String APPLICATION = "Applications";
     private static final String TAG = "FileItemRepository";
     private static Context context;
-    private static UpdateList updateList;
+    private UpdateList updateList;
 
-    public  FileItemRepository(Application application) {
-        context=application.getApplicationContext();
+    public AppListRepository(Application application) {
+        context = application.getApplicationContext();
         FileItemDatabase database = FileItemDatabase.getInstance(application);
         fileItemDao = database.fileItemDao();
         listLiveData = fileItemDao.getAllFilesItems(APPLICATION);
@@ -43,6 +39,12 @@ public class FileItemRepository {
 
     public LiveData<List<FileItem>> getListLiveData() {
         return listLiveData;
+    }
+    public synchronized void UpdateList(List<FileItem> items){
+        if (updateList==null){
+            updateList= new UpdateList(fileItemDao,items);
+            updateList.execute();
+        }
     }
 
 
@@ -52,7 +54,7 @@ public class FileItemRepository {
 
         UpdateList(FileItemDao fileItemDao, List<FileItem> fileItems) {
             this.fileItemDao = fileItemDao;
-            this.fileItems=fileItems;
+            this.fileItems = fileItems;
         }
 
         @Override
@@ -62,19 +64,19 @@ public class FileItemRepository {
             intent.addCategory(Intent.CATEGORY_LAUNCHER);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
             List<ResolveInfo> resolveInfo = context.getPackageManager().queryIntentActivities(intent, 0);
-            if (fileItems==null||fileItems.size()==0){
+            if (fileItems == null || fileItems.size() == 0) {
                 for (ResolveInfo resolve : resolveInfo) {
                     ActivityInfo activityInfo = resolve.activityInfo;
                     if ((resolve.activityInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
                         packageName = activityInfo.packageName;
                         File file = new File(Objects.requireNonNull(getSourceDir(packageName)));
                         fileItemDao.insertFileItem(new FileItem(packageName
-                                ,getAppName(packageName),file.length(),
-                                file.getPath(),APPLICATION,file.lastModified(),Converter.SizeInGMK(file.length())));
+                                , getAppName(packageName), file.length(),
+                                file.getPath(), APPLICATION, file.lastModified(), Converter.SizeInGMK(file.length())));
                     }
                 }
-            }else{
-                List<String> packageNames= new ArrayList<>();
+            } else {
+                List<String> packageNames = new ArrayList<>();
                 for (ResolveInfo resolve : resolveInfo) {
                     ActivityInfo activityInfo = resolve.activityInfo;
                     if ((resolve.activityInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
@@ -82,28 +84,28 @@ public class FileItemRepository {
                         packageNames.add(packageName);
                     }
                 }
-                for (FileItem item:fileItems){
-                    packageName=item.getFileId();
-                    if (packageNames.contains(packageName)){
+                for (FileItem item : fileItems) {
+                    packageName = item.getFileId();
+                    if (packageNames.contains(packageName)) {
                         File file = new File(Objects.requireNonNull(getSourceDir(packageName)));
-                        if (item.getDateAdded()!=file.lastModified()){
+                        if (item.getDateAdded() != file.lastModified()) {
                             fileItemDao.updateFileItem(new FileItem(packageName
-                                    ,getAppName(packageName),file.length(),
-                                    file.getPath(),APPLICATION,file.lastModified(),Converter.SizeInGMK(file.length())));
+                                    , getAppName(packageName), file.length(),
+                                    file.getPath(), APPLICATION, file.lastModified(), Converter.SizeInGMK(file.length())));
 
                         }
-                    }else{
+                    } else {
                         fileItemDao.deleteFileItem(item);
                     }
                     packageNames.remove(packageName);
                 }
-                Log.d(TAG, "doInBackground: "+packageNames.size());
-                if (packageNames.size()>0){
-                    for (String pack:packageNames){
+                Log.d(TAG, "doInBackground: " + packageNames.size());
+                if (packageNames.size() > 0) {
+                    for (String pack : packageNames) {
                         File file = new File(Objects.requireNonNull(getSourceDir(pack)));
                         fileItemDao.insertFileItem(new FileItem(pack
-                                ,getAppName(pack),file.length(),
-                                file.getPath(),APPLICATION,file.lastModified(),Converter.SizeInGMK(file.length())));
+                                , getAppName(pack), file.length(),
+                                file.getPath(), APPLICATION, file.lastModified(), Converter.SizeInGMK(file.length())));
                     }
                 }
             }
@@ -119,6 +121,7 @@ public class FileItemRepository {
         }
         return null;
     }
+
     private static String getSourceDir(String pack_name) {
         try {
             return context.getPackageManager().getApplicationInfo(pack_name, 0).sourceDir;

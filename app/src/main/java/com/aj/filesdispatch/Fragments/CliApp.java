@@ -1,7 +1,5 @@
 package com.aj.filesdispatch.Fragments;
 
-import android.app.Application;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,24 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.aj.filesdispatch.Entities.FileItem;
 import com.aj.filesdispatch.Interface.AddItemToShare;
-import com.aj.filesdispatch.Models1.FileViewItem;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.AppAdapter;
-import com.aj.filesdispatch.ViewModels.FileItemViewModel;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import com.aj.filesdispatch.ViewModels.AppListViewModel;
 
 public class CliApp extends Fragment {
 
@@ -39,8 +27,9 @@ public class CliApp extends Fragment {
     private AddItemToShare appToShare;
     private RecyclerView recyclerView;
     private AppAdapter appAdapter;
-    private FileItemViewModel viewModel;
+    private AppListViewModel viewModel;
     private ProgressBar appLoader;
+
     public CliApp(AddItemToShare appToShare) {
         this.appToShare = appToShare;
     }
@@ -62,7 +51,7 @@ public class CliApp extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        viewModel= new ViewModelProvider(this).get(FileItemViewModel.class);
+        viewModel = new ViewModelProvider(this).get(AppListViewModel.class);
         super.onCreate(savedInstanceState);
     }
 
@@ -70,17 +59,17 @@ public class CliApp extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_cli_app, container, false);
-        recyclerView=view.findViewById(R.id.app_recycler);
-        appLoader=view.findViewById(R.id.app_loading);
+        recyclerView = view.findViewById(R.id.app_recycler);
+        appLoader = view.findViewById(R.id.app_loading);
         appLoader.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(),4));
-        appAdapter= new AppAdapter(getContext(),appToShare);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
+        appAdapter = new AppAdapter(getContext(), appToShare);
         recyclerView.setAdapter(appAdapter);
         viewModel.getFileItems().observe(getViewLifecycleOwner(), fileItems -> {
-           appAdapter.submitList(fileItems);
-           viewModel.UpdateList(fileItems);
-            Log.d(TAG, "onCreateView: "+fileItems.size());
+            appAdapter.submitList(fileItems);
+            viewModel.UpdateList(fileItems);
+            Log.d(TAG, "onCreateView: " + fileItems.size());
         });
         return view;
     }
