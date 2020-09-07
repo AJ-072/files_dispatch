@@ -1,6 +1,7 @@
 package com.aj.filesdispatch.Fragments;
 
 import android.app.Application;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,15 +10,20 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aj.filesdispatch.Entities.FileItem;
 import com.aj.filesdispatch.Interface.AddItemToShare;
+import com.aj.filesdispatch.Models1.FileViewItem;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.AppAdapter;
 import com.aj.filesdispatch.ViewModels.FileItemViewModel;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class CliApp extends Fragment {
@@ -59,6 +65,10 @@ public class CliApp extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_cli_app, container, false);
+        viewModel= new ViewModelProvider(this).get(FileItemViewModel.class);
+        viewModel.getFileItems().observe(getViewLifecycleOwner(), fileItems -> {
+           appAdapter.submitList(fileItems);
+        });
         return view;
     }
 }
