@@ -34,10 +34,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aj.filesdispatch.ApplicationActivity;
-import com.aj.filesdispatch.Services.DispatchService;
 import com.aj.filesdispatch.Models.FileViewItem;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.ServiceListAdapter;
+import com.aj.filesdispatch.Services.DispatchService;
 
 import java.io.File;
 import java.io.IOException;
@@ -114,10 +114,12 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         manager = (WifiManager) getApplication().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (!manager.isP2pSupported())
             return false;
-        p2pManager = ApplicationActivity.wifiP2pManager;
+        p2pManager = (WifiP2pManager) getSystemService(WIFI_P2P_SERVICE);
+        ApplicationActivity.wifiP2pManager=p2pManager;
         if (p2pManager == null)
             return false;
-        dispatchChannel = ApplicationActivity.wifiChannel;
+        dispatchChannel = p2pManager.initialize(getApplicationContext(), getMainLooper(), null);
+        ApplicationActivity.wifiChannel=dispatchChannel;
         if (dispatchChannel == null)
             return false;
         register();

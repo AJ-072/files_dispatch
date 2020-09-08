@@ -43,10 +43,7 @@ public class ApplicationActivity extends Application {
         int mode = isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
         AppCompatDelegate.setDefaultNightMode(mode);
 
-        //create wifiP2pManager and Channel
-        wifiP2pManager = (WifiP2pManager) getSystemService(WIFI_P2P_SERVICE);
-        if (wifiP2pManager != null)
-            wifiChannel = wifiP2pManager.initialize(getApplicationContext(), getMainLooper(), null);
+
 
         //create Notification channel on API level 26 and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
