@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aj.filesdispatch.ApplicationActivity;
 import com.aj.filesdispatch.Models.FileViewItem;
+import com.aj.filesdispatch.Models.WifiP2pService;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.ServiceListAdapter;
 import com.aj.filesdispatch.Services.DispatchService;
@@ -54,6 +55,10 @@ import static com.aj.filesdispatch.ApplicationActivity.FILE_TO_SEND;
 public class FindConnection extends AppCompatActivity implements WifiP2pManager.ConnectionInfoListener, ServiceListAdapter.onClick {
     private static final String TAG = "DispatchManager";
     public static final String INSTANCE_NAME = "_fileDispatch_P2p";
+    public static final String SERVICE_TYPE = "_filesdispatch._tcp";
+    public static final String BUDDY_NAME = "UserName";
+    public static final String AVATAR = "Avatar_drawable";
+    public static final String PORT = "ListeningPort";
     private WifiP2pDnsSdServiceInfo dnsSdServiceInfo;
     private WifiP2pDnsSdServiceRequest dnsSdServiceRequest;
     public static WifiP2pManager p2pManager;
@@ -115,18 +120,19 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         if (!manager.isP2pSupported())
             return false;
         p2pManager = (WifiP2pManager) getSystemService(WIFI_P2P_SERVICE);
-        ApplicationActivity.wifiP2pManager=p2pManager;
+        ApplicationActivity.wifiP2pManager = p2pManager;
         if (p2pManager == null)
             return false;
         dispatchChannel = p2pManager.initialize(getApplicationContext(), getMainLooper(), null);
-        ApplicationActivity.wifiChannel=dispatchChannel;
+        ApplicationActivity.wifiChannel = dispatchChannel;
         if (dispatchChannel == null)
             return false;
         register();
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && !manager.isWifiEnabled()) {
             manager.setWifiEnabled(true);
-            Log.d(TAG, "Wifi start: wifi on");
         }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED)
+            return false;
         return manager.isWifiEnabled();
     }
 
@@ -150,13 +156,12 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     }
 
     public void setLocalService() {
-        record.put("listenport", String.valueOf(getServer_port()));
-        record.put("buddyname", getName());
-        record.put("avatar", "1");
-        dnsSdServiceInfo = WifiP2pDnsSdServiceInfo.newInstance(INSTANCE_NAME, "_filesdispatch._tcp", record);
+        record.put(PORT, String.valueOf(getServer_port()));
+        record.put(BUDDY_NAME, getName());
+        record.put(AVATAR, "1");
+        dnsSdServiceInfo = WifiP2pDnsSdServiceInfo.newInstance(INSTANCE_NAME, SERVICE_TYPE, record);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "setLocalService: not location permission");
-            return;
+            this.finish();
         }
         p2pManager.addLocalService(dispatchChannel, dnsSdServiceInfo, new WifiP2pManager.ActionListener() {
             @Override
@@ -187,15 +192,6 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         });
     }
 
-  /*  @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        if (v.getId()==android.R.id.home)
-        {
-            onPause();
-        }
-        super.onCreateContextMenu(menu, v, menuInfo);
-    }*/
-
     public void setDnsListener() {
         WifiP2pManager.DnsSdServiceResponseListener dnsSdServiceResponseListener = (instanceName, registrationType, srcDevice) -> {
             if (instanceName.equals(INSTANCE_NAME)) {
@@ -209,10 +205,10 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
             Log.d(TAG, "setDnsListener: " + srcDevice.deviceName);
         };
         WifiP2pManager.DnsSdTxtRecordListener txtRecordListener = (fullDomainName, txtRecordMap, srcDevice) -> {
-            Log.d(TAG, "setDnsListener: " + txtRecordMap.get("listenport"));
+            Log.d(TAG, "setDnsListener: " + txtRecordMap.get(PORT));
             device = srcDevice;
             Toast.makeText(this, ServiceListAdapter.getDeviceStatus(device.status), Toast.LENGTH_SHORT).show();
-            wifiP2pService = new WifiP2pService(srcDevice, txtRecordMap.get("buddyname"), Integer.parseInt(Objects.requireNonNull(txtRecordMap.get("listenport"))));
+            wifiP2pService = new WifiP2pService(srcDevice, txtRecordMap.get(BUDDY_NAME), Integer.parseInt(Objects.requireNonNull(txtRecordMap.get(PORT))));
         };
         p2pManager.setDnsSdResponseListeners(dispatchChannel, dnsSdServiceResponseListener, txtRecordListener);
         dnsSdServiceRequest = WifiP2pDnsSdServiceRequest.newInstance();
@@ -261,7 +257,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     }
 
     private String getName() {
-        return preferences.getString("username", "Unknown");
+        return preferences.getString("username", ApplicationActivity.OptnlUserName);
     }
 
     public String getreason(int reason) {

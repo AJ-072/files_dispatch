@@ -8,21 +8,37 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aj.filesdispatch.Models.WifiP2pService;
 import com.aj.filesdispatch.R;
-import com.aj.filesdispatch.dispatchmanager.WifiP2pService;
 
 import java.util.ArrayList;
 
-public class ServiceListAdapter extends RecyclerView.Adapter<ServiceListAdapter.DeviceViewHolder> {
-    ArrayList<WifiP2pService> services=null;
+public class ServiceListAdapter extends ListAdapter<WifiP2pService, ServiceListAdapter.DeviceViewHolder> {
+    ArrayList<WifiP2pService> services = null;
     private static final String TAG = "ServiceListAdapter";
     private onClick click;
 
     public ServiceListAdapter(onClick click) {
+        super(diffUtils);
         this.click = click;
     }
+
+    private static final DiffUtil.ItemCallback<WifiP2pService> diffUtils = new DiffUtil.ItemCallback<WifiP2pService>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull WifiP2pService oldItem, @NonNull WifiP2pService newItem) {
+            return oldItem.getDevice().equals(newItem.getDevice());
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull WifiP2pService oldItem, @NonNull WifiP2pService newItem) {
+            return oldItem.getDisplay_Name().equals(newItem.getDisplay_Name())
+                    &&oldItem.getPort()==newItem.getPort();
+        }
+    };
 
     @NonNull
     @Override
@@ -33,7 +49,7 @@ public class ServiceListAdapter extends RecyclerView.Adapter<ServiceListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull DeviceViewHolder holder, int position) {
-        Log.d(TAG, "onBindViewHolder: "+position);
+        Log.d(TAG, "onBindViewHolder: " + position);
         holder.wifiname.setText(getDeviceStatus(services.get(position).getDevice().status));
         holder.visiblename.setText(services.get(position).getDisplay_Name());
         holder.view.setOnClickListener(v -> {
@@ -43,22 +59,24 @@ public class ServiceListAdapter extends RecyclerView.Adapter<ServiceListAdapter.
 
     @Override
     public int getItemCount() {
-        return services!=null?services.size():0;
+        return services != null ? services.size() : 0;
 
     }
 
     public static class DeviceViewHolder extends RecyclerView.ViewHolder {
         TextView visiblename, wifiname;
         View view;
+
         public DeviceViewHolder(@NonNull View itemView) {
             super(itemView);
-            visiblename=itemView.findViewById(R.id.visible_name);
-            wifiname=itemView.findViewById(R.id.wifi_name);
-            view=itemView;
+            visiblename = itemView.findViewById(R.id.visible_name);
+            wifiname = itemView.findViewById(R.id.wifi_name);
+            view = itemView;
         }
     }
-    public void setServices(ArrayList<WifiP2pService> service){
-        this.services=service;
+
+    public void setServices(ArrayList<WifiP2pService> service) {
+        this.services = service;
         this.notifyDataSetChanged();
     }
 
@@ -81,7 +99,8 @@ public class ServiceListAdapter extends RecyclerView.Adapter<ServiceListAdapter.
 
         }
     }
-    public interface onClick{
+
+    public interface onClick {
         void selectDevice(WifiP2pService service);
     }
 }

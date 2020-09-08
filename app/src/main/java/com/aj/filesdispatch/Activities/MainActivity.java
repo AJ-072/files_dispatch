@@ -9,21 +9,18 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -49,13 +46,13 @@ import com.aj.filesdispatch.Interface.AddItemToShare;
 import com.aj.filesdispatch.Interface.OnBindToService;
 import com.aj.filesdispatch.Models.FileViewItem;
 import com.aj.filesdispatch.Models.UserInfo;
+import com.aj.filesdispatch.Models.WifiP2pService;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.SelectedFileList;
 import com.aj.filesdispatch.Services.DispatchService;
 import com.aj.filesdispatch.common.pager;
 import com.aj.filesdispatch.dispatchmanager.FindConnection;
 import com.aj.filesdispatch.dispatchmanager.WifiBroadcastReceiver;
-import com.aj.filesdispatch.dispatchmanager.WifiP2pService;
 import com.aj.filesdispatch.nav_optn.About;
 import com.aj.filesdispatch.nav_optn.HelpandFeed;
 import com.aj.filesdispatch.nav_optn.Settings;
@@ -66,12 +63,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.aj.filesdispatch.Activities.logo.APP_SETTINGS;
 import static com.aj.filesdispatch.ApplicationActivity.DARK_MODE;
 import static com.aj.filesdispatch.ApplicationActivity.FILE_TO_SEND;
 import static com.aj.filesdispatch.ApplicationActivity.sharedPreferences;
 import static com.aj.filesdispatch.ApplicationActivity.wifiChannel;
 import static com.aj.filesdispatch.ApplicationActivity.wifiP2pManager;
-import static com.aj.filesdispatch.Activities.logo.APP_SETTINGS;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         View.OnClickListener, AdapterView.OnItemClickListener, AddItemToShare, OnBindToService {
@@ -99,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView tv;
     private TextView count_text;
     private Intent dispatchActivity, sendFileIntent;
-    private SharedPreferences.Editor editor;
     private Switch dms;
     private BroadcastReceiver wifiBroadcastReceiver;
     private DispatchService dispatchService = null;
@@ -112,11 +108,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         Initialize();
         if (savedInstanceState != null) {
-            currentTab = savedInstanceState.getInt(CURRENT_TAB,3);
+            currentTab = savedInstanceState.getInt(CURRENT_TAB, 3);
             fileToTransfer = savedInstanceState.getParcelableArrayList(FILE_TO_SEND);
         } else {
-            currentTab =3;
-            fileToTransfer =new ArrayList<>();
+            currentTab = 3;
+            fileToTransfer = new ArrayList<>();
         }
 
         navigationView.setNavigationItemSelectedListener(this);             //Object Click Listeners
@@ -175,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = findViewById(R.id.nav_header);
         dispatchActivity = new Intent(MainActivity.this, FindConnection.class);
         dms = navigationView.getMenu().findItem(R.id.dm).getActionView().findViewById(R.id.dms);
-        editor = sharedPreferences.edit();
         dms.setChecked(sharedPreferences.getBoolean(DARK_MODE, false));
         tv = navigationView.getHeaderView(0).findViewById(R.id.versioncode);
         try {
@@ -296,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void DarkMode(boolean mode) {
         int mode_val = mode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
         AppCompatDelegate.setDefaultNightMode(mode_val);
-        editor.putBoolean(DARK_MODE, mode).apply();
+        sharedPreferences.edit().putBoolean(DARK_MODE, mode).apply();
         dms.setChecked(mode);
     }
 
@@ -339,7 +334,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION))
                     .setNegativeButton("No thanks", (dialog, which) -> {
                         dialog.dismiss();
-                        this.finish();
                     })
                     .setCancelable(false)
                     .create().show();
@@ -359,7 +353,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             isPermissionGranted = false;
                         }).setNegativeButton("No thanks", (dialog, which) -> {
                     dialog.dismiss();
-                    this.finish();
                 }).setCancelable(false)
                         .create().show();
             }
@@ -446,12 +439,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onMultiItemAdded(List<FileViewItem> fileViewItems) {
         if (fileViewItems != null) {
-            if (fileToTransfer==fileViewItems) {
+            if (fileToTransfer == fileViewItems) {
                 for (FileViewItem item : fileViewItems) {
                     item.setChecked(false);
                 }
                 fileToTransfer.clear();
-            }else if (!fileToTransfer.containsAll(fileViewItems)) {
+            } else if (!fileToTransfer.containsAll(fileViewItems)) {
                 fileToTransfer.addAll(fileViewItems);
             } else {
                 fileToTransfer.removeAll(fileViewItems);
@@ -477,14 +470,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SelectedFileList fileList = new SelectedFileList(fileToTransfer, this);
         listRecycler = new RecyclerView(this);
         listRecycler.setLayoutManager(new LinearLayoutManager(this));
-        listRecycler.setPadding(10,5,10,0);
+        listRecycler.setPadding(10, 5, 10, 0);
         listRecycler.setAdapter(fileList);
         listDialog = alertDialog.setView(listRecycler)
                 .setPositiveButton(getText(R.string.close), (dialog, which) -> dialog.cancel())
                 .setNeutralButton(("Remove All"), (dialog, which) -> {
                     onMultiItemAdded(fileToTransfer);
                     fileList.notifyDataSetChanged();
-                    dialog.cancel(); })
+                    dialog.cancel();
+                })
                 .create();
         listDialog.show();
     }
@@ -502,7 +496,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void getConnectedDeviceInfo(UserInfo info) {
         isConnected = true;
-       /* status.setText(String.format("Connected to %s !", info.getUserName()));*/
+        /* status.setText(String.format("Connected to %s !", info.getUserName()));*/
         //status.setCompoundDrawablesRelativeWithIntrinsicBounds();
     }
 }
