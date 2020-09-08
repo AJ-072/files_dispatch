@@ -28,7 +28,7 @@ import java.util.List;
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     private Context activity;
     int width, height;
-    private List<FileViewItem> imageList;
+    private static List<FileViewItem> imageList;
     private OnItemClickToOpen imageToOpen;
     private AddItemToShare imageToShare;
     private Cursor cursorData;
@@ -44,7 +44,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        activity=parent.getContext();
+        activity = parent.getContext();
         View fileView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image_view, parent, false);
         return new ViewHolder(fileView);
     }
@@ -56,13 +56,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             imageList.set(position, new FileViewItem(cursorData, "Images"));
         else if (imageList.size() == position)
             imageList.add(position, new FileViewItem(cursorData, "Images"));
-        else if (imageList.size()<position){
+        else if (imageList.size() < position) {
             Log.d(TAG, "onBindViewHolder: add null");
-            imageList.addAll(Collections.nCopies(position-imageList.size(),null));
+            imageList.addAll(Collections.nCopies(position - imageList.size(), null));
             imageList.add(position, new FileViewItem(cursorData, "Images"));
         }
         Glide.with(activity)
-                .load("file://" + getUriFromMediaStore(position))
+                .load("file://"+getUriFromMediaStore(position))
                 .centerCrop()
                 .into(holder.imageView);
         holder.imageView.setOnClickListener(v -> imageToOpen.OnClick(imageList.get(position)));
@@ -104,8 +104,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             return null;
     }
 
-    public void setImageList(ArrayList<FileViewItem> imageList){
-        this.imageList=imageList;
+    public void setImageList(ArrayList<FileViewItem> imageList) {
+        this.imageList = imageList;
     }
 
     private Bitmap getBitmapFromMediaStore(int position) {
@@ -114,6 +114,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 imageList.get(position).getId(),
                 MediaStore.Images.Thumbnails.MINI_KIND,
                 null);
+
     }
 
     public Uri getUriFromMediaStore(int position) {

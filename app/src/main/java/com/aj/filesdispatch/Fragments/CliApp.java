@@ -61,14 +61,14 @@ public class CliApp extends Fragment {
         View view = inflater.inflate(R.layout.fragment_cli_app, container, false);
         recyclerView = view.findViewById(R.id.app_recycler);
         appLoader = view.findViewById(R.id.app_loading);
-        appLoader.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.VISIBLE);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         appAdapter = new AppAdapter(getContext(), appToShare);
         recyclerView.setAdapter(appAdapter);
         viewModel.getFileItems().observe(getViewLifecycleOwner(), fileItems -> {
             appAdapter.submitList(fileItems);
             viewModel.UpdateList(fileItems);
+            appLoader.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
             Log.d(TAG, "onCreateView: " + fileItems.size());
         });
         return view;

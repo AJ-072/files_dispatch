@@ -1,11 +1,9 @@
 package com.aj.filesdispatch.RecyclerAdapter;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -17,28 +15,29 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.aj.filesdispatch.Models.FileViewItem;
 import com.aj.filesdispatch.Interface.AddItemToShare;
+import com.aj.filesdispatch.Models.FileViewItem;
 import com.aj.filesdispatch.R;
 import com.bumptech.glide.Glide;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> {
     private static final String TAG = "FILE_ADAPTER";
     private Context activity;
-    private List<FileViewItem> videoItems= new ArrayList<>();
+    private List<FileViewItem> videoItems = new ArrayList<>();
     private AddItemToShare videoClick;
     private Cursor cursorData;
 
-    public VideoAdapter(Context activity,AddItemToShare videoClick) {
+    public VideoAdapter(Context activity, AddItemToShare videoClick) {
         this.activity = activity;
-        this.videoClick=videoClick;
+        this.videoClick = videoClick;
     }
 
 
@@ -56,9 +55,9 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
             videoItems.set(position, new FileViewItem(cursorData, "Videos"));
         else if (videoItems.size() == position)
             videoItems.add(position, new FileViewItem(cursorData, "Videos"));
-        else if (videoItems.size()<position){
+        else if (videoItems.size() < position) {
             Log.d(TAG, "onBindViewHolder: add null");
-            videoItems.addAll(Collections.nCopies(position-videoItems.size(),null));
+            videoItems.addAll(Collections.nCopies(position - videoItems.size(), null));
             videoItems.add(position, new FileViewItem(cursorData, "Videos"));
         }
 
@@ -71,14 +70,17 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
             notifyItemChanged(position);
             videoClick.onItemAdded(videoItems.get(position));
         });
-      //  holder.videoDuration.setText(getDur(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA))));
+        //  holder.videoDuration.setText(getDur(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA))));
         //holder.viewImage.setImageBitmap(getBitmapFromMediaStore(position));
         Glide.with(activity)
-                .load(getUriFromMediaStore(position))
+                .load("file://" + getUriFromMediaStore(position))
                 .placeholder(R.drawable.ic_play)
                 .centerCrop()
                 .into(holder.viewImage);
         holder.check_item.setChecked(videoItems.get(position).isChecked());
+        holder.itemView.setOnClickListener(view -> {
+            playVideo(position);
+        });
 
     }
 
@@ -89,11 +91,11 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return cursorData!=null?cursorData.getCount():0;
+        return cursorData != null ? cursorData.getCount() : 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView viewLabel, viewDes,videoDuration;
+        public TextView viewLabel, viewDes, videoDuration;
         public ImageView viewImage;
         public CheckBox check_item;
 
@@ -104,11 +106,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
             viewDes = itemView.findViewById(R.id.file_size);
             viewImage = itemView.findViewById(R.id.file_icon);
             check_item = itemView.findViewById(R.id.video_checkbox);
-            videoDuration= itemView.findViewById(R.id.video_duration);
+            videoDuration = itemView.findViewById(R.id.video_duration);
 
         }
     }
-
 
 
     public void setVideoItems(Cursor data) {
@@ -130,20 +131,21 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
             return null;
     }
 
-    public void setVideoItems(ArrayList<FileViewItem> videoItems){
-        this.videoItems=videoItems;
+    public void setVideoItems(ArrayList<FileViewItem> videoItems) {
+        this.videoItems = videoItems;
     }
+
     private Bitmap getBitmapFromMediaStore(int position) {
-            return MediaStore.Video.Thumbnails.getThumbnail(
-                    activity.getContentResolver(),
-                    videoItems.get(position).getId(),
-                    MediaStore.Video.Thumbnails.MINI_KIND,
-                    null
-            );
+        return MediaStore.Video.Thumbnails.getThumbnail(
+                activity.getContentResolver(),
+                videoItems.get(position).getId(),
+                MediaStore.Video.Thumbnails.MINI_KIND,
+                null
+        );
     }
 
     private Uri getUriFromMediaStore(int position) {
-        return Uri.parse("file://" + videoItems.get(position).getFileLoc());
+        return Uri.parse(videoItems.get(position).getFileLoc());
     }
 
     /*@SuppressLint("DefaultLocale")
@@ -158,15 +160,19 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         mp.release();*//*
         return String.format("%d:%2d",TimeUnit.MILLISECONDS.toMinutes(dur),TimeUnit.MILLISECONDS.toSeconds(dur)-TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(dur)));
     }*/
+    private void playVideo(int position) {
+        File file = new File(String.valueOf(getUriFromMediaStore(position)));
+        Uri fileUri = FileProvider.getUriForFile(
+                activity,
+                "com.aj.filesdispatch.fileProvider",
+                file);
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setDataAndType(fileUri, "video/*");
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        activity.startActivity(intent);
+    }
 }
-    /*File file= new File(String.valueOf(getUriFromMediaStore(position)));
-    Uri fileUri = FileProvider.getUriForFile(
-            activity,
-            "com.aj.filesdispatch.fileprovider",
-            file);
-    Intent intent = new Intent();
-                intent.setAction(android.content.Intent.ACTION_VIEW);
-                intent.setDataAndType(fileUri, "video/*");
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                activity.startActivity(intent);*/
+
 

@@ -25,6 +25,7 @@ import com.aj.filesdispatch.Interface.AddItemToShare;
 import com.aj.filesdispatch.Interface.OnItemClickToOpen;
 import com.aj.filesdispatch.Models.FileViewItem;
 import com.aj.filesdispatch.R;
+import com.bumptech.glide.Glide;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -78,8 +79,11 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
         }
         extension = MimeTypeMap.getFileExtensionFromUrl(encoder).toUpperCase();
         audioList.get(position).setFileDrawable(writeOnDrawable(extension));
+        Glide.with(context)
+                .load(audioList.get(position).getFileDrawable())
+                .fitCenter()
+                .into(holder.audioIcon);
         holder.audioLabel.setText(fileName);
-        holder.audioIcon.setImageDrawable(audioList.get(position).getFileDrawable());
         holder.audioDes.setText(description);
         holder.audioView.setOnClickListener(v -> {
             if (!isPlaying) {
