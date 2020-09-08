@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.aj.filesdispatch.ApplicationActivity.FILE_TO_SEND;
+import static com.aj.filesdispatch.ApplicationActivity.sharedPreferences;
 
 
 public class FindConnection extends AppCompatActivity implements WifiP2pManager.ConnectionInfoListener, ServiceListAdapter.onClick {
@@ -57,6 +58,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     public static final String INSTANCE_NAME = "_fileDispatch_P2p";
     public static final String SERVICE_TYPE = "_filesdispatch._tcp";
     public static final String BUDDY_NAME = "UserName";
+    public static final String IP_ADDRESS="Ip_Address";
     public static final String AVATAR = "Avatar_drawable";
     public static final String PORT = "ListeningPort";
     private WifiP2pDnsSdServiceInfo dnsSdServiceInfo;
@@ -158,7 +160,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     public void setLocalService() {
         record.put(PORT, String.valueOf(getServer_port()));
         record.put(BUDDY_NAME, getName());
-        record.put(AVATAR, "1");
+        record.put(AVATAR, String.valueOf(sharedPreferences.getInt(ApplicationActivity.AvatarName,-1)));
         dnsSdServiceInfo = WifiP2pDnsSdServiceInfo.newInstance(INSTANCE_NAME, SERVICE_TYPE, record);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             this.finish();
@@ -175,8 +177,8 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
             @Override
             public void onFailure(int reason) {
                 if (retry == 3) {
+                    finish();
                 }
-                //onPause();
                 else retry++;
                 if (!manager.isWifiEnabled()) {
                     try {
@@ -335,10 +337,10 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
 
             if (info.isGroupOwner) {
                 int port = wifiP2pService.getPort();
-                service.putExtra("port", port);
+                service.putExtra(PORT, port);
             } else {
-                service.putExtra("ipAddress", info.groupOwnerAddress.getHostAddress());
-                service.putExtra("port", myPort);
+                service.putExtra(IP_ADDRESS, info.groupOwnerAddress.getHostAddress());
+                service.putExtra(PORT, myPort);
             }
             service.putParcelableArrayListExtra(FILE_TO_SEND, (ArrayList<? extends Parcelable>) fileToSend);
             startService(service);

@@ -11,8 +11,13 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.preference.PreferenceManager;
 
+import com.aj.filesdispatch.dispatchmanager.FindConnection;
+
 import java.util.Locale;
 import java.util.Random;
+
+import static com.aj.filesdispatch.dispatchmanager.FindConnection.AVATAR;
+import static com.aj.filesdispatch.dispatchmanager.FindConnection.BUDDY_NAME;
 
 public class ApplicationActivity extends Application {
     public static WifiP2pManager wifiP2pManager;
@@ -26,7 +31,8 @@ public class ApplicationActivity extends Application {
     public static final String SHARED = "SHARED_PREFERENCE";
     private static final String TAG = "ApplicationActivity";
     public static final String FILE_TO_SEND = "FileToSend";
-    public static String AvatarName, OptnlAvatarName;
+    public static String AvatarName;
+    public static int OptnlAvatarName;
     public static final String NOTIFICATION_CHANNEL_1 = "service Started";
 
     @Override
@@ -43,8 +49,6 @@ public class ApplicationActivity extends Application {
         int mode = isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
         AppCompatDelegate.setDefaultNightMode(mode);
 
-
-
         //create Notification channel on API level 26 and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             showConnected = new NotificationChannel(show, NOTIFICATION_CHANNEL_1, NotificationManager.IMPORTANCE_HIGH);
@@ -54,13 +58,13 @@ public class ApplicationActivity extends Application {
 
     public void setUser() {
         OptnlUserName = "User" + String.format(Locale.ROOT, "%04d", new Random().nextInt(100000));
-        OptnlAvatarName = "avatar" + new Random().nextInt(6);
-        AvatarName = sharedPreferences.getString("avatarNum", null);
-        userName = defaultPreference.getString("username", null);
+        OptnlAvatarName = new Random().nextInt(6);
+        AvatarName = sharedPreferences.getString(FindConnection.AVATAR, null);
+        userName = defaultPreference.getString(BUDDY_NAME, null);
         if (userName == null)
-            defaultPreference.edit().putString("username", OptnlUserName).apply();
+            defaultPreference.edit().putString(BUDDY_NAME, OptnlUserName).apply();
         if (AvatarName == null)
-            sharedPreferences.edit().putString("avatarNum", OptnlAvatarName).apply();
+            sharedPreferences.edit().putString(AVATAR, String.valueOf(OptnlAvatarName)).apply();
     }
 }
 

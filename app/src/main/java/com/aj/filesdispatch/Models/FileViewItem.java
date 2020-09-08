@@ -10,9 +10,6 @@ import com.aj.filesdispatch.common.Converter;
 
 import java.io.File;
 
-import static com.aj.filesdispatch.DatabaseHelper.AdToDatabase.FILE_LOC;
-import static com.aj.filesdispatch.DatabaseHelper.DatabaseHelper._ID;
-
 public class FileViewItem extends FileData implements Parcelable {
     private String fileLoc;
     private boolean checked = false;
@@ -33,15 +30,6 @@ public class FileViewItem extends FileData implements Parcelable {
         this.fileDes = Converter.getFileDes(new File(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA))));
         this.fileLoc = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA));
         this.id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID));
-    }
-
-    public FileViewItem(String type, Cursor cursor, Drawable icon) {
-        super(new File(cursor.getString(cursor.getColumnIndexOrThrow(FILE_LOC))));
-        this.fileDes = Converter.getFileDes(new File(cursor.getString(cursor.getColumnIndexOrThrow(FILE_LOC))));
-        this.fileLoc = cursor.getString(cursor.getColumnIndexOrThrow(FILE_LOC));
-        this.id = cursor.getLong(cursor.getColumnIndexOrThrow(_ID));
-        setType(type);
-        setFileDrawable(icon);
     }
 
     public FileViewItem(File file, String fileName, Drawable fileIcon) {

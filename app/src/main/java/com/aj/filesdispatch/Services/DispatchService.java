@@ -46,11 +46,14 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static com.aj.filesdispatch.Enums.Action.ACTION_ADD;
 import static com.aj.filesdispatch.Enums.Action.ACTION_STOP;
 import static com.aj.filesdispatch.ApplicationActivity.FILE_TO_SEND;
 import static com.aj.filesdispatch.Enums.Action.ACTION_REMOVE;
+import static com.aj.filesdispatch.dispatchmanager.FindConnection.IP_ADDRESS;
+import static com.aj.filesdispatch.dispatchmanager.FindConnection.PORT;
 
 enum Me {CLIENT, SERVER}
 
@@ -67,6 +70,7 @@ public class DispatchService extends Service {
     private asyncFileSender fileSender;
     private ReceivingFileTask fileTask;
     private static final String TAG = "DispatchService";
+    private Thread staringThread;
     private static boolean runningOutputStream = false;
     private static UserInfo connectedDevice, myDevice;
     private static OnBindToService bindToService = null;
@@ -105,10 +109,10 @@ public class DispatchService extends Service {
         startForeground(NOTIFICATION_ID, connected);
         if (socket == null) {
             List<FileViewItem> fileToSend = intent.getParcelableArrayListExtra(FILE_TO_SEND);
-            String ip = intent.getStringExtra("ipAddress");
-            int port = intent.getIntExtra("port", 0);
+            String ip = intent.getStringExtra(IP_ADDRESS);
+            int port = intent.getIntExtra(PORT, new Random().nextInt(10000));
             Log.d(TAG, "onStartCommand: " + ip + " " + port);
-            new Thread(() -> {
+            staringThread=new Thread(() -> {
                 if (ip == null) {
                     Log.d(TAG, "onStartCommand: server");
                     try {
@@ -155,7 +159,8 @@ public class DispatchService extends Service {
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-            }).start();
+            });
+            staringThread.start();
         }
         return START_NOT_STICKY;
     }
@@ -211,6 +216,9 @@ public class DispatchService extends Service {
                     socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+            if (staringThread.isAlive()){
+                staringThread.stop();
             }
         }
         super.onDestroy();

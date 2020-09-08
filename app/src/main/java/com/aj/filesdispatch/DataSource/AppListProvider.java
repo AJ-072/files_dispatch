@@ -13,8 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
-import com.aj.filesdispatch.DatabaseHelper.AdToDatabase;
-
 import java.io.File;
 import java.util.List;
 import java.util.Objects;

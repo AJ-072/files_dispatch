@@ -6,6 +6,8 @@ import java.io.Serializable;
 
 import static com.aj.filesdispatch.ApplicationActivity.OptnlAvatarName;
 import static com.aj.filesdispatch.ApplicationActivity.OptnlUserName;
+import static com.aj.filesdispatch.dispatchmanager.FindConnection.AVATAR;
+import static com.aj.filesdispatch.dispatchmanager.FindConnection.BUDDY_NAME;
 
 public class UserInfo implements Serializable {
     private String UserName;
@@ -13,10 +15,10 @@ public class UserInfo implements Serializable {
     private String AppVersion;
     private int ByteReceiverSpeed;
 
-    public UserInfo( int byteReceiverSpeed) {
+    public UserInfo(int byteReceiverSpeed) {
         ByteReceiverSpeed = byteReceiverSpeed;
-        UserName = ApplicationActivity.defaultPreference.getString("username", OptnlUserName);
-        AvatarName = ApplicationActivity.sharedPreferences.getString("avatarNum", OptnlAvatarName);
+        UserName = ApplicationActivity.defaultPreference.getString(BUDDY_NAME, OptnlUserName);
+        AvatarName = ApplicationActivity.sharedPreferences.getString(AVATAR, String.valueOf(OptnlAvatarName));
     }
 
     public int getByteReceiverSpeed() {
