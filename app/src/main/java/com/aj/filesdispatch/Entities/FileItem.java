@@ -11,8 +11,8 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "file_item_table")
 public class FileItem implements Item {
 
-    @PrimaryKey
     @NonNull
+    @PrimaryKey
     private String fileId;
     private String fileName;
     private long fileSize;
