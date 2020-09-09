@@ -2,33 +2,15 @@ package com.aj.filesdispatch.Entities;
 
 import android.graphics.drawable.Drawable;
 
-import androidx.annotation.NonNull;
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
+import java.io.Serializable;
 
-
-@Entity(tableName = "file_item_table")
-public class FileItem implements ItemInterface {
-
-    @PrimaryKey
-    @NonNull
-    private String fileId;
+class SentFileItem implements Serializable, ItemInterface {
     private String fileName;
     private long fileSize;
     private String fileUri;
     private String fileType;
-    private long dateAdded;
     private String showDes;
-
-    @Ignore
-    private boolean checked = false;
-    @Ignore
-    private Drawable drawable = null;
-
-    public FileItem(@NonNull String fileId) {
-        this.fileId = fileId;
-    }
+    private Drawable drawable;
 
     @Override
     public void setFileName(String fileName) {
@@ -49,25 +31,12 @@ public class FileItem implements ItemInterface {
         this.fileType = fileType;
     }
 
-    public void setDateAdded(long dateAdded) {
-        this.dateAdded = dateAdded;
-    }
-
     public void setShowDes(String showDes) {
         this.showDes = showDes;
     }
 
     public void setDrawable(Drawable drawable) {
         this.drawable = drawable;
-    }
-
-    public void setChecked(boolean checked) {
-        this.checked = checked;
-    }
-
-    @NonNull
-    public String getFileId() {
-        return fileId;
     }
 
     @Override
@@ -89,26 +58,7 @@ public class FileItem implements ItemInterface {
         return fileUri;
     }
 
-    public String getShowDes() {
-        return this.showDes;
-    }
-
-    public Drawable getDrawable(Drawable drawable) {
-        if (this.drawable == null)
-            this.drawable = drawable;
-        return this.drawable;
-    }
-
-
     public Drawable getDrawable() {
         return drawable;
-    }
-
-    public long getDateAdded() {
-        return dateAdded;
-    }
-
-    public boolean isChecked() {
-        return checked;
     }
 }
