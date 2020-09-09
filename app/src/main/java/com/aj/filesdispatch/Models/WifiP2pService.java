@@ -11,12 +11,16 @@ public class WifiP2pService {
     private int port;
     private int avatarDrawable;
 
-    public WifiP2pService(WifiP2pDevice device, String display_Name, int port) {
+    public WifiP2pService(WifiP2pDevice device, String display_Name, int port,int AvatarDrawable) {
         this.device = device;
         this.display_Name = display_Name;
         this.port = port;
+        this.avatarDrawable=AvatarDrawable;
     }
 
+    public int getAvatarDrawable() {
+        return avatarDrawable;
+    }
 
     public String getDisplay_Name() {
         return display_Name;

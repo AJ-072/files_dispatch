@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class MsgData implements Serializable {
-    private List<SentFileItem> File;
+    private List<SentFileItem> filesToSend;
     private byte[] bytes;
     private Action Action;
     private int length;
@@ -17,14 +17,14 @@ public class MsgData implements Serializable {
     }
 
     public MsgData(List<SentFileItem> file, byte[] bytes, com.aj.filesdispatch.Enums.Action action, int length) {
-        File = file;
+        filesToSend = file;
         this.bytes = bytes;
         Action = action;
         this.length = length;
     }
 
     public List<SentFileItem> getFileList() {
-        return File;
+        return filesToSend;
     }
 
     public byte[] getBytes() {

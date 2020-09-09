@@ -58,7 +58,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     public static final String INSTANCE_NAME = "_fileDispatch_P2p";
     public static final String SERVICE_TYPE = "_filesdispatch._tcp";
     public static final String BUDDY_NAME = "UserName";
-    public static final String IP_ADDRESS="Ip_Address";
+    public static final String IP_ADDRESS = "Ip_Address";
     public static final String AVATAR = "Avatar_drawable";
     public static final String PORT = "ListeningPort";
     private WifiP2pDnsSdServiceInfo dnsSdServiceInfo;
@@ -160,7 +160,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     public void setLocalService() {
         record.put(PORT, String.valueOf(getServer_port()));
         record.put(BUDDY_NAME, getName());
-        record.put(AVATAR, String.valueOf(sharedPreferences.getInt(ApplicationActivity.AvatarName,-1)));
+        record.put(AVATAR, String.valueOf(sharedPreferences.getInt(ApplicationActivity.AvatarName, -1)));
         dnsSdServiceInfo = WifiP2pDnsSdServiceInfo.newInstance(INSTANCE_NAME, SERVICE_TYPE, record);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             this.finish();
@@ -178,8 +178,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
             public void onFailure(int reason) {
                 if (retry == 3) {
                     finish();
-                }
-                else retry++;
+                } else retry++;
                 if (!manager.isWifiEnabled()) {
                     try {
                         Thread.sleep(1000);
@@ -210,7 +209,8 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
             Log.d(TAG, "setDnsListener: " + txtRecordMap.get(PORT));
             device = srcDevice;
             Toast.makeText(this, ServiceListAdapter.getDeviceStatus(device.status), Toast.LENGTH_SHORT).show();
-            wifiP2pService = new WifiP2pService(srcDevice, txtRecordMap.get(BUDDY_NAME), Integer.parseInt(Objects.requireNonNull(txtRecordMap.get(PORT))));
+            wifiP2pService = new WifiP2pService(srcDevice, txtRecordMap.get(BUDDY_NAME),
+                    Integer.parseInt(Objects.requireNonNull(txtRecordMap.get(PORT))), Integer.parseInt(Objects.requireNonNull(txtRecordMap.get(AVATAR))));
         };
         p2pManager.setDnsSdResponseListeners(dispatchChannel, dnsSdServiceResponseListener, txtRecordListener);
         dnsSdServiceRequest = WifiP2pDnsSdServiceRequest.newInstance();

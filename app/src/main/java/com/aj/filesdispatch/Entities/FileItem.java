@@ -28,14 +28,36 @@ public class FileItem {
     @Ignore
     private Drawable drawable=null;
 
-    public FileItem(@NonNull String fileId, String fileName, long fileSize, String fileUri, String fileType, long dateAdded,String showDes) {
+    public FileItem(@NonNull String fileId) {
         this.fileId = fileId;
+    }
+
+    public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
+    }
+
+    public void setFileUri(String fileUri) {
         this.fileUri = fileUri;
+    }
+
+    public void setFileType(String fileType) {
         this.fileType = fileType;
+    }
+
+    public void setDateAdded(long dateAdded) {
         this.dateAdded = dateAdded;
-        this.showDes=showDes;
+    }
+
+    public void setShowDes(String showDes) {
+        this.showDes = showDes;
+    }
+
+    public void setDrawable(Drawable drawable) {
+        this.drawable = drawable;
     }
 
     public Drawable getDrawable(Drawable drawable) {
