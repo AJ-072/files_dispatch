@@ -5,14 +5,18 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.webkit.MimeTypeMap;
+import android.provider.MediaStore;
 
 import androidx.annotation.Nullable;
 
-import com.aj.filesdispatch.Models.FileViewItem;
-import com.aj.filesdispatch.Models.SentFileItem;
+import com.aj.filesdispatch.Entities.FileItem;
+import com.aj.filesdispatch.Entities.FileItemBuilder;
+import com.aj.filesdispatch.Entities.SentFileItem;
+import com.aj.filesdispatch.common.Converter;
 
 import java.io.File;
+
+import static com.aj.filesdispatch.Fragments.CliImages.IMAGES;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_ITEMS = "History";
@@ -53,19 +57,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void addItem(FileViewItem item) {
+    public void addItem(FileItem item) {
         SQLiteDatabase db = this.getWritableDatabase();
-
-        String MimeType = MimeTypeMap.getFileExtensionFromUrl(new File(item.getFileLoc()).getPath());
-        if (MimeType == null) {
-            MimeType = "Directory";
-        }
 
         ContentValues values = new ContentValues();
         values.put(FILE_NAME, item.getFileName());
         values.put(FILE_SIZE, item.getFileSize());
-        values.put(FILE_TYPE, MimeType);
-        values.put(FILE_LOC, item.getFileLoc());
+        values.put(FILE_TYPE, item.getFileType());
+        values.put(FILE_LOC, item.getFileUri());
         values.put(FILE_SENDER, "ME");
         db.insert(TABLE_ITEMS, null, values);
         db.close();
@@ -74,35 +73,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void addItem(SentFileItem item) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String MimeType = MimeTypeMap.getFileExtensionFromUrl(new File(item.getFileLoc()).getPath());
-        if (MimeType == null) {
-            MimeType = "Directory";
-        }
 
         ContentValues values = new ContentValues();
         values.put(_ID, ID_VALUE);
         values.put(FILE_NAME, item.getFileName());
         values.put(FILE_SIZE, item.getFileSize());
         values.put(FILE_ADDED_DATE, System.currentTimeMillis());
-        values.put(FILE_TYPE, MimeType);
-        values.put(FILE_LOC, item.getFileLoc());
+        values.put(FILE_TYPE, item.getFileType());
+        values.put(FILE_LOC, item.getFileUri());
         values.put(FILE_SENDER, item.getSender());
         db.insert(TABLE_ITEMS, null, values);
         db.close();
     }
 
     // code to get the single contact
-    public FileViewItem getFile(String Loc) {
+    public FileItem getFile(String Loc) {
         SQLiteDatabase db = this.getReadableDatabase();
+        FileItem item = null;
 
-        Cursor cursor = db.query(TABLE_ITEMS, new String[]{_ID, FILE_NAME,
+        Cursor cursorData = db.query(TABLE_ITEMS, new String[]{_ID, FILE_NAME,
                         FILE_SIZE, FILE_TYPE, FILE_LOC, FILE_SENDER}, FILE_LOC + "=?",
                 new String[]{String.valueOf(Loc)}, null, null, null, null);
-        if (cursor != null)
-            cursor.moveToFirst();
-
-        assert cursor != null;
-        return new FileViewItem(cursor);
+        if (cursorData.moveToFirst())
+            item = new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                    .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)))
+                    .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                    .setFileType(IMAGES)
+                    .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                    .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                    .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                    .build();
+        return item;
     }
 
 
@@ -113,23 +114,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery(selectQuery, null);
     }
 
-    public int updateItem(FileViewItem item) {
+    public int updateItem(FileItem item) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(FILE_NAME, item.getFileName());
         values.put(FILE_SIZE, item.getFileSize());
         int result = db.update(TABLE_ITEMS, values, FILE_LOC + " = ?",
-                new String[]{String.valueOf(item.getFileLoc())});
+                new String[]{String.valueOf(item.getFileUri())});
         db.close();
         // updating row
         return result;
     }
 
-    public void deleteItem(FileViewItem item) {
+    public void deleteItem(FileItem item) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_ITEMS, FILE_LOC + " = ?",
-                new String[]{String.valueOf(item.getFileLoc())});
+                new String[]{String.valueOf(item.getFileUri())});
         db.close();
     }
 

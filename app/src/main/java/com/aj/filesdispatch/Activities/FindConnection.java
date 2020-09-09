@@ -26,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -34,11 +35,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aj.filesdispatch.ApplicationActivity;
-import com.aj.filesdispatch.Models.FileViewItem;
-import com.aj.filesdispatch.Models.WifiP2pService;
+import com.aj.filesdispatch.Entities.FileItem;
+import com.aj.filesdispatch.Entities.FileItemBuilder;
+import com.aj.filesdispatch.Entities.WifiP2pService;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.ServiceListAdapter;
 import com.aj.filesdispatch.Services.DispatchService;
+import com.aj.filesdispatch.common.Converter;
 import com.aj.filesdispatch.dispatchmanager.WifiBroadcastReceiver;
 
 import java.io.File;
@@ -50,6 +53,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.aj.filesdispatch.Activities.MainActivity.LOCATION;
+import static com.aj.filesdispatch.Activities.MainActivity.LOCATION_PERMISSION_REPEAT;
 import static com.aj.filesdispatch.ApplicationActivity.FILE_TO_SEND;
 import static com.aj.filesdispatch.ApplicationActivity.sharedPreferences;
 
@@ -70,7 +75,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     private WifiP2pService wifiP2pService;
     private WifiP2pDevice device;
     public static WifiP2pManager.Channel dispatchChannel;
-    private List<FileViewItem> fileToSend = new ArrayList<>();
+    private List<FileItem> fileToSend = new ArrayList<>();
     private int retry = 0;
     private int myPort;
     private TextView connectedName;
@@ -94,25 +99,39 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent getFile = this.getIntent();
-        if (getFile != null)
+        if (getFile != null) {
+            Log.d(TAG, "onCreate: " + getFile.getAction());
             if (Intent.ACTION_SEND.equals(getFile.getAction())) {
-                Uri uri = getFile.getParcelableExtra(Intent.EXTRA_STREAM);
-                fileToSend.add(new FileViewItem(new File(String.valueOf(uri))));
+                File file = new File(String.valueOf(getFile.getParcelableExtra(Intent.EXTRA_STREAM)));
+                fileToSend.add(new FileItemBuilder(file.getPath())
+                        .setShowDes(Converter.getFileDes(file))
+                        .setDateAdded(file.lastModified())
+                        .setFileName(file.getName())
+                        .setFileSize(file.length())
+                        .setFileUri(file.getPath())
+                        .build());
             } else if (Intent.ACTION_SEND_MULTIPLE.equals(getFile.getAction())) {
                 ArrayList<Uri> files = getFile.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
                 if (files != null)
-                    for (Uri file : files) {
-                        fileToSend.add(new FileViewItem(new File(String.valueOf(file))));
+                    for (Uri uri : files) {
+                        File file= new File(String.valueOf(uri));
+                        fileToSend.add(new FileItemBuilder(file.getPath())
+                                .setShowDes(Converter.getFileDes(file))
+                                .setDateAdded(file.lastModified())
+                                .setFileName(file.getName())
+                                .setFileSize(file.length())
+                                .setFileUri(file.getPath())
+                                .build());
                     }
             } else {
                 fileToSend = getFile.getParcelableArrayListExtra(FILE_TO_SEND);
             }
+        }
 
-        if (!isSupported())
+        if (!isSupported()) {
             finish();
-        else {
+        } else {
             initialise();
-            setLocalService();
         }
     }
 
@@ -134,9 +153,8 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && !manager.isWifiEnabled()) {
             manager.setWifiEnabled(true);
         }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED)
-            return false;
-        return manager.isWifiEnabled();
+        MainActivity.RequestPermission(this);
+        return true;
     }
 
     public void initialise() {
@@ -153,12 +171,14 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         p2pManager.requestConnectionInfo(dispatchChannel, this);
         connectDrawable = (AnimationDrawable) connectionIcon.getBackground();
         adapter = new ServiceListAdapter(this);
+        sharedPreferences.edit().putBoolean(LOCATION_PERMISSION_REPEAT, false).apply();
         listView.setAdapter(adapter);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         myDisplayName.setText(getName());
     }
 
     public void setLocalService() {
+        Log.d(TAG, "setLocalService: started");
         record.put(PORT, String.valueOf(getServer_port()));
         record.put(BUDDY_NAME, getName());
         record.put(AVATAR, String.valueOf(sharedPreferences.getInt(ApplicationActivity.AvatarName, -1)));
@@ -169,6 +189,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         p2pManager.addLocalService(dispatchChannel, dnsSdServiceInfo, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
+                Log.d(TAG, "onSuccess: ");
                 setDnsListener();
                 connectDrawable.start();
                 p2pManager.requestConnectionInfo(dispatchChannel, FindConnection.this);
@@ -177,7 +198,8 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
 
             @Override
             public void onFailure(int reason) {
-                if (retry == 3) {
+                Log.d(TAG, "onFailure: ");
+                if (retry == 5) {
                     finish();
                 } else retry++;
                 if (!manager.isWifiEnabled()) {
@@ -197,7 +219,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     public void setDnsListener() {
         WifiP2pManager.DnsSdServiceResponseListener dnsSdServiceResponseListener = (instanceName, registrationType, srcDevice) -> {
             if (instanceName.equals(INSTANCE_NAME)) {
-                services.add(wifiP2pService);
+                services.add(0, wifiP2pService);
                 addToList();
                 connectDrawable.stop();
                 devicedf = srcDevice;
@@ -260,7 +282,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     }
 
     private String getName() {
-        return preferences.getString("username", ApplicationActivity.OptnlUserName);
+        return preferences.getString(BUDDY_NAME, ApplicationActivity.OptnlUserName);
     }
 
     public String getreason(int reason) {
@@ -321,13 +343,11 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     }
 
     public void addToList() {
-        adapter.setServices(services);
+        adapter.submitList(services);
     }
 
     @Override
     public void onConnectionInfoAvailable(WifiP2pInfo info) {
-        if (device != null)
-            Toast.makeText(this, ServiceListAdapter.getDeviceStatus(device.status), Toast.LENGTH_SHORT).show();
         try {
             if (socket != null)
                 socket.close();
@@ -392,5 +412,17 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         Log.d(TAG, "connectionConfirmed: ");
         setResult(AppCompatActivity.RESULT_OK, connected);
         finish();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION) {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                MainActivity.RequestPermission(FindConnection.this);
+            } else {
+                setLocalService();
+            }
+        }
     }
 }

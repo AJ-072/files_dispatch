@@ -3,6 +3,7 @@ package com.aj.filesdispatch.Services;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.Service;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -15,16 +16,17 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.aj.filesdispatch.Activities.FileSendingProgress;
 import com.aj.filesdispatch.ApplicationActivity;
 import com.aj.filesdispatch.DatabaseHelper.DatabaseHelper;
+import com.aj.filesdispatch.Entities.FileItem;
+import com.aj.filesdispatch.Entities.Item;
+import com.aj.filesdispatch.Entities.MsgData;
+import com.aj.filesdispatch.Entities.SentFileItem;
+import com.aj.filesdispatch.Entities.UserInfo;
 import com.aj.filesdispatch.Enums.Action;
-import com.aj.filesdispatch.Activities.FileSendingProgress;
 import com.aj.filesdispatch.Interface.OnBindToService;
 import com.aj.filesdispatch.Interface.SendingFIleListener;
-import com.aj.filesdispatch.Models.FileViewItem;
-import com.aj.filesdispatch.Models.SentFileItem;
-import com.aj.filesdispatch.Models.UserInfo;
-import com.aj.filesdispatch.Models.MsgData;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.common.Converter;
 
@@ -47,12 +49,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static com.aj.filesdispatch.Enums.Action.ACTION_ADD;
-import static com.aj.filesdispatch.Enums.Action.ACTION_STOP;
-import static com.aj.filesdispatch.ApplicationActivity.FILE_TO_SEND;
-import static com.aj.filesdispatch.Enums.Action.ACTION_REMOVE;
 import static com.aj.filesdispatch.Activities.FindConnection.IP_ADDRESS;
 import static com.aj.filesdispatch.Activities.FindConnection.PORT;
+import static com.aj.filesdispatch.ApplicationActivity.FILE_TO_SEND;
+import static com.aj.filesdispatch.Enums.Action.ACTION_ADD;
+import static com.aj.filesdispatch.Enums.Action.ACTION_REMOVE;
+import static com.aj.filesdispatch.Enums.Action.ACTION_STOP;
 
 enum Me {CLIENT, SERVER}
 
@@ -106,11 +108,11 @@ public class DispatchService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         startForeground(NOTIFICATION_ID, connected);
         if (socket == null) {
-            List<FileViewItem> fileToSend = intent.getParcelableArrayListExtra(FILE_TO_SEND);
+            List<FileItem> fileToSend = intent.getParcelableArrayListExtra(FILE_TO_SEND);
             String ip = intent.getStringExtra(IP_ADDRESS);
             int port = intent.getIntExtra(PORT, new Random().nextInt(10000));
             Log.d(TAG, "onStartCommand: " + ip + " " + port);
-            staringThread=new Thread(() -> {
+            staringThread = new Thread(() -> {
                 if (ip == null) {
                     Log.d(TAG, "onStartCommand: server");
                     try {
@@ -144,7 +146,7 @@ public class DispatchService extends Service {
                             myDevice = new UserInfo(socket.getReceiveBufferSize());
                             new ObjectOutputStream(output).writeUnshared(myDevice);
                             connectedDevice = (UserInfo) new ObjectInputStream(input).readUnshared();
-                            helper.setIdValue(connectedDevice.getUserName()+"_"+ Converter.GetDate(System.currentTimeMillis()));
+                            helper.setIdValue(connectedDevice.getUserName() + "_" + Converter.GetDate(System.currentTimeMillis()));
                             receiveBuffer = connectedDevice.getByteReceiverSpeed();
                             bufferSize = Math.min(receiveBuffer, mySendBuffer);
                             fileTask = new ReceivingFileTask(input, this);
@@ -173,7 +175,7 @@ public class DispatchService extends Service {
             fileListener = null;
     }
 
-    public void setTransferFile(List<FileViewItem> items) {
+    public void setTransferFile(List<FileItem> items) {
         if (items != null && items.size() > 0) {
             if (socket != null && socket.isConnected()) {
                 fileSender = asyncFileSender.getInstance(objectOutputStream);
@@ -209,7 +211,7 @@ public class DispatchService extends Service {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (staringThread.isAlive()){
+            if (staringThread.isAlive()) {
                 staringThread.stop();
             }
         }
@@ -219,7 +221,7 @@ public class DispatchService extends Service {
     protected void stopSocket() {
         new Thread(() -> {
             try {
-                if ((fileSender==null||fileSender.getStatus()== AsyncTask.Status.FINISHED) && socket.isConnected()) {
+                if ((fileSender == null || fileSender.getStatus() == AsyncTask.Status.FINISHED) && socket.isConnected()) {
                     ObjectOutputStream objectOutputStream = new ObjectOutputStream(output);
                     objectOutputStream.writeUnshared(new MsgData(null, null, ACTION_STOP, 0));
                     objectOutputStream.flush();
@@ -274,7 +276,7 @@ public class DispatchService extends Service {
 
     private static class asyncFileSender extends AsyncTask<Void, Integer, Boolean> {
         private ObjectOutputStream sending;
-        private List<FileViewItem> sendingFileItems;
+        private List<FileItem> sendingFileItems;
         private List<SentFileItem> newItems;
         private List<SentFileItem> sendingViews;
         private BufferedInputStream fileInput;
@@ -288,11 +290,12 @@ public class DispatchService extends Service {
             newItems = new ArrayList<>();
             sendingViews = new ArrayList<>();
         }
+
         public static asyncFileSender getInstance(ObjectOutputStream outputStream) {
-            if (fileSender==null){
-                synchronized (asyncFileSender.class){
-                    if (fileSender==null){
-                        fileSender= new asyncFileSender(outputStream);
+            if (fileSender == null) {
+                synchronized (asyncFileSender.class) {
+                    if (fileSender == null) {
+                        fileSender = new asyncFileSender(outputStream);
                     }
                 }
             }
@@ -325,13 +328,12 @@ public class DispatchService extends Service {
             }
 
             while (count < sendingFileItems.size()) {
-                FileViewItem currentItem = sendingFileItems.get(count);
+                FileItem currentItem = sendingFileItems.get(count);
                 currentSendingFile = sendingViews.get(count);
-                Log.d(TAG, "doInBackground: " + currentItem.getSender());
                 int bytes;
                 byte[] buffer = new byte[bufferSize];
                 try {
-                    fileInput = new BufferedInputStream(new FileInputStream(new File(currentItem.getFileLoc())));
+                    fileInput = new BufferedInputStream(new FileInputStream(new File(currentItem.getFileUri())));
                 } catch (FileNotFoundException e) {
                     closeFile(fileInput);
                     e.printStackTrace();
@@ -358,7 +360,7 @@ public class DispatchService extends Service {
                 }
                 count++;
                 helper.addItem(currentItem);
-                currentSendingFile.setFileLoc(currentItem.getFileLoc());
+                currentSendingFile.setFileUri(currentItem.getFileUri());
             }
             try {
                 sending.writeUnshared(null);
@@ -403,12 +405,12 @@ public class DispatchService extends Service {
             newItems.clear();
         }
 
-        public void addShareItems(List<FileViewItem> shareItems) {
+        public void addShareItems(List<FileItem> shareItems) {
             if (newItems != null)
                 newItems.clear();
             action = null;
             this.sendingFileItems.addAll(shareItems);
-            for (FileViewItem item : shareItems) {
+            for (FileItem item : shareItems) {
                 Log.d(TAG, "addShareItems: " + item.getFileName());
                 newItems.add(new SentFileItem(item));
             }
@@ -462,7 +464,7 @@ public class DispatchService extends Service {
                         Log.d(TAG, "doInBackground: still in log");
                         currentReceivingFile = item;
                         int total = 0;
-                        File file = getLocation(item.getType(), item.getFileName());
+                        File file = getLocation(item.getFileType(), item.getFileName());
                         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file));
                         while (total < item.getFileSize()) {
                             Log.d(TAG, "doInBackground: lopping");
@@ -475,7 +477,7 @@ public class DispatchService extends Service {
                                 publishProgress(data.getLength());
                             }
                         }
-                        currentReceivingFile.setFileLoc(file.getPath());
+                        currentReceivingFile.setFileUri(file.getPath());
                         helper.addItem(currentReceivingFile);
                         bufferedOutputStream.close();
                     }

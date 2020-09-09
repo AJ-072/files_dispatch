@@ -2,6 +2,7 @@ package com.aj.filesdispatch.RecyclerAdapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,24 +14,28 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.aj.filesdispatch.Models.FileViewItem;
-import com.aj.filesdispatch.R;
+import com.aj.filesdispatch.Entities.FileItem;
+import com.aj.filesdispatch.Entities.FileItemBuilder;
 import com.aj.filesdispatch.Fragments.CliDoc;
+import com.aj.filesdispatch.R;
+import com.aj.filesdispatch.common.Converter;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.aj.filesdispatch.Fragments.CliDoc.DOCUMENT;
 import static com.aj.filesdispatch.Fragments.CliDoc.DOC_LOADER_ID;
 
 public class DocAdapter extends RecyclerView.Adapter<DocAdapter.MyViewHolder> {
-    private List<String> list = Arrays.asList("Archives","Presentations","Documents","E-Books");
+    private List<String> list = Arrays.asList("Archives", "Presentations", "Documents", "E-Books");
     private onDocclick onDocclick;
     private Context context;
     private static final String TAG = "DocAdapter";
     private int id;
-    private List<FileViewItem> docItems = new ArrayList<>();
+    private List<FileItem> docItems = new ArrayList<>();
     private Cursor cursorData;
 
     public DocAdapter(DocAdapter.onDocclick onDocclick, int id) {
@@ -40,7 +45,7 @@ public class DocAdapter extends RecyclerView.Adapter<DocAdapter.MyViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        if (id==DOC_LOADER_ID)
+        if (id == DOC_LOADER_ID)
             return R.layout.item_category_doc_view;
         else
             return R.layout.item_docfile_view;
@@ -62,17 +67,38 @@ public class DocAdapter extends RecyclerView.Adapter<DocAdapter.MyViewHolder> {
         } else {
             cursorData.moveToPosition(position);
             if (docItems.size() > position && docItems.get(position) == null)
-                docItems.set(position, new FileViewItem(cursorData, "Documents"));
+                docItems.set(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                        .setFileName(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA))).getName())
+                        .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                        .setFileType(DOCUMENT)
+                        .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                        .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                        .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                        .build());
             else if (docItems.size() == position)
-                docItems.add(position, new FileViewItem(cursorData, "Documents"));
-            else if (docItems.size()<position){
+                docItems.add(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                        .setFileName(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA))).getName())
+                        .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                        .setFileType(DOCUMENT)
+                        .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                        .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                        .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                        .build());
+            else if (docItems.size() < position) {
                 Log.d(TAG, "onBindViewHolder: add null");
-                docItems.addAll(Collections.nCopies(position-docItems.size(),null));
-                docItems.add(position, new FileViewItem(cursorData, "Documents"));
+                docItems.addAll(Collections.nCopies(position - docItems.size(), null));
+                docItems.add(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                        .setFileName(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA))).getName())
+                        .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                        .setFileType(DOCUMENT)
+                        .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                        .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                        .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                        .build());
             }
             String file_name = docItems.get(position).getFileName();
             holder.docovertext.setText(file_name);
-            holder.file_size.setText(docItems.get(position).getFileDes());
+            holder.file_size.setText(docItems.get(position).getShowDes());
             holder.file_icon.setImageDrawable(ActivityCompat.getDrawable(context, R.drawable.ic_document_24));
         }
     }

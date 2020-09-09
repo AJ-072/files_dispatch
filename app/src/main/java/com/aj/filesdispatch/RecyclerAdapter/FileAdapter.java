@@ -13,16 +13,18 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aj.filesdispatch.Entities.FileItem;
 import com.aj.filesdispatch.Interface.AddItemToShare;
-import com.aj.filesdispatch.Models.FileViewItem;
 import com.aj.filesdispatch.R;
 
 import java.io.File;
 import java.util.ArrayList;
 
+import static com.aj.filesdispatch.Fragments.CliFiles.FOLDER;
+
 public class FileAdapter extends RecyclerView.Adapter<FileAdapter.MyVH> {
     private static final String TAG = "Adapter";
-    private ArrayList<FileViewItem> fileData = new ArrayList<>();
+    private ArrayList<FileItem> fileData = new ArrayList<>();
     private Context context;
     private OnItemClickToOpen fileToOpen;
     private AddItemToShare fileToShare;
@@ -46,15 +48,15 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.MyVH> {
         holder.file_name.setText(fileData.get(position).getFileName());
         holder.file_check.setChecked(fileData.get(position).isChecked());
         holder.file_check.setVisibility(fileData.get(position).isChecked() ? View.VISIBLE : View.GONE);
-        holder.file_size.setText(fileData.get(position).getFileDes());
-        if (new File(fileData.get(position).getFileLoc()).isDirectory()) {
+        holder.file_size.setText(fileData.get(position).getShowDes());
+        if (fileData.get(position).getFileType().equals(FOLDER)) {
             holder.file_icon.setImageDrawable(ActivityCompat.getDrawable(context, R.drawable.ic_file_doc));
         } else {
             holder.file_icon.setImageDrawable(ActivityCompat.getDrawable(context, R.drawable.ic_document_24));
 
         }
         holder.view.setOnClickListener(v -> {
-            fileToOpen.OnClick(fileData.get(position),position);
+            fileToOpen.OnClick(fileData.get(position), position);
         });
         holder.view.setOnLongClickListener(v -> {
             fileToShare.onItemAdded(fileData.get(position));
@@ -86,12 +88,12 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.MyVH> {
         }
     }
 
-    public void setData(ArrayList<FileViewItem> fileData) {
+    public void setData(ArrayList<FileItem> fileData) {
         this.fileData = fileData;
         this.notifyDataSetChanged();
     }
 
-    public interface OnItemClickToOpen{
-        void OnClick(FileViewItem item,int position);
+    public interface OnItemClickToOpen {
+        void OnClick(FileItem item, int position);
     }
 }

@@ -1,10 +1,11 @@
 package com.aj.filesdispatch.Interface;
 
-import com.aj.filesdispatch.Models.FileViewItem;
+import com.aj.filesdispatch.Entities.FileItem;
 
 import java.util.List;
 
 public interface AddItemToShare {
-    void onItemAdded(FileViewItem item);
-    void onMultiItemAdded(List<FileViewItem> fileViewItems);
+    void onItemAdded(FileItem item);
+
+    void onMultiItemAdded(List<FileItem> fileViewItems);
 }

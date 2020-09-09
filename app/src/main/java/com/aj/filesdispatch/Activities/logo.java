@@ -21,7 +21,7 @@ import java.util.Objects;
 
 public class logo extends AppCompatActivity {
     public static final int STORAGE = 200;
-    public static final String NEVER = "NEVER_AGAIN";
+    public static final String STORAGE_PERMISSION = "NEVER_AGAIN";
     public static final int APP_SETTINGS = 72;
     private static final String TAG = "logo";
     private SharedPreferences sharedPreferences;
@@ -34,7 +34,7 @@ public class logo extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_logo);
         sharedPreferences = getSharedPreferences("Storage_request_Never_enabled", MODE_PRIVATE);
-        sharedPreferences.getBoolean(NEVER, false);
+        sharedPreferences.edit().putBoolean(STORAGE_PERMISSION, false).apply();
         permission = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Log.d(TAG, "onCreate: ");
         uri = Uri.fromParts("package", getPackageName(), null);
@@ -56,7 +56,7 @@ public class logo extends AppCompatActivity {
     public void RequestPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             Log.d(TAG, "RequestPermission: repeat");
-            sharedPreferences.edit().putBoolean(NEVER, true).apply();
+            sharedPreferences.edit().putBoolean(STORAGE_PERMISSION, true).apply();
             new AlertDialog.Builder(this)
                     .setTitle("Permission Needed")
                     .setIcon(R.drawable.ic_logo)
@@ -70,7 +70,7 @@ public class logo extends AppCompatActivity {
                     .setCancelable(false)
                     .create().show();
         } else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-            if (!sharedPreferences.getBoolean(NEVER, false)) {
+            if (!sharedPreferences.getBoolean(STORAGE_PERMISSION, false)) {
                 Log.d(TAG, "RequestPermission: denied");
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE);
             } else {

@@ -26,11 +26,13 @@ import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aj.filesdispatch.Entities.FileItem;
+import com.aj.filesdispatch.Entities.FileItemBuilder;
 import com.aj.filesdispatch.Interface.AddItemToShare;
 import com.aj.filesdispatch.Interface.OnItemClickToOpen;
-import com.aj.filesdispatch.Models.FileViewItem;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.ImageAdapter;
+import com.aj.filesdispatch.common.Converter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    public static final String IMAGES = "Images";
     private final static int MEDIASTORE_LOADER_ID = 101;
     private static final String TAG = "Cli_images";
     private Context context;
@@ -50,7 +53,7 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
     private TextView noImageText;
     private OnBackPressedCallback backPressedCallback;
     private AddItemToShare itemToShare;
-    private ArrayList<FileViewItem> imageItems;
+    private ArrayList<FileItem> imageItems;
 
     private String mParam1;
     private String mParam2;
@@ -133,7 +136,14 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
             if (imageItems.size() < Math.min(data.getCount(), 30))
                 for (int i = 0; i < Math.min(data.getCount(), 30); i++) {
                     data.moveToPosition(i);
-                    imageItems.add(new FileViewItem(data, "Images"));
+                    imageItems.add(new FileItemBuilder(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                            .setFileName(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)))
+                            .setFileSize(data.getLong(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                            .setFileType(IMAGES)
+                            .setDateAdded(data.getLong(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                            .setFileUri(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                            .setShowDes(Converter.getFileDes(new File(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                            .build());
                 }
             imageAdapter.setImageList(imageItems);
             imageAdapter.setImageList(data);
@@ -148,7 +158,7 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         imageAdapter.setImageList((Cursor) null);
-        imageAdapter.setImageList((ArrayList<FileViewItem>) null);
+        imageAdapter.setImageList((ArrayList<FileItem>) null);
     }
 
     @Override
@@ -190,8 +200,8 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
     }
 
     @Override
-    public void OnClick(FileViewItem item) {
-        File file = new File(String.valueOf(item.getFileLoc()));
+    public void OnClick(FileItem item) {
+        File file = new File(String.valueOf(item.getFileUri()));
         Uri fileUri = FileProvider.getUriForFile(
                 context,
                 "com.aj.filesdispatch.fileProvider",

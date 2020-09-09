@@ -21,10 +21,12 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aj.filesdispatch.Entities.FileItem;
+import com.aj.filesdispatch.Entities.FileItemBuilder;
 import com.aj.filesdispatch.Interface.AddItemToShare;
-import com.aj.filesdispatch.Models.FileViewItem;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.FileAdapter;
+import com.aj.filesdispatch.common.Converter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,20 +34,22 @@ import java.util.List;
 import java.util.Objects;
 
 import static androidx.core.content.ContextCompat.getDrawable;
+import static com.aj.filesdispatch.Fragments.CliDoc.DOCUMENT;
 
-public class CliFiles extends Fragment implements LoaderManager.LoaderCallbacks<ArrayList<FileViewItem>>, FileAdapter.OnItemClickToOpen, AddItemToShare {
+public class CliFiles extends Fragment implements LoaderManager.LoaderCallbacks<ArrayList<FileItem>>, FileAdapter.OnItemClickToOpen, AddItemToShare {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "CliFiles";
     public static final int FILE_LOADER_ID = 101;
+    public static final String FOLDER = "Folder";
     private RecyclerView fileRecycler;
     private TextView noFileText;
     private ProgressBar filesLoading;
     private FileAdapter adapter;
     private File dir;
-    private List<FileViewItem> selectedFiles = new ArrayList<>();
-    private ArrayList<FileViewItem> fileData = new ArrayList<>();
+    private List<FileItem> selectedFiles = new ArrayList<>();
+    private ArrayList<FileItem> fileData = new ArrayList<>();
     private AddItemToShare fileToShare;
     private LoaderManager loaderManager;
     private ViewGroup container;
@@ -104,29 +108,36 @@ public class CliFiles extends Fragment implements LoaderManager.LoaderCallbacks<
 
     @NonNull
     @Override
-    public Loader<ArrayList<FileViewItem>> onCreateLoader(int id, @Nullable Bundle args) {
-        return new AsyncTaskLoader<ArrayList<FileViewItem>>(container.getContext()) {
+    public Loader<ArrayList<FileItem>> onCreateLoader(int id, @Nullable Bundle args) {
+        return new AsyncTaskLoader<ArrayList<FileItem>>(container.getContext()) {
             @Override
             protected void onStartLoading() {
                 forceLoad();
             }
 
             @Override
-            public ArrayList<FileViewItem> loadInBackground() {
+            public ArrayList<FileItem> loadInBackground() {
                 File[] files = dir.listFiles();
                 fileData.clear();
                 if (files != null) {
                     for (File f : files) {
                         boolean selected = false;
-                        for (FileViewItem item : selectedFiles) {
-                            if (item.getFileLoc().equals(f.getPath())) {
+                        for (FileItem item : selectedFiles) {
+                            if (item.getFileUri().equals(f.getPath())) {
                                 fileData.add(item);
                                 selected = true;
                                 break;
                             }
                         }
                         if (!selected)
-                            fileData.add(new FileViewItem(f));
+                            fileData.add(new FileItemBuilder(f.getPath())
+                                    .setFileName(f.getName())
+                                    .setFileSize(f.isFile() ? f.length() : 0)
+                                    .setFileType(f.isFile() ? DOCUMENT : FOLDER)
+                                    .setDateAdded(f.lastModified())
+                                    .setFileUri(f.getPath())
+                                    .setShowDes(Converter.getFileDes(f))
+                                    .build());
                     }
                 }
                 return fileData;
@@ -135,7 +146,7 @@ public class CliFiles extends Fragment implements LoaderManager.LoaderCallbacks<
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader<ArrayList<FileViewItem>> loader, ArrayList<FileViewItem> data) {
+    public void onLoadFinished(@NonNull Loader<ArrayList<FileItem>> loader, ArrayList<FileItem> data) {
         filesLoading.setVisibility(View.GONE);
         if (data.size() > 0) {
             adapter.setData(data);
@@ -148,7 +159,7 @@ public class CliFiles extends Fragment implements LoaderManager.LoaderCallbacks<
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<ArrayList<FileViewItem>> loader) {
+    public void onLoaderReset(@NonNull Loader<ArrayList<FileItem>> loader) {
         Log.d(TAG, "onLoaderReset: called");
         adapter.setData(null);
     }
@@ -201,8 +212,8 @@ public class CliFiles extends Fragment implements LoaderManager.LoaderCallbacks<
     }
 
     @Override
-    public void OnClick(FileViewItem item, int position) {
-        File clicked_file = new File(item.getFileLoc());
+    public void OnClick(FileItem item, int position) {
+        File clicked_file = new File(item.getFileUri());
         if (clicked_file.isDirectory()) {
             if (item.isChecked()) {
                 fileToShare.onItemAdded(item);
@@ -221,7 +232,7 @@ public class CliFiles extends Fragment implements LoaderManager.LoaderCallbacks<
     }
 
     @Override
-    public void onItemAdded(FileViewItem item) {
+    public void onItemAdded(FileItem item) {
         if (selectedFiles.contains(item))
             selectedFiles.remove(item);
         else
@@ -231,7 +242,7 @@ public class CliFiles extends Fragment implements LoaderManager.LoaderCallbacks<
     }
 
     @Override
-    public void onMultiItemAdded(List<FileViewItem> fileViewItems) {
+    public void onMultiItemAdded(List<FileItem> fileViewItems) {
         if (selectedFiles.containsAll(fileViewItems))
             selectedFiles.removeAll(fileViewItems);
         else

@@ -15,20 +15,25 @@ import androidx.appcompat.widget.AppCompatCheckBox;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aj.filesdispatch.Entities.FileItem;
+import com.aj.filesdispatch.Entities.FileItemBuilder;
 import com.aj.filesdispatch.Interface.AddItemToShare;
 import com.aj.filesdispatch.Interface.OnItemClickToOpen;
-import com.aj.filesdispatch.Models.FileViewItem;
 import com.aj.filesdispatch.R;
+import com.aj.filesdispatch.common.Converter;
 import com.bumptech.glide.Glide;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.aj.filesdispatch.Fragments.CliImages.IMAGES;
+
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     private Context activity;
     int width, height;
-    private static List<FileViewItem> imageList;
+    private List<FileItem> imageList;
     private OnItemClickToOpen imageToOpen;
     private AddItemToShare imageToShare;
     private Cursor cursorData;
@@ -53,16 +58,37 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         cursorData.moveToPosition(position);
         if (imageList.size() > position && imageList.get(position) == null)
-            imageList.set(position, new FileViewItem(cursorData, "Images"));
+            imageList.set(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                    .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)))
+                    .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                    .setFileType(IMAGES)
+                    .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                    .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                    .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                    .build());
         else if (imageList.size() == position)
-            imageList.add(position, new FileViewItem(cursorData, "Images"));
+            imageList.add(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                    .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)))
+                    .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                    .setFileType(IMAGES)
+                    .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                    .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                    .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                    .build());
         else if (imageList.size() < position) {
             Log.d(TAG, "onBindViewHolder: add null");
             imageList.addAll(Collections.nCopies(position - imageList.size(), null));
-            imageList.add(position, new FileViewItem(cursorData, "Images"));
+            imageList.add(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                    .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)))
+                    .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                    .setFileType(IMAGES)
+                    .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                    .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                    .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                    .build());
         }
         Glide.with(activity)
-                .load("file://"+getUriFromMediaStore(position))
+                .load("file://" + getUriFromMediaStore(position))
                 .centerCrop()
                 .into(holder.imageView);
         holder.imageView.setOnClickListener(v -> imageToOpen.OnClick(imageList.get(position)));
@@ -86,38 +112,38 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         }
     }
 
-    public void setImageList(Cursor data) {
-        Cursor old = swapCursor(data);
+    public void setImageList(Cursor cursorData) {
+        Cursor old = swapCursor(cursorData);
         if (old != null) {
             old.close();
         }
     }
 
-    public Cursor swapCursor(Cursor data) {
+    public Cursor swapCursor(Cursor cursorData) {
         Cursor old;
-        if (cursorData != data) {
-            old = cursorData;
-            cursorData = data;
+        if (this.cursorData != cursorData) {
+            old = this.cursorData;
+            this.cursorData = cursorData;
             this.notifyDataSetChanged();
             return old;
         } else
             return null;
     }
 
-    public void setImageList(ArrayList<FileViewItem> imageList) {
+    public void setImageList(ArrayList<FileItem> imageList) {
         this.imageList = imageList;
     }
 
     private Bitmap getBitmapFromMediaStore(int position) {
         return MediaStore.Images.Thumbnails.getThumbnail(
                 activity.getContentResolver(),
-                imageList.get(position).getId(),
+                Long.parseLong(imageList.get(position).getFileId()),
                 MediaStore.Images.Thumbnails.MINI_KIND,
                 null);
 
     }
 
     public Uri getUriFromMediaStore(int position) {
-        return Uri.parse(imageList.get(position).getFileLoc());
+        return Uri.parse(imageList.get(position).getFileUri());
     }
 }

@@ -1,7 +1,7 @@
 package com.aj.filesdispatch.Interface;
 
-import com.aj.filesdispatch.Models.FileViewItem;
+import com.aj.filesdispatch.Entities.FileItem;
 
 public interface OnItemClickToOpen {
-    void OnClick(FileViewItem item);
+    void OnClick(FileItem item);
 }

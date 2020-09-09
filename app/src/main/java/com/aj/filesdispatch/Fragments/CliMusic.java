@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,11 +30,13 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.aj.filesdispatch.Models.FileViewItem;
+import com.aj.filesdispatch.Entities.FileItem;
+import com.aj.filesdispatch.Entities.FileItemBuilder;
 import com.aj.filesdispatch.Interface.AddItemToShare;
 import com.aj.filesdispatch.Interface.OnItemClickToOpen;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.AudioAdapter;
+import com.aj.filesdispatch.common.Converter;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +49,7 @@ public class CliMusic extends Fragment implements LoaderManager.LoaderCallbacks<
     private static final String TAG = "CliMusic";
     private final static int MEDIASTORE_LOADER_ID = 101;
     private Context context;
+    public static final String AUDIOS = "Audios";
     private RecyclerView audioRecycler;
     private View audioPlayerView;
     private TextView audioName;
@@ -62,13 +64,13 @@ public class CliMusic extends Fragment implements LoaderManager.LoaderCallbacks<
     private LoaderManager loaderManager;
     private OnBackPressedCallback backPressedCallback;
     private AddItemToShare audioToShare;
-    private ArrayList<FileViewItem> audioList;
+    private ArrayList<FileItem> audioList;
 
     private String mParam1;
     private String mParam2;
 
     public CliMusic(AddItemToShare addAudioToShare) {
-        this.audioToShare=addAudioToShare;
+        this.audioToShare = addAudioToShare;
     }
 
     public CliMusic() {
@@ -87,9 +89,9 @@ public class CliMusic extends Fragment implements LoaderManager.LoaderCallbacks<
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        audioList= new ArrayList<>();
-        context= getContext();
-        audioAdapter = new AudioAdapter(audioToShare,this, getContext());
+        audioList = new ArrayList<>();
+        context = getContext();
+        audioAdapter = new AudioAdapter(audioToShare, this, getContext());
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -107,9 +109,9 @@ public class CliMusic extends Fragment implements LoaderManager.LoaderCallbacks<
         return view;
     }
 
-    private void initilise(View view){
-        musicLoading=view.findViewById(R.id.audio_loading);
-        noMusicText=view.findViewById(R.id.no_audio_text);
+    private void initilise(View view) {
+        musicLoading = view.findViewById(R.id.audio_loading);
+        noMusicText = view.findViewById(R.id.no_audio_text);
         audioRecycler = view.findViewById(R.id.music_list);
         layoutManager = new LinearLayoutManager(context);
         audioPlayerView = getLayoutInflater().inflate(R.layout.audio_player_layout, null, false);
@@ -145,7 +147,7 @@ public class CliMusic extends Fragment implements LoaderManager.LoaderCallbacks<
                 MediaStore.Files.FileColumns.DATA,
                 MediaStore.Files.FileColumns.SIZE,
                 MediaStore.Files.FileColumns.MIME_TYPE,
-                MediaStore.Files.FileColumns.TITLE
+                MediaStore.Files.FileColumns.DISPLAY_NAME
         };
         return new CursorLoader(context,
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -158,17 +160,24 @@ public class CliMusic extends Fragment implements LoaderManager.LoaderCallbacks<
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         musicLoading.setVisibility(View.GONE);
-        if (data.getCount()>0){
-            if (audioList.size()<Math.min(data.getCount(),30))
-            for (int i=0;i<Math.min(data.getCount(),30);i++){
-                data.moveToPosition(i);
-                audioList.add(new FileViewItem(data,"Images"));
-            }
+        if (data.getCount() > 0) {
+            if (audioList.size() < Math.min(data.getCount(), 30))
+                for (int i = 0; i < Math.min(data.getCount(), 30); i++) {
+                    data.moveToPosition(i);
+                    audioList.add(new FileItemBuilder(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                            .setFileName(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)))
+                            .setFileSize(data.getLong(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                            .setFileType(AUDIOS)
+                            .setDateAdded(data.getLong(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                            .setFileUri(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                            .setShowDes(Converter.getFileDes(new File(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                            .build());
+                }
             audioAdapter.setAudioList(audioList);
             audioRecycler.setVisibility(View.VISIBLE);
             noMusicText.setVisibility(View.GONE);
             audioAdapter.ChangeItems(data);
-        }else{
+        } else {
             audioRecycler.setVisibility(View.INVISIBLE);
             noMusicText.setVisibility(View.VISIBLE);
         }
@@ -181,11 +190,11 @@ public class CliMusic extends Fragment implements LoaderManager.LoaderCallbacks<
     }
 
     @Override
-    public void  OnClick(FileViewItem item) {
-        Uri uri=Uri.parse(item.getFileLoc());
-        String name=item.getFileName();
+    public void OnClick(FileItem item) {
+        Uri uri = Uri.parse(item.getFileUri());
+        String name = item.getFileName();
         try {
-            audioPlay.setBackground(ActivityCompat.getDrawable(context,R.drawable.ic_pause_circle));
+            audioPlay.setBackground(ActivityCompat.getDrawable(context, R.drawable.ic_pause_circle));
             player.setDataSource(context, uri);
             audioName.setText(name);
             musicPlayer.show();
@@ -219,10 +228,10 @@ public class CliMusic extends Fragment implements LoaderManager.LoaderCallbacks<
 
     private void playButton(ImageButton play) {
         if (player.isPlaying()) {
-            play.setBackground(ActivityCompat.getDrawable(context,R.drawable.ic_play_circle));
+            play.setBackground(ActivityCompat.getDrawable(context, R.drawable.ic_play_circle));
             player.pause();
         } else {
-            play.setBackground(ActivityCompat.getDrawable(context,R.drawable.ic_pause_circle));
+            play.setBackground(ActivityCompat.getDrawable(context, R.drawable.ic_pause_circle));
             player.start();
         }
         setProgress();
@@ -285,7 +294,7 @@ public class CliMusic extends Fragment implements LoaderManager.LoaderCallbacks<
     @Override
     public void onPause() {
         super.onPause();
-        if (player!=null&&player.isPlaying())
+        if (player != null && player.isPlaying())
             playButton(audioPlay);
         backPressedCallback.setEnabled(false);
         Log.d(TAG, "onPause: called");
@@ -305,7 +314,7 @@ public class CliMusic extends Fragment implements LoaderManager.LoaderCallbacks<
 
     @Override
     public void onDestroyView() {
-        if (player!=null){
+        if (player != null) {
             player.release();
         }
         super.onDestroyView();

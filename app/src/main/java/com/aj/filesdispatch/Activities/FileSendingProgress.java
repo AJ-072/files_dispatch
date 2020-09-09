@@ -16,11 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aj.filesdispatch.DatabaseHelper.DatabaseHelper;
+import com.aj.filesdispatch.Entities.SentFileItem;
 import com.aj.filesdispatch.Interface.OnBindToService;
 import com.aj.filesdispatch.Interface.SendingFIleListener;
 import com.aj.filesdispatch.Interface.setClickListener;
-import com.aj.filesdispatch.Models.SentFileItem;
-import com.aj.filesdispatch.Models.UserInfo;
+import com.aj.filesdispatch.Entities.UserInfo;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.FileSendingRecyclerAdapter;
 import com.aj.filesdispatch.Services.DispatchService;

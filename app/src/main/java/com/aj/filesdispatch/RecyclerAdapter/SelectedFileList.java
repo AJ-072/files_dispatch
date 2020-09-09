@@ -10,18 +10,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aj.filesdispatch.Entities.FileItem;
 import com.aj.filesdispatch.Interface.AddItemToShare;
-import com.aj.filesdispatch.Models.FileViewItem;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.common.Converter;
 
 import java.util.List;
 
 public class SelectedFileList extends RecyclerView.Adapter<SelectedFileList.selectedViewHolder> {
-    private List<FileViewItem> selectedFiles;
+    private List<FileItem> selectedFiles;
     private AddItemToShare removeFromList;
 
-    public SelectedFileList(List<FileViewItem> selectedFiles, AddItemToShare removeFromList) {
+    public SelectedFileList(List<FileItem> selectedFiles, AddItemToShare removeFromList) {
         this.selectedFiles = selectedFiles;
         this.removeFromList = removeFromList;
     }

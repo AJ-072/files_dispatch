@@ -1,7 +1,6 @@
-package com.aj.filesdispatch.Models;
+package com.aj.filesdispatch.Entities;
 
 import com.aj.filesdispatch.Enums.Action;
-import com.aj.filesdispatch.Models.SentFileItem;
 
 import java.io.Serializable;
 import java.util.List;

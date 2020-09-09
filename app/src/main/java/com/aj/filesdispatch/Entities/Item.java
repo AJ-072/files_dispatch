@@ -1,6 +1,6 @@
 package com.aj.filesdispatch.Entities;
 
-interface Item {
+public interface Item {
     void setFileName(String fileName);
 
     void setFileSize(long fileSize);

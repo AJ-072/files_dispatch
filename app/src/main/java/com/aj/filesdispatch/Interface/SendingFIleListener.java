@@ -1,6 +1,6 @@
 package com.aj.filesdispatch.Interface;
 
-import com.aj.filesdispatch.Models.SentFileItem;
+import com.aj.filesdispatch.Entities.SentFileItem;
 
 import java.util.List;
 

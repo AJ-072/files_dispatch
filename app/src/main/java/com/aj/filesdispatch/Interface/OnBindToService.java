@@ -1,7 +1,6 @@
 package com.aj.filesdispatch.Interface;
 
-import com.aj.filesdispatch.Models.SentFileItem;
-import com.aj.filesdispatch.Models.UserInfo;
+import com.aj.filesdispatch.Entities.UserInfo;
 
 public interface OnBindToService {
     void setTotalProgress(int totalProgress);

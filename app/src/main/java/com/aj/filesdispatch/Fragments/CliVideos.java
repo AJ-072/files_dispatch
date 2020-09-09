@@ -23,11 +23,14 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aj.filesdispatch.Entities.FileItem;
+import com.aj.filesdispatch.Entities.FileItemBuilder;
 import com.aj.filesdispatch.Interface.AddItemToShare;
-import com.aj.filesdispatch.Models.FileViewItem;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.VideoAdapter;
+import com.aj.filesdispatch.common.Converter;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -36,6 +39,7 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "videos";
+    public static final String VIDEOS = "Videos";
     private final static int MEDIASTORE_LOADER_ID = 0;
     private Context context;
     private RecyclerView videoRecycler;
@@ -45,7 +49,7 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
     private OnBackPressedCallback backPressedCallback;
     private VideoAdapter videoAdapter;
     private AddItemToShare videoToShare;
-    private ArrayList<FileViewItem> videoItems;
+    private ArrayList<FileItem> videoItems;
 
     private String mParam1;
     private String mParam2;
@@ -175,7 +179,14 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
             if (videoItems.size() < Math.min(data.getCount(), 30))
                 for (int i = 0; i < Math.min(data.getCount(), 30); i++) {
                     data.moveToPosition(i);
-                    videoItems.add(new FileViewItem(data, "Images"));
+                    videoItems.add(new FileItemBuilder(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                            .setFileName(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.TITLE)))
+                            .setFileSize(data.getLong(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                            .setFileType(VIDEOS)
+                            .setDateAdded(data.getLong(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                            .setFileUri(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                            .setShowDes(Converter.getFileDes(new File(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                            .build());
                 }
             videoAdapter.setVideoItems(videoItems);
             noVideoText.setVisibility(View.GONE);
@@ -191,6 +202,6 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         videoAdapter.setVideoItems((Cursor) null);
-        videoAdapter.setVideoItems((ArrayList<FileViewItem>) null);
+        videoAdapter.setVideoItems((ArrayList<FileItem>) null);
     }
 }

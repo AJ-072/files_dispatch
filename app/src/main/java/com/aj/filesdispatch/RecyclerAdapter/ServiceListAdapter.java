@@ -12,13 +12,10 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.aj.filesdispatch.Models.WifiP2pService;
+import com.aj.filesdispatch.Entities.WifiP2pService;
 import com.aj.filesdispatch.R;
 
-import java.util.ArrayList;
-
 public class ServiceListAdapter extends ListAdapter<WifiP2pService, ServiceListAdapter.DeviceViewHolder> {
-    ArrayList<WifiP2pService> services = null;
     private static final String TAG = "ServiceListAdapter";
     private onClick click;
 
@@ -50,17 +47,9 @@ public class ServiceListAdapter extends ListAdapter<WifiP2pService, ServiceListA
     @Override
     public void onBindViewHolder(@NonNull DeviceViewHolder holder, int position) {
         Log.d(TAG, "onBindViewHolder: " + position);
-        holder.wifiname.setText(getDeviceStatus(services.get(position).getDevice().status));
-        holder.visiblename.setText(services.get(position).getDisplay_Name());
-        holder.view.setOnClickListener(v -> {
-            click.selectDevice(services.get(position));
-        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return services != null ? services.size() : 0;
-
+        holder.wifiname.setText(getDeviceStatus(getItem(position).getDevice().status));
+        holder.visiblename.setText(getItem(position).getDisplay_Name());
+        holder.view.setOnClickListener(v -> click.selectDevice(getItem(position)));
     }
 
     public static class DeviceViewHolder extends RecyclerView.ViewHolder {
@@ -73,11 +62,6 @@ public class ServiceListAdapter extends ListAdapter<WifiP2pService, ServiceListA
             wifiname = itemView.findViewById(R.id.wifi_name);
             view = itemView;
         }
-    }
-
-    public void setServices(ArrayList<WifiP2pService> service) {
-        this.services = service;
-        this.notifyDataSetChanged();
     }
 
 

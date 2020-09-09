@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,17 +22,22 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aj.filesdispatch.Entities.FileItem;
+import com.aj.filesdispatch.Entities.FileItemBuilder;
 import com.aj.filesdispatch.Interface.AddItemToShare;
 import com.aj.filesdispatch.Interface.OnItemClickToOpen;
-import com.aj.filesdispatch.Models.FileViewItem;
 import com.aj.filesdispatch.R;
+import com.aj.filesdispatch.common.Converter;
 import com.bumptech.glide.Glide;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.aj.filesdispatch.Fragments.CliMusic.AUDIOS;
 
 public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
     private static final String TAG = "FILE_ADAPTER";
@@ -39,7 +45,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
     private OnItemClickToOpen itemClickToOpen;
     private Context context;
     private boolean isPlaying = false;
-    private List<FileViewItem> audioList = new ArrayList<>();
+    private List<FileItem> audioList = new ArrayList<>();
     private Cursor cursorData;
 
     public AudioAdapter(AddItemToShare itemToShare, OnItemClickToOpen itemClickToOpen, Context context) {
@@ -61,16 +67,37 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull AudioAdapter.ViewHolder holder, int position) {
         cursorData.moveToPosition(position);
         if (audioList.size() > position && audioList.get(position) == null)
-            audioList.set(position, new FileViewItem(cursorData, "Audios"));
+            audioList.set(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                    .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)))
+                    .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                    .setFileType(AUDIOS)
+                    .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                    .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                    .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                    .build());
         else if (audioList.size() == position)
-            audioList.add(position, new FileViewItem(cursorData, "Audios"));
+            audioList.add(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                    .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)))
+                    .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                    .setFileType(AUDIOS)
+                    .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                    .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                    .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                    .build());
         else if (audioList.size() < position) {
             Log.d(TAG, "onBindViewHolder: add null");
             audioList.addAll(Collections.nCopies(position - audioList.size(), null));
-            audioList.add(position, new FileViewItem(cursorData, "Audios"));
+            audioList.add(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                    .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)))
+                    .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                    .setFileType(AUDIOS)
+                    .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                    .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                    .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                    .build());
         }
         String extension, encoder;
-        String description = audioList.get(position).getFileDes();
+        String description = audioList.get(position).getShowDes();
         String fileName = audioList.get(position).getFileName();
         try {
             encoder = URLEncoder.encode(fileName, "UTF-8").replace("+", "%20");
@@ -78,9 +105,9 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
             encoder = fileName;
         }
         extension = MimeTypeMap.getFileExtensionFromUrl(encoder).toUpperCase();
-        audioList.get(position).setFileDrawable(writeOnDrawable(extension));
+        audioList.get(position).setDrawable(writeOnDrawable(extension));
         Glide.with(context)
-                .load(audioList.get(position).getFileDrawable())
+                .load(audioList.get(position).getDrawable())
                 .fitCenter()
                 .into(holder.audioIcon);
         holder.audioLabel.setText(fileName);
@@ -144,7 +171,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
             return null;
     }
 
-    public void setAudioList(ArrayList<FileViewItem> audioList) {
+    public void setAudioList(ArrayList<FileItem> audioList) {
         this.audioList = audioList;
     }
 

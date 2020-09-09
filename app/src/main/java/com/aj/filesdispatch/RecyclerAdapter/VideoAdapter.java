@@ -18,9 +18,11 @@ import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.aj.filesdispatch.Entities.FileItem;
+import com.aj.filesdispatch.Entities.FileItemBuilder;
 import com.aj.filesdispatch.Interface.AddItemToShare;
-import com.aj.filesdispatch.Models.FileViewItem;
 import com.aj.filesdispatch.R;
+import com.aj.filesdispatch.common.Converter;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
@@ -28,10 +30,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.aj.filesdispatch.Fragments.CliVideos.VIDEOS;
+
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> {
     private static final String TAG = "FILE_ADAPTER";
     private Context activity;
-    private List<FileViewItem> videoItems = new ArrayList<>();
+    private List<FileItem> videoItems = new ArrayList<>();
     private AddItemToShare videoClick;
     private Cursor cursorData;
 
@@ -52,16 +56,37 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull VideoAdapter.ViewHolder holder, int position) {
         cursorData.moveToPosition(position);
         if (videoItems.size() > position && videoItems.get(position) == null)
-            videoItems.set(position, new FileViewItem(cursorData, "Videos"));
+            videoItems.set(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                    .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.TITLE)))
+                    .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                    .setFileType(VIDEOS)
+                    .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                    .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                    .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                    .build());
         else if (videoItems.size() == position)
-            videoItems.add(position, new FileViewItem(cursorData, "Videos"));
+            videoItems.add(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                    .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.TITLE)))
+                    .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                    .setFileType(VIDEOS)
+                    .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                    .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                    .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                    .build());
         else if (videoItems.size() < position) {
             Log.d(TAG, "onBindViewHolder: add null");
             videoItems.addAll(Collections.nCopies(position - videoItems.size(), null));
-            videoItems.add(position, new FileViewItem(cursorData, "Videos"));
+            videoItems.add(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
+                    .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.TITLE)))
+                    .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
+                    .setFileType(VIDEOS)
+                    .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
+                    .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
+                    .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
+                    .build());
         }
 
-        String size = videoItems.get(position).getFileDes();
+        String size = videoItems.get(position).getShowDes();
         String label = videoItems.get(position).getFileName();
         holder.viewLabel.setText(label);
         holder.viewDes.setText(size);
@@ -131,21 +156,21 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
             return null;
     }
 
-    public void setVideoItems(ArrayList<FileViewItem> videoItems) {
+    public void setVideoItems(ArrayList<FileItem> videoItems) {
         this.videoItems = videoItems;
     }
 
     private Bitmap getBitmapFromMediaStore(int position) {
         return MediaStore.Video.Thumbnails.getThumbnail(
                 activity.getContentResolver(),
-                videoItems.get(position).getId(),
+                Long.parseLong(videoItems.get(position).getFileId()),
                 MediaStore.Video.Thumbnails.MINI_KIND,
                 null
         );
     }
 
     private Uri getUriFromMediaStore(int position) {
-        return Uri.parse(videoItems.get(position).getFileLoc());
+        return Uri.parse(videoItems.get(position).getFileUri());
     }
 
     /*@SuppressLint("DefaultLocale")

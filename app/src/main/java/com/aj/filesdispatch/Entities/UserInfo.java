@@ -1,4 +1,4 @@
-package com.aj.filesdispatch.Models;
+package com.aj.filesdispatch.Entities;
 
 import com.aj.filesdispatch.ApplicationActivity;
 

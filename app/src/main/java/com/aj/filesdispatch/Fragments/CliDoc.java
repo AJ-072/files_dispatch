@@ -38,7 +38,7 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
     private static final String ARG_PARAM2 = "param2";
     public static final int DOC_LOADER_ID = 201;
     public static final int DOC_FILE_LOADER_ID = 101;
-    private ArrayList<String> docFileType = new ArrayList<>();
+    public static final String DOCUMENT= "Documents";
     private List<String> type = new ArrayList<>();
     public static int current_id = DOC_LOADER_ID;
     private static final String TAG = "Doc fragment";
@@ -49,7 +49,6 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
     Context context;
     DocAdapter adapter;
     RecyclerView recyclerView;
-    List<String> list = new ArrayList<>();
     private RecyclerView.LayoutManager gridLayout, linearLayout;
     private String mParam1;
     private String mParam2;
@@ -87,8 +86,7 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
         recyclerView = view.findViewById(R.id.doc_over_view);
         documentLoading = view.findViewById(R.id.document_loading_progress);
         noDocText = view.findViewById(R.id.no_document_text);
-        DividerItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
-        itemDecoration.setDrawable(getResources().getDrawable(R.drawable.line_divider, context.getTheme()));
+
         Log.d(TAG, "onCreateView: ");
 
         linearLayout = new LinearLayoutManager(context);
@@ -176,6 +174,9 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
         if (data != null && data.getCount() > 0) {
             setAdapter(linearLayout,current_id);
             adapter.setData(data);
+            DividerItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
+            itemDecoration.setDrawable(getResources().getDrawable(R.drawable.line_divider, context.getTheme()));
+            recyclerView.addItemDecoration(itemDecoration);
             recyclerView.setVisibility(View.VISIBLE);
             noDocText.setVisibility(View.GONE);
         } else {
@@ -196,16 +197,16 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
             type.clear();
         switch (position) {
             case 0:
-                type = Arrays.asList("zip", "rar");
+                type = Arrays.asList(getResources().getStringArray(R.array.Archives));
                 break;
             case 1:
-                type = Arrays.asList("ppt", "pptx");
+                type = Arrays.asList(getResources().getStringArray(R.array.Presentations));
                 break;
             case 2:
-                type = Arrays.asList("doc", "docx");
+                type = Arrays.asList(getResources().getStringArray(R.array.Documents));
                 break;
             case 3:
-                type = Arrays.asList("txt", "pdf");
+                type = Arrays.asList(getResources().getStringArray(R.array.EBooks));
                 break;
 
         }

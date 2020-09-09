@@ -1,4 +1,4 @@
-package com.aj.filesdispatch.Models;
+package com.aj.filesdispatch.Entities;
 
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Parcel;

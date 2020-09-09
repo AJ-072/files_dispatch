@@ -42,7 +42,6 @@ public class CliApp extends Fragment {
     public static CliApp newInstance(String param1, String param2) {
         CliApp fragment = new CliApp();
         Bundle args = new Bundle();
-        Log.d(TAG, "newInstance: valled");
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);

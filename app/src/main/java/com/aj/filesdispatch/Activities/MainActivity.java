@@ -42,11 +42,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.aj.filesdispatch.Entities.FileItem;
 import com.aj.filesdispatch.Interface.AddItemToShare;
 import com.aj.filesdispatch.Interface.OnBindToService;
-import com.aj.filesdispatch.Models.FileViewItem;
-import com.aj.filesdispatch.Models.UserInfo;
-import com.aj.filesdispatch.Models.WifiP2pService;
+import com.aj.filesdispatch.Entities.UserInfo;
+import com.aj.filesdispatch.Entities.WifiP2pService;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.SelectedFileList;
 import com.aj.filesdispatch.Services.DispatchService;
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static int count = 0;
     public static final String TAG = "wifi";
     private Toolbar toolbar;
-    public static final String NEVER = "NEVER_AGAIN";
+    public static final String LOCATION_PERMISSION_REPEAT = "NEVER_AGAIN";
     public static final int CONNECTED_DEVICE = 2;
     private ActionBarDrawerToggle toggle;
     private DrawerLayout drawerLayout;
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private BroadcastReceiver wifiBroadcastReceiver;
     private DispatchService dispatchService = null;
     private Intent serviceIntent;
-    public ArrayList<FileViewItem> fileToTransfer;
+    public ArrayList<FileItem> fileToTransfer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             v.setVisibility(View.GONE);
         });*/
+        sharedPreferences.edit().putBoolean(LOCATION_PERMISSION_REPEAT, false).apply();
         count_text = findViewById(R.id.selected_item_count);
         drawerLayout = findViewById(R.id.drawer);
         navigationView = findViewById(R.id.nav_header);
@@ -231,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     startActivityForResult(dispatchActivity, CONNECTED_DEVICE);
                 } else if (!isPermissionGranted) {
                     Log.d(TAG, "onClick: permission not granted");
-                    RequestPermission();
+                    RequestPermission(MainActivity.this);
                 } else {
                     Log.d(TAG, "onClick: otherWise");
                     dispatchService.setTransferFile(fileToTransfer);
@@ -320,36 +321,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public void RequestPermission() {
+    public static void RequestPermission(Activity activity) {
         Intent permission = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
             Log.d(TAG, "RequestPermission: repeat");
-            sharedPreferences.edit().putBoolean(NEVER, true).apply();
-            new AlertDialog.Builder(this)
+            sharedPreferences.edit().putBoolean(LOCATION_PERMISSION_REPEAT, true).apply();
+            new AlertDialog.Builder(activity)
                     .setTitle("Permission Needed")
                     .setIcon(R.drawable.ic_logo)
                     .setMessage(R.string.repeat_request_location)
                     .setPositiveButton("OK", (dialog, which) ->
-                            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION))
-                    .setNegativeButton("No thanks", (dialog, which) -> {
-                        dialog.dismiss();
-                    })
+                            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION))
+                    .setNegativeButton("No thanks", (dialog, which) -> dialog.dismiss())
                     .setCancelable(false)
                     .create().show();
         } else {
-            if (!sharedPreferences.getBoolean(NEVER, false)) {
-                Log.d(TAG, "RequestPermission: denied");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION);
+            if (!sharedPreferences.getBoolean(LOCATION_PERMISSION_REPEAT, false)) {
+                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION);
             } else {
                 Log.d(TAG, "RequestPermission: manual");
-                new AlertDialog.Builder(this)
+                new AlertDialog.Builder(activity)
                         .setTitle("Permission Needed")
                         .setIcon(R.drawable.ic_logo)
                         .setMessage(R.string.open_app_settings_location)
                         .setPositiveButton("OK", (dialog, which) -> {
-                            permission.setData(Uri.fromParts("package", getPackageName(), null));
-                            startActivityForResult(permission, APP_SETTINGS);
-                            isPermissionGranted = false;
+                            permission.setData(Uri.fromParts("package", activity.getPackageName(), null));
+                            activity.startActivityForResult(permission, APP_SETTINGS);
                         }).setNegativeButton("No thanks", (dialog, which) -> {
                     dialog.dismiss();
                 }).setCancelable(false)
@@ -364,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int GrantedCode = grantResults[0];
             if (GrantedCode == PackageManager.PERMISSION_DENIED) {
                 Log.d(TAG, "onRequestPermissionsResult: denied");
-                RequestPermission();
+                RequestPermission(MainActivity.this);
             } else {
                 isPermissionGranted = true;
                 if (fileToTransfer.size() > 0)
@@ -421,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onItemAdded(FileViewItem item) {
+    public void onItemAdded(FileItem item) {
         if (item != null) {
             Log.d(TAG, "addAppList: added " + item.getFileName());
             if (!fileToTransfer.contains(item)) {
@@ -436,10 +433,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onMultiItemAdded(List<FileViewItem> fileViewItems) {
+    public void onMultiItemAdded(List<FileItem> fileViewItems) {
         if (fileViewItems != null) {
             if (fileToTransfer == fileViewItems) {
-                for (FileViewItem item : fileViewItems) {
+                for (FileItem item : fileViewItems) {
                     item.setChecked(false);
                 }
                 fileToTransfer.clear();
