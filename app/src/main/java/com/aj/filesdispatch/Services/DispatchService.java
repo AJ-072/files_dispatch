@@ -67,11 +67,10 @@ public class DispatchService extends Service {
     private InputStream input;
     private OutputStream output;
     private ObjectOutputStream objectOutputStream;
-    private asyncFileSender fileSender;
     private ReceivingFileTask fileTask;
     private static final String TAG = "DispatchService";
     private Thread staringThread;
-    private static boolean runningOutputStream = false;
+    private asyncFileSender fileSender;
     private static UserInfo connectedDevice, myDevice;
     private static OnBindToService bindToService = null;
     private static SendingFIleListener fileListener = null;
@@ -177,22 +176,16 @@ public class DispatchService extends Service {
 
     public void setTransferFile(List<FileViewItem> items) {
         if (items != null && items.size() > 0) {
-            Log.d(TAG, String.valueOf(items.size()));
-            Log.d(TAG, "onBind: inside loob " + runningOutputStream);
-            if (socket != null && socket.isConnected())
-                if (runningOutputStream) {
-                    fileSender.addShareItems(items);
-                } else {
-                    runningOutputStream = true;
-                    fileSender = new asyncFileSender(objectOutputStream, items);
-                    fileSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }
+            if (socket != null && socket.isConnected()) {
+                fileSender = asyncFileSender.getInstance(objectOutputStream);
+                fileSender.addShareItems(items);
+            }
         }
     }
 
     public void removeItem(SentFileItem item) {
         if (item.getSender().equals(myDevice.getUserName())) {
-            fileSender.removeShareItem(item);
+            asyncFileSender.getInstance(objectOutputStream).removeShareItem(item);
         } else {
             List<SentFileItem> fileItems = new ArrayList<>();
             fileItems.add(item);
@@ -227,7 +220,7 @@ public class DispatchService extends Service {
     protected void stopSocket() {
         new Thread(() -> {
             try {
-                if (fileSender.getStatus() == AsyncTask.Status.FINISHED && socket.isConnected()) {
+                if ((fileSender==null||fileSender.getStatus()== AsyncTask.Status.FINISHED) && socket.isConnected()) {
                     ObjectOutputStream objectOutputStream = new ObjectOutputStream(output);
                     objectOutputStream.writeUnshared(new MsgData(null, null, ACTION_STOP, 0));
                     objectOutputStream.flush();
@@ -287,15 +280,24 @@ public class DispatchService extends Service {
         private List<SentFileItem> sendingViews;
         private BufferedInputStream fileInput;
         private Action action = null;
+        private static asyncFileSender fileSender;
         int count = 0;
 
-        public asyncFileSender(ObjectOutputStream outputStream, List<FileViewItem> shareItems) {
+        public asyncFileSender(ObjectOutputStream outputStream) {
             this.sending = outputStream;
             sendingFileItems = new ArrayList<>();
             newItems = new ArrayList<>();
             sendingViews = new ArrayList<>();
-            Log.d(TAG, "asyncFileSender: " + shareItems.get(0).getFileName() + (outputStream != null));
-            addShareItems(shareItems);
+        }
+        public static asyncFileSender getInstance(ObjectOutputStream outputStream) {
+            if (fileSender==null){
+                synchronized (asyncFileSender.class){
+                    if (fileSender==null){
+                        fileSender= new asyncFileSender(outputStream);
+                    }
+                }
+            }
+            return fileSender;
         }
 
         @Override
@@ -396,7 +398,6 @@ public class DispatchService extends Service {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             this.cancel(false);
-            runningOutputStream = false;
             sendingViews.clear();
             sendingFileItems.clear();
             currentSendingFile = null;

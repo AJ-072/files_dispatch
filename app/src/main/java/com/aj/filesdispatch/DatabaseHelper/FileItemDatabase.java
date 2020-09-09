@@ -1,8 +1,6 @@
 package com.aj.filesdispatch.DatabaseHelper;
 
 import android.content.Context;
-import android.os.AsyncTask;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -18,17 +16,19 @@ public abstract class FileItemDatabase extends RoomDatabase {
 
     private static FileItemDatabase instance;
 
-    private static final String TAG = "FileItemDatabase";
-
     public abstract FileItemDao fileItemDao();
 
-    public static synchronized FileItemDatabase getInstance(Context context) {
+    public static FileItemDatabase getInstance(Context context) {
         if (instance == null) {
-            instance = Room.databaseBuilder(context.getApplicationContext()
-                    , FileItemDatabase.class, "file_item_database")
-                    .fallbackToDestructiveMigration()
-                    .addCallback(fileItemCallback)
-                    .build();
+            synchronized (FileItemDatabase.class) {
+                if (instance == null) {
+                    instance = Room.databaseBuilder(context.getApplicationContext()
+                            , FileItemDatabase.class, "file_item_database")
+                            .fallbackToDestructiveMigration()
+                            .addCallback(fileItemCallback)
+                            .build();
+                }
+            }
         }
         return instance;
     }
