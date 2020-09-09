@@ -72,6 +72,7 @@ public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
         holder.itemView.setOnClickListener(view -> {
             getItem(position).setChecked(!getItem(position).isChecked());
             notifyItemChanged(position);
+            onAppItemClick.onItemAdded(getItem(position));
         });
     }
 

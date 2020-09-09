@@ -46,9 +46,10 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
     private LoaderManager loaderManager;
     private OnBackPressedCallback OnBackPressedCallback;
     private TextView noDocText;
-    Context context;
-    DocAdapter adapter;
-    RecyclerView recyclerView;
+    private Context context;
+    private DocAdapter adapter;
+    private RecyclerView recyclerView;
+    private DividerItemDecoration itemDecoration;
     private RecyclerView.LayoutManager gridLayout, linearLayout;
     private String mParam1;
     private String mParam2;
@@ -87,6 +88,9 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
         documentLoading = view.findViewById(R.id.document_loading_progress);
         noDocText = view.findViewById(R.id.no_document_text);
 
+        itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
+        itemDecoration.setDrawable(getResources().getDrawable(R.drawable.line_divider, context.getTheme()));
+
         Log.d(TAG, "onCreateView: ");
 
         linearLayout = new LinearLayoutManager(context);
@@ -121,6 +125,7 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
                             })
                             .create().show();
                 } else {
+                    recyclerView.removeItemDecoration(itemDecoration);
                     setList();
                 }
             }
@@ -174,8 +179,6 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
         if (data != null && data.getCount() > 0) {
             setAdapter(linearLayout,current_id);
             adapter.setData(data);
-            DividerItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
-            itemDecoration.setDrawable(getResources().getDrawable(R.drawable.line_divider, context.getTheme()));
             recyclerView.addItemDecoration(itemDecoration);
             recyclerView.setVisibility(View.VISIBLE);
             noDocText.setVisibility(View.GONE);
