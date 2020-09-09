@@ -4,7 +4,7 @@ import android.graphics.drawable.Drawable;
 
 import java.io.Serializable;
 
-class SentFileItem implements Serializable, ItemInterface {
+class SentFileItem implements Serializable, Item {
     private String fileName;
     private long fileSize;
     private String fileUri;

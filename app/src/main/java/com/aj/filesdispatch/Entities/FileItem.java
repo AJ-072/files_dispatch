@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey;
 
 
 @Entity(tableName = "file_item_table")
-public class FileItem implements ItemInterface {
+public class FileItem implements Item {
 
     @PrimaryKey
     @NonNull

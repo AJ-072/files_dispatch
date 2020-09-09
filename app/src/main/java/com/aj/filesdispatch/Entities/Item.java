@@ -2,7 +2,7 @@ package com.aj.filesdispatch.Entities;
 
 import android.graphics.drawable.Drawable;
 
-interface ItemInterface {
+interface Item {
     void setFileName(String fileName);
 
     void setFileSize(long fileSize);
