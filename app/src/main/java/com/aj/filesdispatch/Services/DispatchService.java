@@ -5,7 +5,6 @@ import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Environment;
@@ -52,8 +51,8 @@ import static com.aj.filesdispatch.Enums.Action.ACTION_ADD;
 import static com.aj.filesdispatch.Enums.Action.ACTION_STOP;
 import static com.aj.filesdispatch.ApplicationActivity.FILE_TO_SEND;
 import static com.aj.filesdispatch.Enums.Action.ACTION_REMOVE;
-import static com.aj.filesdispatch.dispatchmanager.FindConnection.IP_ADDRESS;
-import static com.aj.filesdispatch.dispatchmanager.FindConnection.PORT;
+import static com.aj.filesdispatch.Activities.FindConnection.IP_ADDRESS;
+import static com.aj.filesdispatch.Activities.FindConnection.PORT;
 
 enum Me {CLIENT, SERVER}
 

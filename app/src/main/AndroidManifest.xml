@@ -56,7 +56,7 @@
             android:excludeFromRecents="false"
             android:autoRemoveFromRecents="false"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".dispatchmanager.FindConnection"
+        <activity android:name=".Activities.FindConnection"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

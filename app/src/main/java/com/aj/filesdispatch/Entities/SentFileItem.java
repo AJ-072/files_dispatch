@@ -58,6 +58,10 @@ class SentFileItem implements Serializable, Item {
         return fileUri;
     }
 
+    public String getShowDes() {
+        return this.showDes;
+    }
+
     public Drawable getDrawable() {
         return drawable;
     }

@@ -6,8 +6,8 @@ import java.io.Serializable;
 
 import static com.aj.filesdispatch.ApplicationActivity.OptnlAvatarName;
 import static com.aj.filesdispatch.ApplicationActivity.OptnlUserName;
-import static com.aj.filesdispatch.dispatchmanager.FindConnection.AVATAR;
-import static com.aj.filesdispatch.dispatchmanager.FindConnection.BUDDY_NAME;
+import static com.aj.filesdispatch.Activities.FindConnection.AVATAR;
+import static com.aj.filesdispatch.Activities.FindConnection.BUDDY_NAME;
 
 public class UserInfo implements Serializable {
     private String UserName;

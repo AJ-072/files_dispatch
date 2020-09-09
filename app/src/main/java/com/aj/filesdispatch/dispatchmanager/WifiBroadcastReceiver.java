@@ -12,6 +12,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import com.aj.filesdispatch.Activities.FindConnection;
 import com.aj.filesdispatch.Services.DispatchService;
 
 public class WifiBroadcastReceiver extends BroadcastReceiver {

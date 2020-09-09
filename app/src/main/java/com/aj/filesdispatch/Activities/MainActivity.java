@@ -51,7 +51,6 @@ import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.SelectedFileList;
 import com.aj.filesdispatch.Services.DispatchService;
 import com.aj.filesdispatch.common.pager;
-import com.aj.filesdispatch.dispatchmanager.FindConnection;
 import com.aj.filesdispatch.dispatchmanager.WifiBroadcastReceiver;
 import com.aj.filesdispatch.nav_optn.About;
 import com.aj.filesdispatch.nav_optn.HelpandFeed;

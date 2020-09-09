@@ -1,7 +1,5 @@
 package com.aj.filesdispatch.Entities;
 
-import android.graphics.drawable.Drawable;
-
 interface Item {
     void setFileName(String fileName);
 

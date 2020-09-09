@@ -11,13 +11,13 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.preference.PreferenceManager;
 
-import com.aj.filesdispatch.dispatchmanager.FindConnection;
+import com.aj.filesdispatch.Activities.FindConnection;
 
 import java.util.Locale;
 import java.util.Random;
 
-import static com.aj.filesdispatch.dispatchmanager.FindConnection.AVATAR;
-import static com.aj.filesdispatch.dispatchmanager.FindConnection.BUDDY_NAME;
+import static com.aj.filesdispatch.Activities.FindConnection.AVATAR;
+import static com.aj.filesdispatch.Activities.FindConnection.BUDDY_NAME;
 
 public class ApplicationActivity extends Application {
     public static WifiP2pManager wifiP2pManager;

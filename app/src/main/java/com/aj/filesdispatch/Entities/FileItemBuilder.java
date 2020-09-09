@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable;
 public class FileItemBuilder {
     FileItem fileItem;
 
-    FileItemBuilder(String ID) {
+    public FileItemBuilder(String ID) {
         fileItem = new FileItem(ID);
     }
 

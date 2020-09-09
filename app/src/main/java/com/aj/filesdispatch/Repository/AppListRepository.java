@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveData;
 
 import com.aj.filesdispatch.DatabaseHelper.FileItemDatabase;
 import com.aj.filesdispatch.Entities.FileItem;
+import com.aj.filesdispatch.Entities.FileItemBuilder;
 import com.aj.filesdispatch.Interface.FileItemDao;
 import com.aj.filesdispatch.common.Converter;
 
@@ -40,9 +41,10 @@ public class AppListRepository {
     public LiveData<List<FileItem>> getListLiveData() {
         return listLiveData;
     }
-    public synchronized void UpdateList(List<FileItem> items){
-        if (updateList==null){
-            updateList= new UpdateList(fileItemDao,items);
+
+    public synchronized void UpdateList(List<FileItem> items) {
+        if (updateList == null) {
+            updateList = new UpdateList(fileItemDao, items);
             updateList.execute();
         }
     }
@@ -70,9 +72,15 @@ public class AppListRepository {
                     if ((resolve.activityInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
                         packageName = activityInfo.packageName;
                         File file = new File(Objects.requireNonNull(getSourceDir(packageName)));
-                        fileItemDao.insertFileItem(new FileItem(packageName
-                                , getAppName(packageName), file.length(),
-                                file.getPath(), APPLICATION, file.lastModified(), Converter.SizeInGMK(file.length())));
+                        fileItemDao.insertFileItem(
+                                new FileItemBuilder(packageName)
+                                        .setFileName(getAppName(packageName))
+                                        .setFileSize(file.length())
+                                        .setDateAdded(file.lastModified())
+                                        .setFileType(APPLICATION)
+                                        .setFileUri(getSourceDir(packageName))
+                                        .setShowDes(Converter.SizeInGMK(file.length()))
+                                        .build());
                     }
                 }
             } else {
@@ -89,9 +97,15 @@ public class AppListRepository {
                     if (packageNames.contains(packageName)) {
                         File file = new File(Objects.requireNonNull(getSourceDir(packageName)));
                         if (item.getDateAdded() != file.lastModified()) {
-                            fileItemDao.updateFileItem(new FileItem(packageName
-                                    , getAppName(packageName), file.length(),
-                                    file.getPath(), APPLICATION, file.lastModified(), Converter.SizeInGMK(file.length())));
+                            fileItemDao.updateFileItem(
+                                    new FileItemBuilder(packageName)
+                                            .setFileName(getAppName(packageName))
+                                            .setFileSize(file.length())
+                                            .setDateAdded(file.lastModified())
+                                            .setFileType(APPLICATION)
+                                            .setFileUri(getSourceDir(packageName))
+                                            .setShowDes(Converter.SizeInGMK(file.length()))
+                                            .build());
 
                         }
                     } else {
@@ -103,9 +117,15 @@ public class AppListRepository {
                 if (packageNames.size() > 0) {
                     for (String pack : packageNames) {
                         File file = new File(Objects.requireNonNull(getSourceDir(pack)));
-                        fileItemDao.insertFileItem(new FileItem(pack
-                                , getAppName(pack), file.length(),
-                                file.getPath(), APPLICATION, file.lastModified(), Converter.SizeInGMK(file.length())));
+                        fileItemDao.insertFileItem(
+                                new FileItemBuilder(pack)
+                                .setFileName(getAppName(pack))
+                                .setFileSize(file.length())
+                                .setDateAdded(file.lastModified())
+                                .setFileType(APPLICATION)
+                                .setFileUri(getSourceDir(pack))
+                                .setShowDes(Converter.SizeInGMK(file.length()))
+                                .build());
                     }
                 }
             }

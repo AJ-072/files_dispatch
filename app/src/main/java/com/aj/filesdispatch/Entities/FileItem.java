@@ -1,15 +1,19 @@
 package com.aj.filesdispatch.Entities;
 
 import android.graphics.drawable.Drawable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.util.Objects;
+
 
 @Entity(tableName = "file_item_table")
-public class FileItem implements Item {
+public class FileItem implements Item , Parcelable {
 
     @NonNull
     @PrimaryKey
@@ -29,6 +33,29 @@ public class FileItem implements Item {
     public FileItem(@NonNull String fileId) {
         this.fileId = fileId;
     }
+
+    protected FileItem(Parcel in) {
+        fileId = Objects.requireNonNull(in.readString());
+        fileName = in.readString();
+        fileSize = in.readLong();
+        fileUri = in.readString();
+        fileType = in.readString();
+        dateAdded = in.readLong();
+        showDes = in.readString();
+        checked = in.readByte() != 0;
+    }
+
+    public static final Creator<FileItem> CREATOR = new Creator<FileItem>() {
+        @Override
+        public FileItem createFromParcel(Parcel in) {
+            return new FileItem(in);
+        }
+
+        @Override
+        public FileItem[] newArray(int size) {
+            return new FileItem[size];
+        }
+    };
 
     @Override
     public void setFileName(String fileName) {
@@ -99,7 +126,6 @@ public class FileItem implements Item {
         return this.drawable;
     }
 
-
     public Drawable getDrawable() {
         return drawable;
     }
@@ -110,5 +136,22 @@ public class FileItem implements Item {
 
     public boolean isChecked() {
         return checked;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(fileId);
+        parcel.writeString(fileName);
+        parcel.writeLong(fileSize);
+        parcel.writeString(fileUri);
+        parcel.writeString(fileType);
+        parcel.writeLong(dateAdded);
+        parcel.writeString(showDes);
+        parcel.writeByte((byte) (checked ? 1 : 0));
     }
 }

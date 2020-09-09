@@ -1,4 +1,4 @@
-package com.aj.filesdispatch.dispatchmanager;
+package com.aj.filesdispatch.Activities;
 
 import android.Manifest;
 import android.content.Context;
@@ -39,6 +39,7 @@ import com.aj.filesdispatch.Models.WifiP2pService;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.ServiceListAdapter;
 import com.aj.filesdispatch.Services.DispatchService;
+import com.aj.filesdispatch.dispatchmanager.WifiBroadcastReceiver;
 
 import java.io.File;
 import java.io.IOException;
