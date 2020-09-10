@@ -1,96 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/focusedShade"
     tools:context=".Activities.FindConnection">
 
-    <LinearLayout
-        android:id="@+id/User"
-        android:layout_width="match_parent"
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/my_avatar"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:orientation="horizontal"
-        android:baselineAligned="false">
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/ic_avatarbackground"
+        android:src="@drawable/ic_avatar7"
+        app:layout_constraintBottom_toTopOf="@+id/availWifiList"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
-            android:layout_weight="50"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+    <TextView
+        android:id="@+id/my_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/app_name"
+        android:textColor="@color/notFocused"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/my_avatar"
+        app:layout_constraintStart_toStartOf="@+id/my_avatar"
+        app:layout_constraintTop_toBottomOf="@+id/my_avatar" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/connectingIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:background="@drawable/wifi_search" />
-
-            <TextView
-                android:id="@+id/visible_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:text="@string/app_name"
-                android:textColor="@color/notFocused"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/device_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/app_name"
-                android:textColor="@color/notFocused"
-                android:textSize="14sp"
-                android:textStyle="bold|italic" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/connectedUser"
-            android:layout_width="0dp"
-            android:layout_weight="50"
-            android:visibility="gone"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:background="@drawable/ic_wifi_3" />
-
-            <TextView
-                android:id="@+id/connected_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:text="@string/app_name"
-                android:textColor="@color/notFocused"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/connected_device_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/app_name"
-                android:textColor="@color/notFocused"
-                android:textSize="14sp"
-                android:textStyle="bold|italic" />
-        </LinearLayout>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/my_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textColor="@color/notFocused"
+        android:textSize="14sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintEnd_toEndOf="@+id/my_name"
+        app:layout_constraintStart_toStartOf="@+id/my_name"
+        app:layout_constraintTop_toBottomOf="@+id/my_name" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/availWifiList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/User"
+        android:layout_height="0dp"
         android:layout_margin="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline2"
         tools:listitem="@layout/device_list" />
-</RelativeLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.3" />
+</androidx.constraintlayout.widget.ConstraintLayout>

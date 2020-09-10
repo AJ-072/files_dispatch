@@ -18,11 +18,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
         visible_name = findPreference("username");
-        Objects.requireNonNull(visible_name).setOnBindEditTextListener(new EditTextPreference.OnBindEditTextListener() {
-            @Override
-            public void onBindEditText(@NonNull EditText editText) {
+        Objects.requireNonNull(visible_name).setOnBindEditTextListener(editText -> {
 
-            }
         });
     }
 }

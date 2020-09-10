@@ -77,4 +77,5 @@
     <string name="feedback">FeedBack</string>
     <string name="remove">Remove</string>
     <string name="no_history">No History</string>
+    <string name="size">Size</string>
 </resources>

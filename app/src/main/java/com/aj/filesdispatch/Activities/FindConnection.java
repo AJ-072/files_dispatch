@@ -78,11 +78,8 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     private List<FileItem> fileToSend = new ArrayList<>();
     private int retry = 0;
     private int myPort;
-    private TextView connectedName;
-    private TextView connectedDisplayName;
     private ArrayList<WifiP2pService> services = new ArrayList<>();
     private ImageView connectionIcon;
-    private LinearLayout connectedView;
     WifiP2pDevice devicedf;
     private Intent service;
     private AnimationDrawable connectDrawable;
@@ -161,12 +158,9 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         service = new Intent(this, DispatchService.class);
         RecyclerView listView = findViewById(R.id.availWifiList);
         listView.setLayoutManager(new LinearLayoutManager(this));
-        connectionIcon = findViewById(R.id.connectingIcon);
-        TextView myName = findViewById(R.id.device_name);
-        TextView myDisplayName = findViewById(R.id.visible_name);
-        connectedName = findViewById(R.id.connected_device_name);
-        connectedDisplayName = findViewById(R.id.connected_name);
-        connectedView = findViewById(R.id.connectedUser);
+        connectionIcon = findViewById(R.id.my_avatar);
+        TextView myStatus = findViewById(R.id.my_status);
+        TextView myDisplayName = findViewById(R.id.my_name);
         connectionIcon.setBackground(ActivityCompat.getDrawable(this, R.drawable.wifi_search));
         p2pManager.requestConnectionInfo(dispatchChannel, this);
         connectDrawable = (AnimationDrawable) connectionIcon.getBackground();
@@ -329,9 +323,6 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
                 adapter.notifyItemChanged(0);
                 Toast.makeText(FindConnection.this, ServiceListAdapter.getDeviceStatus(device.status), Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "setDnsListener: " + ServiceListAdapter.getDeviceStatus(devicedf.status));
-                connectedView.setVisibility(View.VISIBLE);
-                connectedName.setText(service.getDevice().deviceName);
-                connectedDisplayName.setText(service.getDisplay_Name());
             }
 
             @Override

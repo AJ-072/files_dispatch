@@ -58,8 +58,8 @@ public class ServiceListAdapter extends ListAdapter<WifiP2pService, ServiceListA
 
         public DeviceViewHolder(@NonNull View itemView) {
             super(itemView);
-            visiblename = itemView.findViewById(R.id.visible_name);
-            wifiname = itemView.findViewById(R.id.wifi_name);
+            visiblename = itemView.findViewById(R.id.icon_name);
+            wifiname = itemView.findViewById(R.id.status_view);
             view = itemView;
         }
     }
