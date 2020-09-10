@@ -319,16 +319,12 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         p2pManager.connect(dispatchChannel, config, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Log.d(TAG, "onSuccess: set connection successfully with " + config.deviceAddress);
-                adapter.notifyItemChanged(0);
                 Toast.makeText(FindConnection.this, ServiceListAdapter.getDeviceStatus(device.status), Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "setDnsListener: " + ServiceListAdapter.getDeviceStatus(devicedf.status));
             }
 
             @Override
             public void onFailure(int reason) {
                 Toast.makeText(getApplicationContext(), "Not Connected", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onFailure: connecting failed");
             }
         });
     }
