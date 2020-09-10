@@ -13,6 +13,7 @@ import androidx.preference.PreferenceManager;
 
 import com.aj.filesdispatch.Activities.FindConnection;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
 
@@ -24,15 +25,16 @@ public class ApplicationActivity extends Application {
     public static WifiP2pManager.Channel wifiChannel;
     public static String userName;
     public static String OptnlUserName;
+    public static int AvatarName;
+    public static int OptnlAvatarName;
+    private static final String TAG = "ApplicationActivity";
     public NotificationChannel showConnected;
+    public static final int[] Avatars={R.drawable.ic_avatar1,R.drawable.ic_avatar2,R.drawable.ic_avatar3,R.drawable.ic_avatar4,R.drawable.ic_avatar5,R.drawable.ic_avatar6,R.drawable.ic_avatar7};
     public static SharedPreferences sharedPreferences, defaultPreference;
     public static final String show = "DEVICE_CONNECTED";
     public static final String DARK_MODE = "DARK_MODE";
     public static final String SHARED = "SHARED_PREFERENCE";
-    private static final String TAG = "ApplicationActivity";
     public static final String FILE_TO_SEND = "FileToSend";
-    public static String AvatarName;
-    public static int OptnlAvatarName;
     public static final String NOTIFICATION_CHANNEL_1 = "service Started";
 
     @Override
@@ -58,13 +60,13 @@ public class ApplicationActivity extends Application {
 
     public void setUser() {
         OptnlUserName = "User" + String.format(Locale.ROOT, "%04d", new Random().nextInt(100000));
-        OptnlAvatarName = new Random().nextInt(6);
-        AvatarName = sharedPreferences.getString(FindConnection.AVATAR, null);
+        OptnlAvatarName = Avatars[new Random().nextInt(6)];
         userName = defaultPreference.getString(BUDDY_NAME, null);
+        AvatarName = sharedPreferences.getInt(AVATAR, OptnlAvatarName);
         if (userName == null)
             defaultPreference.edit().putString(BUDDY_NAME, OptnlUserName).apply();
-        if (AvatarName == null)
-            sharedPreferences.edit().putString(AVATAR, String.valueOf(OptnlAvatarName)).apply();
+        if (AvatarName == 0)
+            sharedPreferences.edit().putInt(AVATAR,OptnlAvatarName).apply();
     }
 }
 

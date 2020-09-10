@@ -21,6 +21,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -74,15 +76,15 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     private WifiManager manager;
     private WifiP2pService wifiP2pService;
     private WifiP2pDevice device;
+    private Animation avatar_background;
     public static WifiP2pManager.Channel dispatchChannel;
     private List<FileItem> fileToSend = new ArrayList<>();
     private int retry = 0;
     private int myPort;
+    private int avatarId;
     private ArrayList<WifiP2pService> services = new ArrayList<>();
-    private ImageView connectionIcon;
-    WifiP2pDevice devicedf;
+    private ImageView connectionIcon,avatarBg;
     private Intent service;
-    private AnimationDrawable connectDrawable;
     private SharedPreferences preferences;
     Map<String, String> record = new HashMap<>();
     private WifiBroadcastReceiver wifiBroadcastReceiver;
@@ -159,11 +161,13 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         RecyclerView listView = findViewById(R.id.availWifiList);
         listView.setLayoutManager(new LinearLayoutManager(this));
         connectionIcon = findViewById(R.id.my_avatar);
+        avatarBg= findViewById(R.id.my_avatar_anim);
+        avatarId=sharedPreferences.getInt(AVATAR, ApplicationActivity.AvatarName);
+        connectionIcon.setImageResource(avatarId);
         TextView myStatus = findViewById(R.id.my_status);
         TextView myDisplayName = findViewById(R.id.my_name);
-        connectionIcon.setBackground(ActivityCompat.getDrawable(this, R.drawable.wifi_search));
+        avatar_background= AnimationUtils.loadAnimation(this,R.anim.searching_connection);
         p2pManager.requestConnectionInfo(dispatchChannel, this);
-        connectDrawable = (AnimationDrawable) connectionIcon.getBackground();
         adapter = new ServiceListAdapter(this);
         sharedPreferences.edit().putBoolean(LOCATION_PERMISSION_REPEAT, false).apply();
         listView.setAdapter(adapter);
@@ -175,7 +179,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         Log.d(TAG, "setLocalService: started");
         record.put(PORT, String.valueOf(getServer_port()));
         record.put(BUDDY_NAME, getName());
-        record.put(AVATAR, String.valueOf(sharedPreferences.getInt(ApplicationActivity.AvatarName, -1)));
+        record.put(AVATAR, String.valueOf(avatarId));
         dnsSdServiceInfo = WifiP2pDnsSdServiceInfo.newInstance(INSTANCE_NAME, SERVICE_TYPE, record);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             this.finish();
@@ -185,9 +189,8 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
             public void onSuccess() {
                 Log.d(TAG, "onSuccess: ");
                 setDnsListener();
-                connectDrawable.start();
+                avatarBg.setAnimation(avatar_background);
                 p2pManager.requestConnectionInfo(dispatchChannel, FindConnection.this);
-                Log.d(TAG, "onSuccess: add local successfully");
             }
 
             @Override
@@ -215,10 +218,6 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
             if (instanceName.equals(INSTANCE_NAME)) {
                 services.add(0, wifiP2pService);
                 addToList();
-                connectDrawable.stop();
-                devicedf = srcDevice;
-                Log.d(TAG, "setDnsListener: " + ServiceListAdapter.getDeviceStatus(devicedf.status));
-                connectionIcon.setBackground(ActivityCompat.getDrawable(this, R.drawable.ic_wifi_3));
             }
             Log.d(TAG, "setDnsListener: " + srcDevice.deviceName);
         };
@@ -350,7 +349,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
                 service.putExtra(IP_ADDRESS, info.groupOwnerAddress.getHostAddress());
                 service.putExtra(PORT, myPort);
             }
-            service.putParcelableArrayListExtra(FILE_TO_SEND, (ArrayList<? extends Parcelable>) fileToSend);
+            service.putParcelableArrayListExtra(FILE_TO_SEND, (ArrayList<FileItem>) fileToSend);
             startService(service);
             connectionConfirmed();
         }
@@ -358,7 +357,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     }
 
     @Override
-    public void selectDevice(WifiP2pService service) {
+    public void selectDevice(WifiP2pService service,int position) {
         setConnection(service);
     }
 

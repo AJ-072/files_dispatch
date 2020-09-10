@@ -61,7 +61,7 @@ public class CliApp extends Fragment {
         recyclerView = view.findViewById(R.id.app_recycler);
         appLoader = view.findViewById(R.id.app_loading);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
-        appAdapter = new AppAdapter(getContext(), appToShare);
+        appAdapter = new AppAdapter(getActivity(), appToShare);
         recyclerView.setAdapter(appAdapter);
         viewModel.getFileItems().observe(getViewLifecycleOwner(), fileItems -> {
             appAdapter.submitList(fileItems);

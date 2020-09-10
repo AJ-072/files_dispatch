@@ -46,20 +46,19 @@ public class ServiceListAdapter extends ListAdapter<WifiP2pService, ServiceListA
 
     @Override
     public void onBindViewHolder(@NonNull DeviceViewHolder holder, int position) {
-        Log.d(TAG, "onBindViewHolder: " + position);
-        holder.wifiname.setText(getDeviceStatus(getItem(position).getDevice().status));
+        holder.status.setText(getDeviceStatus(getItem(position).getDevice().status));
         holder.visiblename.setText(getItem(position).getDisplay_Name());
-        holder.view.setOnClickListener(v -> click.selectDevice(getItem(position)));
+        holder.view.setOnClickListener(v -> click.selectDevice(getItem(position),position));
     }
 
     public static class DeviceViewHolder extends RecyclerView.ViewHolder {
-        TextView visiblename, wifiname;
-        View view;
+        private TextView visiblename, status;
+        private View view;
 
         public DeviceViewHolder(@NonNull View itemView) {
             super(itemView);
             visiblename = itemView.findViewById(R.id.icon_name);
-            wifiname = itemView.findViewById(R.id.status_view);
+            status = itemView.findViewById(R.id.status_view);
             view = itemView;
         }
     }
@@ -85,6 +84,6 @@ public class ServiceListAdapter extends ListAdapter<WifiP2pService, ServiceListA
     }
 
     public interface onClick {
-        void selectDevice(WifiP2pService service);
+        void selectDevice(WifiP2pService service,int position);
     }
 }
