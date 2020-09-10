@@ -148,7 +148,6 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         ApplicationActivity.wifiChannel = dispatchChannel;
         if (dispatchChannel == null)
             return false;
-        register();
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && !manager.isWifiEnabled()) {
             manager.setWifiEnabled(true);
         }
@@ -173,6 +172,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         listView.setAdapter(adapter);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         myDisplayName.setText(getName());
+        avatarBg.setAnimation(avatar_background);
     }
 
     public void setLocalService() {
@@ -189,7 +189,6 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
             public void onSuccess() {
                 Log.d(TAG, "onSuccess: ");
                 setDnsListener();
-                avatarBg.setAnimation(avatar_background);
                 p2pManager.requestConnectionInfo(dispatchChannel, FindConnection.this);
             }
 
@@ -334,6 +333,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
 
     @Override
     public void onConnectionInfoAvailable(WifiP2pInfo info) {
+        Log.d(TAG, "onConnectionInfoAvailable: ");
         try {
             if (socket != null)
                 socket.close();
@@ -362,12 +362,19 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     }
 
     private void register() {
+        Log.d(TAG, "register: "+(dispatchChannel ==null)+(p2pManager==null));
         wifiBroadcastReceiver = new WifiBroadcastReceiver(p2pManager, dispatchChannel, this);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         registerReceiver(wifiBroadcastReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        register();
     }
 
     @Override

@@ -186,7 +186,7 @@ public class DispatchService extends Service {
 
     public void removeItem(SentFileItem item) {
         if (item.getSender().equals(myDevice.getUserName())) {
-            asyncFileSender.getInstance(objectOutputStream).removeShareItem(item);
+            fileSender.removeShareItem(item);
         } else {
             List<SentFileItem> fileItems = new ArrayList<>();
             fileItems.add(item);
@@ -418,6 +418,7 @@ public class DispatchService extends Service {
             Log.d(TAG, "addShareItems: add");
             action = ACTION_ADD;
             alterTransferFile(action, newItems);
+            executeOnExecutor(THREAD_POOL_EXECUTOR);
         }
 
         public void removeShareItem(SentFileItem fileItem) {

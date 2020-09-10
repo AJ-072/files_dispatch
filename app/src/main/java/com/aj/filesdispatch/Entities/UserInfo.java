@@ -11,14 +11,14 @@ import static com.aj.filesdispatch.Activities.FindConnection.BUDDY_NAME;
 
 public class UserInfo implements Serializable {
     private String UserName;
-    private String AvatarName;
+    private int AvatarName;
     private String AppVersion;
     private int ByteReceiverSpeed;
 
     public UserInfo(int byteReceiverSpeed) {
         ByteReceiverSpeed = byteReceiverSpeed;
         UserName = ApplicationActivity.defaultPreference.getString(BUDDY_NAME, OptnlUserName);
-        AvatarName = ApplicationActivity.sharedPreferences.getString(AVATAR, String.valueOf(OptnlAvatarName));
+        AvatarName = ApplicationActivity.sharedPreferences.getInt(AVATAR,OptnlAvatarName);
     }
 
     public int getByteReceiverSpeed() {
@@ -29,7 +29,7 @@ public class UserInfo implements Serializable {
         return UserName;
     }
 
-    public String getAvatarName() {
+    public int getAvatarName() {
         return AvatarName;
     }
 

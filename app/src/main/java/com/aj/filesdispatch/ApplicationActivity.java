@@ -62,10 +62,10 @@ public class ApplicationActivity extends Application {
         OptnlUserName = "User" + String.format(Locale.ROOT, "%04d", new Random().nextInt(100000));
         OptnlAvatarName = Avatars[new Random().nextInt(6)];
         userName = defaultPreference.getString(BUDDY_NAME, null);
-        AvatarName = sharedPreferences.getInt(AVATAR, OptnlAvatarName);
+        AvatarName = sharedPreferences.getInt(AVATAR, -1);
         if (userName == null)
             defaultPreference.edit().putString(BUDDY_NAME, OptnlUserName).apply();
-        if (AvatarName == 0)
+        if (AvatarName == -1)
             sharedPreferences.edit().putInt(AVATAR,OptnlAvatarName).apply();
     }
 }
