@@ -180,7 +180,7 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
                 for (int i = 0; i < Math.min(data.getCount(), 30); i++) {
                     data.moveToPosition(i);
                     videoItems.add(new FileItemBuilder(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
-                            .setFileName(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.TITLE)))
+                            .setFileName(new File(data.getString(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA))).getName())
                             .setFileSize(data.getLong(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
                             .setFileType(VIDEOS)
                             .setDateAdded(data.getLong(data.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))

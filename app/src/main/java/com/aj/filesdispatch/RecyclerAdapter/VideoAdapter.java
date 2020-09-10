@@ -57,7 +57,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         cursorData.moveToPosition(position);
         if (videoItems.size() > position && videoItems.get(position) == null)
             videoItems.set(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
-                    .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.TITLE)))
+                    .setFileName(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA))).getName())
                     .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
                     .setFileType(VIDEOS)
                     .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
@@ -66,7 +66,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
                     .build());
         else if (videoItems.size() == position)
             videoItems.add(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
-                    .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.TITLE)))
+                    .setFileName(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA))).getName())
                     .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
                     .setFileType(VIDEOS)
                     .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))
@@ -77,7 +77,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
             Log.d(TAG, "onBindViewHolder: add null");
             videoItems.addAll(Collections.nCopies(position - videoItems.size(), null));
             videoItems.add(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
-                    .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.TITLE)))
+                    .setFileName(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA))).getName())
                     .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
                     .setFileType(VIDEOS)
                     .setDateAdded(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_ADDED)))

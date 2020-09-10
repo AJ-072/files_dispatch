@@ -126,8 +126,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         alertDialog = new androidx.appcompat.app.AlertDialog.Builder(this);
 
-        viewPager.setCurrentItem(currentTab);
-
         connection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
@@ -216,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onResume() {
+        viewPager.setCurrentItem(currentTab);
         bindService(serviceIntent, connection, 0);
         super.onResume();
     }

@@ -2,6 +2,7 @@ package com.aj.filesdispatch.RecyclerAdapter;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +71,7 @@ public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
         holder.appSize.setText(getItem(position).getShowDes());
         holder.appName.setText(getItem(position).getFileName());
         holder.itemView.setOnClickListener(view -> {
+            Log.d(TAG, "onBindViewHolder: "+(onAppItemClick==null));
             getItem(position).setChecked(!getItem(position).isChecked());
             notifyItemChanged(position);
             onAppItemClick.onItemAdded(getItem(position));

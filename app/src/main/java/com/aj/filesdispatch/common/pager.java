@@ -1,5 +1,7 @@
 package com.aj.filesdispatch.common;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -16,11 +18,13 @@ import com.aj.filesdispatch.Fragments.CliVideos;
 public class pager extends androidx.fragment.app.FragmentPagerAdapter {
     private int tabNum;
     private MainActivity activity;
+    private static final String TAG = "pager";
 
     public pager(@NonNull FragmentManager fm, int behavior, int tab, MainActivity activity) {
         super(fm, behavior);
         this.tabNum = tab;
         this.activity = activity;
+        Log.d(TAG, "pager: "+(activity==null));
     }
 
     @NonNull
