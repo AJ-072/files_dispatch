@@ -23,6 +23,8 @@ import com.aj.filesdispatch.common.Converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.aj.filesdispatch.Activities.FindConnection.BUDDY_NAME;
+import static com.aj.filesdispatch.ApplicationActivity.defaultPreference;
 import static com.aj.filesdispatch.Fragments.CliDoc.DOCUMENT;
 import static com.aj.filesdispatch.Fragments.CliFiles.FOLDER;
 import static com.aj.filesdispatch.Fragments.CliImages.IMAGES;
@@ -33,7 +35,7 @@ import static com.aj.filesdispatch.Repository.AppListRepository.APPLICATION;
 public class FileSendingRecyclerAdapter extends RecyclerView.Adapter<FileSendingRecyclerAdapter.ViewHolder> {
     private List<SentFileItem> TransferingFile = new ArrayList<>();
     private static final String TAG = "FileSendingRecyclerAdap";
-    private static String me = ApplicationActivity.userName;
+    private static String me = defaultPreference.getString(BUDDY_NAME, null);
     private Context context;
     private setClickListener cancelListener;
 

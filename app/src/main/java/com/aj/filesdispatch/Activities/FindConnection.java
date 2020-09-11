@@ -168,7 +168,6 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         connectionIcon = findViewById(R.id.my_avatar);
         avatarBg = findViewById(R.id.my_avatar_anim);
         connectionIcon.setImageResource(avatarId);
-        TextView myStatus = findViewById(R.id.my_status);
         TextView myDisplayName = findViewById(R.id.my_name);
         myDisplayName.setText(BuddyName);
         avatar_background = AnimationUtils.loadAnimation(this, R.anim.searching_connection);

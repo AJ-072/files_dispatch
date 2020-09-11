@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -48,17 +49,20 @@ public class ServiceListAdapter extends ListAdapter<WifiP2pService, ServiceListA
     public void onBindViewHolder(@NonNull DeviceViewHolder holder, int position) {
         holder.status.setText(getDeviceStatus(getItem(position).getDevice().status));
         holder.visiblename.setText(getItem(position).getDisplay_Name());
+        holder.avatar.setImageResource(getItem(position).getAvatarDrawable());
         holder.view.setOnClickListener(v -> click.selectDevice(getItem(position),position));
     }
 
     public static class DeviceViewHolder extends RecyclerView.ViewHolder {
         private TextView visiblename, status;
         private View view;
+        private ImageView avatar;
 
         public DeviceViewHolder(@NonNull View itemView) {
             super(itemView);
             visiblename = itemView.findViewById(R.id.icon_name);
             status = itemView.findViewById(R.id.status_view);
+            avatar=itemView.findViewById(R.id.my_avatar);
             view = itemView;
         }
     }

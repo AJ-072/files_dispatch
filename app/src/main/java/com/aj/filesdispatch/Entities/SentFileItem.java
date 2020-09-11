@@ -6,6 +6,9 @@ import com.aj.filesdispatch.ApplicationActivity;
 
 import java.io.Serializable;
 
+import static com.aj.filesdispatch.Activities.FindConnection.BUDDY_NAME;
+import static com.aj.filesdispatch.ApplicationActivity.defaultPreference;
+
 public class SentFileItem implements Serializable, Item {
     private String fileName;
     private long fileSize;
@@ -22,7 +25,7 @@ public class SentFileItem implements Serializable, Item {
         setFileSize(item.getFileSize());
         setFileType(item.getFileType());
         setShowDes(item.getShowDes());
-        sender= ApplicationActivity.userName;
+        sender= defaultPreference.getString(BUDDY_NAME, null);
     }
 
     public String getSender() {

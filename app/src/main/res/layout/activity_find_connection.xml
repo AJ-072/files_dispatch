@@ -17,13 +17,10 @@
         app:layout_constraintStart_toStartOf="@id/my_avatar"
         app:layout_constraintTop_toTopOf="@id/my_avatar" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/my_avatar"
+    <include
+        layout="@layout/avatar_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/ic_avatarbackground"
-        android:src="@drawable/ic_avatar7"
         app:layout_constraintBottom_toTopOf="@+id/availWifiList"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -42,17 +39,6 @@
         app:layout_constraintStart_toStartOf="@+id/my_avatar"
         app:layout_constraintTop_toBottomOf="@+id/my_avatar" />
 
-    <TextView
-        android:id="@+id/my_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textColor="@color/notFocused"
-        android:textSize="14sp"
-        android:textStyle="bold|italic"
-        app:layout_constraintEnd_toEndOf="@+id/my_name"
-        app:layout_constraintStart_toStartOf="@+id/my_name"
-        app:layout_constraintTop_toBottomOf="@+id/my_name" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/availWifiList"
