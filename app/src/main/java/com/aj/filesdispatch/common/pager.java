@@ -17,14 +17,10 @@ import com.aj.filesdispatch.Fragments.CliVideos;
 
 public class pager extends androidx.fragment.app.FragmentPagerAdapter {
     private int tabNum;
-    private MainActivity activity;
-    private static final String TAG = "pager";
 
-    public pager(@NonNull FragmentManager fm, int behavior, int tab, MainActivity activity) {
+    public pager(@NonNull FragmentManager fm, int behavior, int tab) {
         super(fm, behavior);
         this.tabNum = tab;
-        this.activity = activity;
-        Log.d(TAG, "pager: "+(activity==null));
     }
 
     @NonNull
@@ -32,20 +28,20 @@ public class pager extends androidx.fragment.app.FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new CliMusic(activity);
+                return new CliMusic();
             case 1:
-                return new CliVideos(activity);
+                return new CliVideos();
             case 2:
-                return new CliImages(activity);
+                return new CliImages();
             case 4:
                 return new CliDoc();
             case 5:
-                return new CliFiles(activity);
+                return new CliFiles();
             case 6:
                 return new History();
             case 3:
             default:
-                return new CliApp(activity);
+                return new CliApp();
         }
     }
 

@@ -70,7 +70,7 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new DocAdapter(this, current_id);
+        adapter = new DocAdapter(this, current_id,getActivity());
         Log.d(TAG, "onCreate: ");
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);

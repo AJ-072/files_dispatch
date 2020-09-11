@@ -52,7 +52,6 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
     private ProgressBar imageLoading;
     private TextView noImageText;
     private OnBackPressedCallback backPressedCallback;
-    private AddItemToShare itemToShare;
     private ArrayList<FileItem> imageItems;
 
     private String mParam1;
@@ -60,10 +59,6 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
 
     public CliImages() {
         // Required empty public constructor
-    }
-
-    public CliImages(AddItemToShare itemToShare) {
-        this.itemToShare = itemToShare;
     }
 
     public static CliImages newInstance(String param1, String param2) {
@@ -82,7 +77,7 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
         context = requireContext().getApplicationContext();
         DisplayMetrics metrics = new DisplayMetrics();
         requireActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-        imageAdapter = new ImageAdapter(this, itemToShare, metrics.widthPixels, metrics.heightPixels);
+        imageAdapter = new ImageAdapter(this, (AddItemToShare) getActivity(), metrics.widthPixels, metrics.heightPixels);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);

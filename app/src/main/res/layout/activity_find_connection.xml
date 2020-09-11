@@ -12,10 +12,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/search_device"
-        app:layout_constraintBottom_toBottomOf="@id/my_avatar"
-        app:layout_constraintEnd_toEndOf="@id/my_avatar"
-        app:layout_constraintStart_toStartOf="@id/my_avatar"
-        app:layout_constraintTop_toTopOf="@id/my_avatar" />
+        app:layout_constraintBottom_toBottomOf="@id/avatar_icon"
+        app:layout_constraintEnd_toEndOf="@id/avatar_icon"
+        app:layout_constraintStart_toStartOf="@id/avatar_icon"
+        app:layout_constraintTop_toTopOf="@id/avatar_icon" />
 
     <include
         layout="@layout/avatar_icon"
@@ -35,9 +35,9 @@
         android:textColor="@color/notFocused"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/my_avatar"
-        app:layout_constraintStart_toStartOf="@+id/my_avatar"
-        app:layout_constraintTop_toBottomOf="@+id/my_avatar" />
+        app:layout_constraintEnd_toEndOf="@+id/avatar_icon"
+        app:layout_constraintStart_toStartOf="@+id/avatar_icon"
+        app:layout_constraintTop_toBottomOf="@+id/avatar_icon" />
 
 
     <androidx.recyclerview.widget.RecyclerView

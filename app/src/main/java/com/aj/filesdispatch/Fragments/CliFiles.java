@@ -62,9 +62,6 @@ public class CliFiles extends Fragment implements LoaderManager.LoaderCallbacks<
         // Required empty public constructor
     }
 
-    public CliFiles(AddItemToShare fileToShare) {
-        this.fileToShare = fileToShare;
-    }
 
     public static CliFiles newInstance(String param1, String param2) {
         CliFiles fragment = new CliFiles();
@@ -89,6 +86,7 @@ public class CliFiles extends Fragment implements LoaderManager.LoaderCallbacks<
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         this.container = container;
+        fileToShare= (AddItemToShare) getActivity();
         View view = inflater.inflate(R.layout.fragment_cli_files, container, false);
         fileRecycler = view.findViewById(R.id.file_recycler);
         noFileText = view.findViewById(R.id.no_file_text);

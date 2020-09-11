@@ -1,5 +1,6 @@
 package com.aj.filesdispatch.RecyclerAdapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aj.filesdispatch.Entities.FileItem;
 import com.aj.filesdispatch.Entities.FileItemBuilder;
 import com.aj.filesdispatch.Fragments.CliDoc;
+import com.aj.filesdispatch.Interface.AddItemToShare;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.common.Converter;
 
@@ -35,12 +37,14 @@ public class DocAdapter extends RecyclerView.Adapter<DocAdapter.MyViewHolder> {
     private Context context;
     private static final String TAG = "DocAdapter";
     private int id;
+    private AddItemToShare itemToShare;
     private List<FileItem> docItems = new ArrayList<>();
     private Cursor cursorData;
 
-    public DocAdapter(DocAdapter.onDocclick onDocclick, int id) {
+    public DocAdapter(DocAdapter.onDocclick onDocclick, int id, Activity activity) {
         this.onDocclick = onDocclick;
         this.id = id;
+        this.itemToShare= (AddItemToShare) activity;
     }
 
     @Override
@@ -100,6 +104,9 @@ public class DocAdapter extends RecyclerView.Adapter<DocAdapter.MyViewHolder> {
             holder.docovertext.setText(file_name);
             holder.file_size.setText(docItems.get(position).getShowDes());
             holder.file_icon.setImageDrawable(ActivityCompat.getDrawable(context, R.drawable.ic_document_24));
+            holder.view.setOnClickListener(view -> {
+                itemToShare.onItemAdded(docItems.get(position));
+            });
         }
     }
 

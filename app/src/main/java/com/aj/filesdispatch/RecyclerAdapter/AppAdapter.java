@@ -2,7 +2,6 @@ package com.aj.filesdispatch.RecyclerAdapter;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +19,14 @@ import com.aj.filesdispatch.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
     private static final String TAG = "Adapter";
     private Activity activity;
-    AddItemToShare onAppItemClick;
+    private AddItemToShare onAppItemClick;
+    private ExecutorService threadPool = Executors.newFixedThreadPool(5);
     private static DiffUtil.ItemCallback<FileItem> fileItemItemCallback = new DiffUtil.ItemCallback<FileItem>() {
         @Override
         public boolean areItemsTheSame(@NonNull FileItem oldItem, @NonNull FileItem newItem) {
@@ -40,10 +41,10 @@ public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
         }
     };
 
-    public AppAdapter(Activity activity, AddItemToShare onAppItemClick) {
+    public AppAdapter(Activity activity) {
         super(fileItemItemCallback);
         this.activity = activity;
-        this.onAppItemClick = onAppItemClick;
+        this.onAppItemClick = (AddItemToShare) activity;
     }
 
 
@@ -58,30 +59,31 @@ public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         if (getItem(position).getDrawable() == null)
-            new Thread(() -> {
+            threadPool.submit(() -> {
                 try {
                     getItem(position).getDrawable(activity.getPackageManager().getApplicationIcon(getItem(position).getFileId()));
                     updateIcon(position);
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                 }
-            }).start();
-        Glide.with(activity)
-                .load(getItem(position).getDrawable())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .fitCenter()
-                .into(holder.appIcon);
+            });
+        else
+            Glide.with(activity)
+                    .load(getItem(position).getDrawable())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .fitCenter()
+                    .into(holder.appIcon);
         holder.appCheck.setVisibility(getItem(position).isChecked() ? View.VISIBLE : View.INVISIBLE);
         holder.appSize.setText(getItem(position).getShowDes());
         holder.appName.setText(getItem(position).getFileName());
         holder.itemView.setOnClickListener(view -> {
-            Log.d(TAG, "onBindViewHolder: " + (onAppItemClick == null));
             getItem(position).setChecked(!getItem(position).isChecked());
             notifyItemChanged(position);
             onAppItemClick.onItemAdded(getItem(position));
         });
     }
-    private void updateIcon(int position){
+
+    private void updateIcon(int position) {
         activity.runOnUiThread(() -> {
             notifyItemChanged(position);
         });

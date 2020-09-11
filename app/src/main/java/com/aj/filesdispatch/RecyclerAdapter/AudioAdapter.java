@@ -1,6 +1,6 @@
 package com.aj.filesdispatch.RecyclerAdapter;
 
-import android.content.Context;
+import android.app.Activity;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -36,6 +36,8 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.aj.filesdispatch.Fragments.CliMusic.AUDIOS;
 
@@ -43,15 +45,16 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
     private static final String TAG = "FILE_ADAPTER";
     private AddItemToShare itemToShare;
     private OnItemClickToOpen itemClickToOpen;
-    private Context context;
+    private Activity activity;
+    private ExecutorService threadPool = Executors.newFixedThreadPool(4);
     private boolean isPlaying = false;
     private List<FileItem> audioList = new ArrayList<>();
     private Cursor cursorData;
 
-    public AudioAdapter(AddItemToShare itemToShare, OnItemClickToOpen itemClickToOpen, Context context) {
+    public AudioAdapter(Activity activity, OnItemClickToOpen itemClickToOpen) {
         this.itemClickToOpen = itemClickToOpen;
-        this.itemToShare = itemToShare;
-        this.context = context;
+        this.itemToShare = (AddItemToShare) activity;
+        this.activity = activity;
     }
 
 
@@ -96,22 +99,26 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
                     .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
                     .build());
         }
-        String extension, encoder;
-        String description = audioList.get(position).getShowDes();
-        String fileName = audioList.get(position).getFileName();
-        try {
-            encoder = URLEncoder.encode(fileName, "UTF-8").replace("+", "%20");
-        } catch (UnsupportedEncodingException e) {
-            encoder = fileName;
-        }
-        extension = MimeTypeMap.getFileExtensionFromUrl(encoder).toUpperCase();
-        audioList.get(position).setDrawable(writeOnDrawable(extension));
-        Glide.with(context)
-                .load(audioList.get(position).getDrawable())
-                .fitCenter()
-                .into(holder.audioIcon);
-        holder.audioLabel.setText(fileName);
-        holder.audioDes.setText(description);
+        if (audioList.get(position).getDrawable() == null) {
+            threadPool.submit(() -> {
+                String extension, encoder;
+                String fileName = audioList.get(position).getFileName();
+                try {
+                    encoder = URLEncoder.encode(fileName, "UTF-8").replace("+", "%20");
+                } catch (UnsupportedEncodingException e) {
+                    encoder = fileName;
+                }
+                extension = MimeTypeMap.getFileExtensionFromUrl(encoder).toUpperCase();
+                audioList.get(position).setDrawable(writeOnDrawable(extension));
+                updateIcon(position);
+            });
+        } else
+            Glide.with(activity)
+                    .load(audioList.get(position).getDrawable())
+                    .fitCenter()
+                    .into(holder.audioIcon);
+        holder.audioLabel.setText(audioList.get(position).getFileName());
+        holder.audioDes.setText(audioList.get(position).getShowDes());
         holder.audioView.setOnClickListener(v -> {
             if (!isPlaying) {
                 isPlaying = true;
@@ -129,6 +136,10 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
     @Override
     public long getItemId(int position) {
         return position;
+    }
+
+    private void updateIcon(int position) {
+        activity.runOnUiThread(() -> notifyItemChanged(position));
     }
 
     @Override
@@ -180,7 +191,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
     }
 
     private Drawable writeOnDrawable(String extension) {
-        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.ic_music_icon);
+        Drawable drawable = ContextCompat.getDrawable(activity, R.drawable.ic_music_icon);
         Bitmap drawableIcon = null;
         if (drawable != null) {
             drawableIcon = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
@@ -193,13 +204,13 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
         Canvas iconCanvas = new Canvas(icon);
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setColor(context.getResources().getColor(R.color.audioPlayer));
+        paint.setColor(activity.getResources().getColor(R.color.audioPlayer));
         Typeface typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
         paint.setTextSize(23);
         paint.setFakeBoldText(true);
         paint.setTypeface(typeface);
         iconCanvas.drawText(extension, (float) icon.getWidth() * 7 / 12, (float) icon.getHeight() * 2 / 3, paint);
-        return new BitmapDrawable(context.getResources(), icon);
+        return new BitmapDrawable(activity.getResources(), icon);
     }
 }
 

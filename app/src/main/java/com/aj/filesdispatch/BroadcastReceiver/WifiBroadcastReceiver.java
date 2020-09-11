@@ -1,4 +1,4 @@
-package com.aj.filesdispatch.dispatchmanager;
+package com.aj.filesdispatch.BroadcastReceiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

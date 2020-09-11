@@ -48,7 +48,6 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
     private ProgressBar videoLoading;
     private OnBackPressedCallback backPressedCallback;
     private VideoAdapter videoAdapter;
-    private AddItemToShare videoToShare;
     private ArrayList<FileItem> videoItems;
 
     private String mParam1;
@@ -56,10 +55,6 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
 
     public CliVideos() {
         // Required empty public constructor
-    }
-
-    public CliVideos(AddItemToShare videoToShare) {
-        this.videoToShare = videoToShare;
     }
 
     public static CliVideos newInstance(String param1, String param2) {
@@ -76,7 +71,7 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
         super.onCreate(savedInstanceState);
         videoItems = new ArrayList<>();
         context = requireContext().getApplicationContext();
-        videoAdapter = new VideoAdapter(getContext(), videoToShare);
+        videoAdapter = new VideoAdapter(getActivity());
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);

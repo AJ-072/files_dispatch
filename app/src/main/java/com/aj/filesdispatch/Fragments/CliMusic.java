@@ -63,15 +63,10 @@ public class CliMusic extends Fragment implements LoaderManager.LoaderCallbacks<
     private AudioAdapter audioAdapter;
     private LoaderManager loaderManager;
     private OnBackPressedCallback backPressedCallback;
-    private AddItemToShare audioToShare;
     private ArrayList<FileItem> audioList;
 
     private String mParam1;
     private String mParam2;
-
-    public CliMusic(AddItemToShare addAudioToShare) {
-        this.audioToShare = addAudioToShare;
-    }
 
     public CliMusic() {
         // Required empty public constructor
@@ -91,7 +86,7 @@ public class CliMusic extends Fragment implements LoaderManager.LoaderCallbacks<
         super.onCreate(savedInstanceState);
         audioList = new ArrayList<>();
         context = getContext();
-        audioAdapter = new AudioAdapter(audioToShare, this, getContext());
+        audioAdapter = new AudioAdapter(getActivity(), this);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);

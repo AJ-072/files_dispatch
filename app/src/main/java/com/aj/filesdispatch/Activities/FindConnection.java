@@ -40,7 +40,7 @@ import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.ServiceListAdapter;
 import com.aj.filesdispatch.Services.DispatchService;
 import com.aj.filesdispatch.common.Converter;
-import com.aj.filesdispatch.dispatchmanager.WifiBroadcastReceiver;
+import com.aj.filesdispatch.BroadcastReceiver.WifiBroadcastReceiver;
 
 import java.io.File;
 import java.io.IOException;
@@ -165,7 +165,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         avatarId = preferences.getInt(AVATAR, ApplicationActivity.OptnlAvatarName);
         BuddyName = preferences.getString(BUDDY_NAME, ApplicationActivity.OptnlUserName);
-        connectionIcon = findViewById(R.id.my_avatar);
+        connectionIcon = findViewById(R.id.avatar_icon);
         avatarBg = findViewById(R.id.my_avatar_anim);
         connectionIcon.setImageResource(avatarId);
         TextView myDisplayName = findViewById(R.id.my_name);

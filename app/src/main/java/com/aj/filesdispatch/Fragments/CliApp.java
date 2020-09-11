@@ -22,34 +22,28 @@ public class CliApp extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
     private static final String TAG = "CliApp";
-    private AddItemToShare appToShare;
     private RecyclerView recyclerView;
     private AppAdapter appAdapter;
     private AppListViewModel viewModel;
     private ProgressBar appLoader;
 
-    public CliApp(AddItemToShare appToShare) {
-        this.appToShare = appToShare;
-    }
-
-    public CliApp() {
+    public CliApp(){
 
     }
 
-
-    public static CliApp newInstance(String param1, String param2) {
+    /*public static CliApp newInstance(String param1, String param2) {
         CliApp fragment = new CliApp();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
-    }
+    }*/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         viewModel = new ViewModelProvider(this).get(AppListViewModel.class);
         super.onCreate(savedInstanceState);
     }
@@ -61,7 +55,7 @@ public class CliApp extends Fragment {
         recyclerView = view.findViewById(R.id.app_recycler);
         appLoader = view.findViewById(R.id.app_loading);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
-        appAdapter = new AppAdapter(getActivity(), appToShare);
+        appAdapter = new AppAdapter(getActivity());
         recyclerView.setAdapter(appAdapter);
         viewModel.getFileItems().observe(getViewLifecycleOwner(), fileItems -> {
             appAdapter.submitList(fileItems);

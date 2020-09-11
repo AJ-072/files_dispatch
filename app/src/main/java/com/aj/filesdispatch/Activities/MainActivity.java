@@ -16,7 +16,6 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +23,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -52,9 +50,8 @@ import com.aj.filesdispatch.Entities.WifiP2pService;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.SelectedFileList;
 import com.aj.filesdispatch.Services.DispatchService;
-import com.aj.filesdispatch.common.Converter;
 import com.aj.filesdispatch.common.pager;
-import com.aj.filesdispatch.dispatchmanager.WifiBroadcastReceiver;
+import com.aj.filesdispatch.BroadcastReceiver.WifiBroadcastReceiver;
 import com.aj.filesdispatch.nav_optn.About;
 import com.aj.filesdispatch.nav_optn.HelpandFeed;
 import com.aj.filesdispatch.nav_optn.Settings;
@@ -258,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void TabMenu() {
-        adapter = new pager(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, tabLayout.getTabCount(), this);
+        adapter = new pager(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, tabLayout.getTabCount());
         //viewPager.onRestoreInstanceState(viewPager.onSaveInstanceState());
         viewPager.setAdapter(adapter);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

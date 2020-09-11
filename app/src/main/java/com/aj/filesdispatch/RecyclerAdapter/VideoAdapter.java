@@ -1,5 +1,6 @@
 package com.aj.filesdispatch.RecyclerAdapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -34,14 +35,14 @@ import static com.aj.filesdispatch.Fragments.CliVideos.VIDEOS;
 
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> {
     private static final String TAG = "FILE_ADAPTER";
-    private Context activity;
+    private Activity activity;
     private List<FileItem> videoItems = new ArrayList<>();
     private AddItemToShare videoClick;
     private Cursor cursorData;
 
-    public VideoAdapter(Context activity, AddItemToShare videoClick) {
+    public VideoAdapter(Activity activity) {
         this.activity = activity;
-        this.videoClick = videoClick;
+        this.videoClick = (AddItemToShare) activity;
     }
 
 

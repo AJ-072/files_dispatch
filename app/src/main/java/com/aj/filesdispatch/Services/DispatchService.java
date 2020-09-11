@@ -523,21 +523,23 @@ public class DispatchService extends Service {
         }
 
         private File getLocation(String Extension, String fileName) {
-            int count = 1;
-            StringBuilder uri = new StringBuilder();
-            uri = uri.append(Environment.getExternalStorageDirectory().getPath()).append("//")
-                    .append(context.getString(R.string.app_name))
-                    .append("//").append(Extension);
-            if (Extension.equals(APPLICATION))
-                uri.append("//").append(fileName).append(".apk");
-            else
-                uri.append("//").append(fileName);
-            File file = new File(uri.toString());
-            while (file.exists()) {
-                file = new File(uri.insert(uri.lastIndexOf("."),count+".").toString());
+            int count = 0;
+            File file;
+            do {
+                StringBuilder uri = new StringBuilder();
+                uri = uri.append(Environment.getExternalStorageDirectory().getPath()).append("//")
+                        .append(context.getString(R.string.app_name))
+                        .append("//").append(Extension);
+                if (Extension.equals(APPLICATION))
+                    uri.append("//").append(fileName).append(".apk");
+                else
+                    uri.append("//").append(fileName);
+                if (count == 0)
+                    file = new File(uri.toString());
+                else
+                    file = new File(uri.insert(uri.lastIndexOf("."), "("+count + ")").toString());
                 count++;
-            }
-
+            } while (file.exists());
             Log.d(TAG, "getLocation: " + file.getPath());
             try {
                 file.createNewFile();
