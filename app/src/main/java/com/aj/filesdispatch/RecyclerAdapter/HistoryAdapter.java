@@ -89,7 +89,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             adapter= new HistoryItemAdapter();
             recyclerView.setLayoutManager(new LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false));
             recyclerView.setAdapter(adapter);
-            LoaderManager.getInstance(fragment).initLoader(1,null,this);
+            LoaderManager.getInstance(fragment).initLoader(2,null,this);
         }
 
         @NonNull
@@ -104,7 +104,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 @Nullable
                 @Override
                 public Cursor loadInBackground() {
-                    return new DatabaseHelper(context,1).getListForSender(id_value);
+                    return new DatabaseHelper(context,1).getAllItems();
                 }
             };
         }

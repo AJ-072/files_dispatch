@@ -67,7 +67,7 @@ public class History extends Fragment implements LoaderManager.LoaderCallbacks<C
         historyRecycler=view.findViewById(R.id.history_recycler_view);
         noHistory=view.findViewById(R.id.no_history_text);
         historyProgress=view.findViewById(R.id.history_progress);
-        historyRecycler.setLayoutManager(new LinearLayoutManager(this.getContext(),RecyclerView.HORIZONTAL,false));
+        historyRecycler.setLayoutManager(new LinearLayoutManager(this.getContext(),RecyclerView.VERTICAL,false));
         adapter= new HistoryAdapter(this);
         LoaderManager.getInstance(this).initLoader(1,null,this);
         historyRecycler.setAdapter(adapter);

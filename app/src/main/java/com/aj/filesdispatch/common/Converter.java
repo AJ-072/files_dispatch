@@ -22,8 +22,16 @@ public class Converter {
     }
 
     public static String GetDate(long dateInLong) {
+        if (dateInLong==0){
+            return SimpleDateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date());
+        }
         return SimpleDateFormat.getDateInstance(DateFormat.SHORT).format(new Date(dateInLong * 1000));
     }
+
+    public static String GetDateMed(long dateInLong) {
+        return SimpleDateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date(dateInLong * 1000));
+    }
+
 
     public static String getFileDes(File file) {
         if (file.isDirectory()) {

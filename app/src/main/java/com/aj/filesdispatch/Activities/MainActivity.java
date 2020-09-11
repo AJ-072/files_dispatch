@@ -23,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -50,6 +51,7 @@ import com.aj.filesdispatch.Entities.WifiP2pService;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.SelectedFileList;
 import com.aj.filesdispatch.Services.DispatchService;
+import com.aj.filesdispatch.common.Converter;
 import com.aj.filesdispatch.common.pager;
 import com.aj.filesdispatch.dispatchmanager.WifiBroadcastReceiver;
 import com.aj.filesdispatch.nav_optn.About;
@@ -163,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             v.setVisibility(View.GONE);
         });*/
+        Toast.makeText(this, Converter.GetDate(0), Toast.LENGTH_SHORT).show();
         sharedPreferences.edit().putBoolean(LOCATION_PERMISSION_REPEAT, false).apply();
         count_text = findViewById(R.id.selected_item_count);
         drawerLayout = findViewById(R.id.drawer);

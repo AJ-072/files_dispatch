@@ -61,9 +61,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put(_ID, ID_VALUE);
         values.put(FILE_NAME, item.getFileName());
         values.put(FILE_SIZE, item.getFileSize());
         values.put(FILE_TYPE, item.getFileType());
+        values.put(FILE_ADDED_DATE,item.getDateAdded());
         values.put(FILE_LOC, item.getFileUri());
         values.put(FILE_SENDER, "ME");
         db.insert(TABLE_ITEMS, null, values);
@@ -78,7 +80,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(_ID, ID_VALUE);
         values.put(FILE_NAME, item.getFileName());
         values.put(FILE_SIZE, item.getFileSize());
-        values.put(FILE_ADDED_DATE, System.currentTimeMillis());
+        values.put(FILE_ADDED_DATE, System.currentTimeMillis()/1000);
         values.put(FILE_TYPE, item.getFileType());
         values.put(FILE_LOC, item.getFileUri());
         values.put(FILE_SENDER, item.getSender());
@@ -103,6 +105,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
                     .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
                     .build();
+        cursorData.close();
         return item;
     }
 
@@ -150,6 +153,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public Cursor getListForSender(String ID_VALUE) {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.query(TABLE_ITEMS, null, DatabaseHelper._ID + " = " + ID_VALUE, null, null, null, FILE_ADDED_DATE + " DESC");
+        return db.query(TABLE_ITEMS, new String[]{_ID, FILE_NAME,
+                FILE_SIZE, FILE_TYPE, FILE_LOC, FILE_SENDER},
+                DatabaseHelper._ID + " = '" + ID_VALUE+"'", null,
+                null, null, FILE_ADDED_DATE + " DESC");
     }
 }
