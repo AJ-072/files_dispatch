@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
@@ -18,13 +17,10 @@ import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,7 +54,6 @@ import java.util.Objects;
 import static com.aj.filesdispatch.Activities.MainActivity.LOCATION;
 import static com.aj.filesdispatch.Activities.MainActivity.LOCATION_PERMISSION_REPEAT;
 import static com.aj.filesdispatch.ApplicationActivity.FILE_TO_SEND;
-import static com.aj.filesdispatch.ApplicationActivity.sharedPreferences;
 
 
 public class FindConnection extends AppCompatActivity implements WifiP2pManager.ConnectionInfoListener, ServiceListAdapter.onClick {
@@ -71,24 +66,23 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     public static final String PORT = "ListeningPort";
     private WifiP2pDnsSdServiceInfo dnsSdServiceInfo;
     private WifiP2pDnsSdServiceRequest dnsSdServiceRequest;
-    public static WifiP2pManager p2pManager;
+    private WifiP2pManager p2pManager;
     private ServiceListAdapter adapter;
     private WifiManager manager;
     private WifiP2pService wifiP2pService;
     private WifiP2pDevice device;
     private Animation avatar_background;
-    public static WifiP2pManager.Channel dispatchChannel;
+    private WifiP2pManager.Channel dispatchChannel;
     private List<FileItem> fileToSend = new ArrayList<>();
-    private int retry = 0;
-    private int myPort;
-    private int avatarId;
+    private int retry = 0, myPort, avatarId;
+    private String BuddyName;
     private ArrayList<WifiP2pService> services = new ArrayList<>();
-    private ImageView connectionIcon,avatarBg;
+    private ImageView connectionIcon, avatarBg;
     private Intent service;
     private SharedPreferences preferences;
-    Map<String, String> record = new HashMap<>();
+    private Map<String, String> record = new HashMap<>();
     private WifiBroadcastReceiver wifiBroadcastReceiver;
-    ServerSocket socket;
+    private ServerSocket socket;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -113,7 +107,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
                 ArrayList<Uri> files = getFile.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
                 if (files != null)
                     for (Uri uri : files) {
-                        File file= new File(String.valueOf(uri));
+                        File file = new File(String.valueOf(uri));
                         fileToSend.add(new FileItemBuilder(file.getPath())
                                 .setShowDes(Converter.getFileDes(file))
                                 .setDateAdded(file.lastModified())
@@ -159,26 +153,32 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         service = new Intent(this, DispatchService.class);
         RecyclerView listView = findViewById(R.id.availWifiList);
         listView.setLayoutManager(new LinearLayoutManager(this));
+        p2pManager.requestConnectionInfo(dispatchChannel, this);
+        adapter = new ServiceListAdapter(this);
+        setAvatarAndUser();
+        preferences.edit().putBoolean(LOCATION_PERMISSION_REPEAT, false).apply();
+        listView.setAdapter(adapter);
+
+    }
+
+    public void setAvatarAndUser() {
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        avatarId = preferences.getInt(AVATAR, ApplicationActivity.OptnlAvatarName);
+        BuddyName = preferences.getString(BUDDY_NAME, ApplicationActivity.OptnlUserName);
         connectionIcon = findViewById(R.id.my_avatar);
-        avatarBg= findViewById(R.id.my_avatar_anim);
-        avatarId=sharedPreferences.getInt(AVATAR, ApplicationActivity.AvatarName);
+        avatarBg = findViewById(R.id.my_avatar_anim);
         connectionIcon.setImageResource(avatarId);
         TextView myStatus = findViewById(R.id.my_status);
         TextView myDisplayName = findViewById(R.id.my_name);
-        avatar_background= AnimationUtils.loadAnimation(this,R.anim.searching_connection);
-        p2pManager.requestConnectionInfo(dispatchChannel, this);
-        adapter = new ServiceListAdapter(this);
-        sharedPreferences.edit().putBoolean(LOCATION_PERMISSION_REPEAT, false).apply();
-        listView.setAdapter(adapter);
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        myDisplayName.setText(getName());
+        myDisplayName.setText(BuddyName);
+        avatar_background = AnimationUtils.loadAnimation(this, R.anim.searching_connection);
         avatarBg.setAnimation(avatar_background);
     }
 
     public void setLocalService() {
         Log.d(TAG, "setLocalService: started");
         record.put(PORT, String.valueOf(getServer_port()));
-        record.put(BUDDY_NAME, getName());
+        record.put(BUDDY_NAME, BuddyName);
         record.put(AVATAR, String.valueOf(avatarId));
         dnsSdServiceInfo = WifiP2pDnsSdServiceInfo.newInstance(INSTANCE_NAME, SERVICE_TYPE, record);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -238,7 +238,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
 
             @Override
             public void onFailure(int reason) {
-                Log.d(TAG, "onFailure: add service failed" + getreason(reason));
+                Log.d(TAG, "onFailure: add service failed" + getReason(reason));
 
             }
         });
@@ -273,11 +273,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
 
     }
 
-    private String getName() {
-        return preferences.getString(BUDDY_NAME, ApplicationActivity.OptnlUserName);
-    }
-
-    public String getreason(int reason) {
+    public String getReason(int reason) {
         switch (reason) {
             case WifiP2pManager.BUSY:
                 return "Busy";
@@ -357,12 +353,12 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     }
 
     @Override
-    public void selectDevice(WifiP2pService service,int position) {
+    public void selectDevice(WifiP2pService service, int position) {
         setConnection(service);
     }
 
     private void register() {
-        Log.d(TAG, "register: "+(dispatchChannel ==null)+(p2pManager==null));
+        Log.d(TAG, "register: " + (dispatchChannel == null) + (p2pManager == null));
         wifiBroadcastReceiver = new WifiBroadcastReceiver(p2pManager, dispatchChannel, this);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);

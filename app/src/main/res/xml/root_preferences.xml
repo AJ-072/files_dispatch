@@ -3,7 +3,7 @@
     <EditTextPreference
         android:id="@+id/account"
         app:icon="@drawable/ic_profile_default"
-        app:key="username"
+        app:key="UserName"
         android:onClick="Click"
         app:title="@string/username"
         app:useSimpleSummaryProvider="true" />

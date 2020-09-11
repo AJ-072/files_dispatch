@@ -23,12 +23,10 @@ import static com.aj.filesdispatch.Activities.FindConnection.BUDDY_NAME;
 public class ApplicationActivity extends Application {
     public static WifiP2pManager wifiP2pManager;
     public static WifiP2pManager.Channel wifiChannel;
-    public static String userName;
     public static String OptnlUserName;
-    public static int AvatarName;
     public static int OptnlAvatarName;
     private static final String TAG = "ApplicationActivity";
-    public NotificationChannel showConnected;
+    private NotificationChannel showConnected;
     public static final int[] Avatars={R.drawable.ic_avatar1,R.drawable.ic_avatar2,R.drawable.ic_avatar3,R.drawable.ic_avatar4,R.drawable.ic_avatar5,R.drawable.ic_avatar6,R.drawable.ic_avatar7};
     public static SharedPreferences sharedPreferences, defaultPreference;
     public static final String show = "DEVICE_CONNECTED";
@@ -61,11 +59,9 @@ public class ApplicationActivity extends Application {
     public void setUser() {
         OptnlUserName = "User" + String.format(Locale.ROOT, "%04d", new Random().nextInt(100000));
         OptnlAvatarName = Avatars[new Random().nextInt(6)];
-        userName = defaultPreference.getString(BUDDY_NAME, null);
-        AvatarName = sharedPreferences.getInt(AVATAR, -1);
-        if (userName == null)
+        if (defaultPreference.getString(BUDDY_NAME, null) == null)
             defaultPreference.edit().putString(BUDDY_NAME, OptnlUserName).apply();
-        if (AvatarName == -1)
+        if (sharedPreferences.getInt(AVATAR, -1) == -1)
             sharedPreferences.edit().putInt(AVATAR,OptnlAvatarName).apply();
     }
 }

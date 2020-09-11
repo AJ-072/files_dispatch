@@ -145,7 +145,7 @@ public class DispatchService extends Service {
                             myDevice = new UserInfo(socket.getReceiveBufferSize());
                             new ObjectOutputStream(output).writeUnshared(myDevice);
                             connectedDevice = (UserInfo) new ObjectInputStream(input).readUnshared();
-                            helper.setIdValue(connectedDevice.getUserName() + "_" + Converter.GetDate(System.currentTimeMillis()));
+                            helper.setIdValue(connectedDevice.getUserName() + "_" + Converter.GetDate(0));
                             receiveBuffer = connectedDevice.getByteReceiverSpeed();
                             bufferSize = Math.min(receiveBuffer, mySendBuffer);
                             fileTask = new ReceivingFileTask(input, this);

@@ -16,6 +16,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -165,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             v.setVisibility(View.GONE);
         });*/
-        Toast.makeText(this, Converter.GetDate(0), Toast.LENGTH_SHORT).show();
         sharedPreferences.edit().putBoolean(LOCATION_PERMISSION_REPEAT, false).apply();
         count_text = findViewById(R.id.selected_item_count);
         drawerLayout = findViewById(R.id.drawer);
@@ -220,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         viewPager.setCurrentItem(currentTab);
         bindService(serviceIntent, connection, 0);
         super.onResume();
+        drawerLayout.closeDrawer(GravityCompat.START);
     }
 
     @Override

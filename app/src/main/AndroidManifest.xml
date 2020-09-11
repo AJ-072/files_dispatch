@@ -72,8 +72,7 @@
         </activity>
         <activity
             android:name=".Activities.MainActivity"
-            android:autoRemoveFromRecents="false"
-            android:excludeFromRecents="false"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

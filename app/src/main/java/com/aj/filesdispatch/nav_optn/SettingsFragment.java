@@ -21,13 +21,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
-        visible_name = findPreference("username");
-        Objects.requireNonNull(visible_name).setOnBindEditTextListener(editText -> {
-
-        });
-        visible_name.setOnPreferenceClickListener(preference -> {
-            Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
-            return true;
-        });
+        visible_name = findPreference("UserName");
     }
 }
