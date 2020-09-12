@@ -43,7 +43,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     private List<FileItem> imageList;
     private OnItemClickToOpen imageToOpen;
     private AddItemToShare imageToShare;
-    private ExecutorService threadPool = Executors.newSingleThreadExecutor();
+    private ExecutorService threadPool = Executors.newFixedThreadPool(10);
     private Cursor cursorData;
     private static final String TAG = "ImageAdapter";
 
@@ -64,7 +64,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-        holder.imageView.setImageDrawable(ActivityCompat.getDrawable(activity,android.R.color.transparent));
+        holder.imageView.setImageDrawable(ActivityCompat.getDrawable(activity,R.color.focusedShade));
         cursorData.moveToPosition(position);
         if (imageList.size() > position && imageList.get(position) == null) {
             imageList.set(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))

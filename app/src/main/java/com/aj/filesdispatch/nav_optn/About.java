@@ -7,13 +7,14 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.motion.widget.MotionScene;
 
 import com.aj.filesdispatch.R;
 
 import java.util.Objects;
 
 public class About extends AppCompatActivity {
-    TextView version, about;
+    private TextView version, about;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +31,13 @@ public class About extends AppCompatActivity {
             e.printStackTrace();
         }
         about = findViewById(R.id.us);
-        about.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        about.setOnClickListener(v -> {
 
-            }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }

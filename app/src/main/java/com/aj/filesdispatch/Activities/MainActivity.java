@@ -42,16 +42,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.aj.filesdispatch.BroadcastReceiver.WifiBroadcastReceiver;
 import com.aj.filesdispatch.Entities.FileItem;
-import com.aj.filesdispatch.Interface.AddItemToShare;
-import com.aj.filesdispatch.Interface.OnBindToService;
 import com.aj.filesdispatch.Entities.UserInfo;
 import com.aj.filesdispatch.Entities.WifiP2pService;
+import com.aj.filesdispatch.Interface.AddItemToShare;
+import com.aj.filesdispatch.Interface.OnBindToService;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.SelectedFileList;
 import com.aj.filesdispatch.Services.DispatchService;
 import com.aj.filesdispatch.common.pager;
-import com.aj.filesdispatch.BroadcastReceiver.WifiBroadcastReceiver;
 import com.aj.filesdispatch.nav_optn.About;
 import com.aj.filesdispatch.nav_optn.HelpandFeed;
 import com.aj.filesdispatch.nav_optn.Settings;
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerView listRecycler;
     private NavigationView navigationView;
     private ViewPager viewPager;
-    private Integer currentTab;
+    private Integer currentTab=3;
     private TabLayout tabLayout;
     private ServiceConnection connection;
     private Button send;
@@ -99,20 +99,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private BroadcastReceiver wifiBroadcastReceiver;
     private DispatchService dispatchService = null;
     private Intent serviceIntent;
-    public ArrayList<FileItem> fileToTransfer;
+    private ArrayList<FileItem> fileToTransfer = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Initialize();
-        if (savedInstanceState != null) {
-            currentTab = savedInstanceState.getInt(CURRENT_TAB, 3);
-            fileToTransfer = savedInstanceState.getParcelableArrayList(FILE_TO_SEND);
-        } else {
-            currentTab = 3;
-            fileToTransfer = new ArrayList<>();
-        }
 
         navigationView.setNavigationItemSelectedListener(this);             //Object Click Listeners
         send.setOnClickListener(this);
@@ -389,14 +382,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        currentTab = savedInstanceState.getInt(CURRENT_TAB, 3);
+        fileToTransfer = savedInstanceState.getParcelableArrayList(FILE_TO_SEND);
+        setCount();
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        //outState.putParcelableArrayList(FILE_TO_SEND, fileToTransfer);
+        outState.putParcelableArrayList(FILE_TO_SEND, fileToTransfer);
         outState.putInt(CURRENT_TAB, currentTab);
 
     }
@@ -445,12 +441,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else {
                 fileToTransfer.removeAll(fileViewItems);
             }
-            count = fileToTransfer.size();
         }
         setCount();
     }
 
     private void setCount() {
+        count = fileToTransfer.size();
         if (count > 0) {
             count_text.setVisibility(View.VISIBLE);
             count_text.setText(String.valueOf(count));
