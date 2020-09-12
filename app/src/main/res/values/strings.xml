@@ -78,4 +78,6 @@
     <string name="remove">Remove</string>
     <string name="no_history">No History</string>
     <string name="size">Size</string>
+    <string name="file_name">File_Name</string>
+    <string name="file_size">File_Size</string>
 </resources>

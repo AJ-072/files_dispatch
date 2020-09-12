@@ -22,12 +22,17 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/file_icon"
-        android:layout_width="100dp"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="100dp"
+        android:maxHeight="80dp"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
         android:paddingHorizontal="5dp"
-        android:src="@drawable/ic_launcher_foreground"
+        android:src="@drawable/ic_android"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/send_guideline"
+        app:layout_constraintStart_toStartOf="@+id/file_progress"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -42,7 +47,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/file_cancel"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@id/file_icon"
+        app:layout_constraintStart_toEndOf="@id/send_guideline"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.29000002" />
 
@@ -67,4 +72,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/send_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="100dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
