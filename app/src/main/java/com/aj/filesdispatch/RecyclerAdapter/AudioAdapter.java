@@ -110,7 +110,11 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
                 }
                 extension = MimeTypeMap.getFileExtensionFromUrl(encoder).toUpperCase();
                 audioList.get(position).setDrawable(writeOnDrawable(extension));
-                updateIcon(position);
+                activity.runOnUiThread(() -> Glide.with(activity)
+                        .load(audioList.get(position).getDrawable())
+                        .fitCenter()
+                        .into(holder.audioIcon));
+                //updateIcon(position);
             });
         } else
             Glide.with(activity)

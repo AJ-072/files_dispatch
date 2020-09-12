@@ -1,5 +1,6 @@
 package com.aj.filesdispatch.Fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -77,7 +78,7 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
         context = requireContext().getApplicationContext();
         DisplayMetrics metrics = new DisplayMetrics();
         requireActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-        imageAdapter = new ImageAdapter(this, (AddItemToShare) getActivity(), metrics.widthPixels, metrics.heightPixels);
+        imageAdapter = new ImageAdapter(this, getActivity(), metrics.widthPixels, metrics.heightPixels);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);

@@ -62,7 +62,12 @@ public class AppAdapter extends ListAdapter<FileItem, AppAdapter.MyViewHolder> {
             threadPool.submit(() -> {
                 try {
                     getItem(position).getDrawable(activity.getPackageManager().getApplicationIcon(getItem(position).getFileId()));
-                    updateIcon(position);
+                    activity.runOnUiThread(() -> Glide.with(activity)
+                            .load(getItem(position).getDrawable())
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .fitCenter()
+                            .into(holder.appIcon));
+                    //updateIcon(position);
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                 }

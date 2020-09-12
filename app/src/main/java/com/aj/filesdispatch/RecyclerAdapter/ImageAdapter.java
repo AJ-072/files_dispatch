@@ -1,10 +1,14 @@
 package com.aj.filesdispatch.RecyclerAdapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +17,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatCheckBox;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aj.filesdispatch.Entities.FileItem;
@@ -27,21 +32,25 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.aj.filesdispatch.Fragments.CliImages.IMAGES;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
-    private Context activity;
+    private Activity activity;
     int width, height;
     private List<FileItem> imageList;
     private OnItemClickToOpen imageToOpen;
     private AddItemToShare imageToShare;
+    private ExecutorService threadPool = Executors.newSingleThreadExecutor();
     private Cursor cursorData;
     private static final String TAG = "ImageAdapter";
 
-    public ImageAdapter(OnItemClickToOpen imageToOpen, AddItemToShare imageToShare, int width, int height) {
+    public ImageAdapter(OnItemClickToOpen imageToOpen, Activity activity, int width, int height) {
         this.imageToOpen = imageToOpen;
-        this.imageToShare = imageToShare;
+        this.imageToShare = (AddItemToShare) activity;
+        this.activity=activity;
         this.width = width;
         this.height = height;
     }
@@ -49,15 +58,15 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        activity = parent.getContext();
         View fileView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image_view, parent, false);
         return new ViewHolder(fileView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+        holder.imageView.setImageDrawable(ActivityCompat.getDrawable(activity,android.R.color.transparent));
         cursorData.moveToPosition(position);
-        if (imageList.size() > position && imageList.get(position) == null)
+        if (imageList.size() > position && imageList.get(position) == null) {
             imageList.set(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
                     .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)))
                     .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
@@ -66,7 +75,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                     .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
                     .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
                     .build());
-        else if (imageList.size() == position)
+        }
+        else if (imageList.size() == position) {
             imageList.add(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
                     .setFileName(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME)))
                     .setFileSize(cursorData.getLong(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)))
@@ -75,6 +85,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                     .setFileUri(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))
                     .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
                     .build());
+        }
         else if (imageList.size() < position) {
             Log.d(TAG, "onBindViewHolder: add null");
             imageList.addAll(Collections.nCopies(position - imageList.size(), null));
@@ -87,10 +98,20 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                     .setShowDes(Converter.getFileDes(new File(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATA)))))
                     .build());
         }
-        Glide.with(activity)
-                .load("file://" + getUriFromMediaStore(position))
-                .centerCrop()
-                .into(holder.imageView);
+        if (imageList.get(position).getDrawable() == null) {
+            threadPool.submit(() -> {
+                imageList.get(position).setDrawable(getBitmapFromMediaStore(position));
+                activity.runOnUiThread(() -> Glide.with(activity)
+                        .load(imageList.get(position).getDrawable())
+                        .centerCrop()
+                        .into(holder.imageView));
+            });
+        }
+        else
+            Glide.with(activity)
+                    .load(imageList.get(position).getDrawable())
+                    .centerCrop()
+                    .into(holder.imageView);
         holder.imageView.setOnClickListener(v -> imageToOpen.OnClick(imageList.get(position)));
         holder.checkBox.setOnClickListener(v -> imageToShare.onItemAdded(imageList.get(position)));
         holder.checkBox.setChecked(imageList.get(position).isChecked());
@@ -134,16 +155,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         this.imageList = imageList;
     }
 
-    private Bitmap getBitmapFromMediaStore(int position) {
-        return MediaStore.Images.Thumbnails.getThumbnail(
+    private Drawable getBitmapFromMediaStore(int position) {
+        return new BitmapDrawable(activity.getResources(),MediaStore.Images.Thumbnails.getThumbnail(
                 activity.getContentResolver(),
                 Long.parseLong(imageList.get(position).getFileId()),
                 MediaStore.Images.Thumbnails.MINI_KIND,
-                null);
+                null));
 
-    }
-
-    public Uri getUriFromMediaStore(int position) {
-        return Uri.parse(imageList.get(position).getFileUri());
     }
 }
