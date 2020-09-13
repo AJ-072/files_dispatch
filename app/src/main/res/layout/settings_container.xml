@@ -4,7 +4,7 @@
     android:id="@+id/settings_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#4000">
+    >
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/this_user"
@@ -36,6 +36,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/settings_fragment"
+        android:background="#3000"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"

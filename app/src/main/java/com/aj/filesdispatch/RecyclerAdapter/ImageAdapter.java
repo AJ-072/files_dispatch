@@ -64,7 +64,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-        holder.imageView.setImageDrawable(ActivityCompat.getDrawable(activity,R.color.focusedShade));
+        //holder.imageView.setImageDrawable(ActivityCompat.getDrawable(activity,R.color.focusedShade));
         cursorData.moveToPosition(position);
         if (imageList.size() > position && imageList.get(position) == null) {
             imageList.set(position, new FileItemBuilder(cursorData.getString(cursorData.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)))
@@ -128,8 +128,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.picview);
-            checkBox = itemView.findViewById(R.id.pic_check);
+            imageView = itemView.findViewById(R.id.image_item);
+            checkBox = itemView.findViewById(R.id.image_check);
         }
     }
 

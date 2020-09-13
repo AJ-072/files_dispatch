@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/file_icon"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -25,13 +25,13 @@
         android:background="@drawable/buttonbg"
         android:backgroundTint="#4000"
         android:drawableStart="@drawable/ic_play"
-        android:paddingEnd="5dp"
+        android:paddingHorizontal="5dp"
         android:textColor="#FFF"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/file_icon" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/file_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -40,14 +40,14 @@
         android:maxLines="2"
         android:paddingHorizontal="5dp"
         android:text="@string/file_name"
-        android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Subtitle"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/video_checkbox"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/file_icon" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/file_size"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -55,20 +55,20 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="5dp"
         android:text="@string/file_size"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
         android:textStyle="bold"
+        android:textSize="13sp"
+        android:textColor="#828282"
         app:layout_constraintEnd_toStartOf="@+id/video_checkbox"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/file_icon"
         app:layout_constraintTop_toBottomOf="@+id/file_name" />
 
-    <CheckBox
+    <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/video_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:gravity="top"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

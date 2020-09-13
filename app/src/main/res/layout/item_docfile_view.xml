@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:paddingHorizontal="10dp">
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/file_icon"
         android:layout_width="48dp"
         android:layout_height="48dp"
@@ -19,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/file_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -28,9 +28,9 @@
         android:gravity="center_vertical"
         android:maxLines="1"
         android:paddingHorizontal="5dp"
-        android:text="File_Name"
-        android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Subtitle"
+        android:text="@string/file_name"
         android:textStyle="bold"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/file_checked"
         app:layout_constraintHorizontal_bias="0.0"
@@ -46,9 +46,10 @@
         android:layout_marginTop="5dp"
         android:gravity="center_vertical"
         android:paddingHorizontal="5dp"
-        android:text="File_Size"
+        android:text="@string/file_size"
         android:textSize="12sp"
         android:textStyle="bold"
+        android:textColor="#828282"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/file_name"

@@ -8,16 +8,29 @@
     tools:context=".Activities.FindConnection">
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/my_avatar_anim"
+        android:id="@+id/my_avatar_anim1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/search_device"
-        app:layout_constraintBottom_toBottomOf="@id/avatar_icon"
-        app:layout_constraintEnd_toEndOf="@id/avatar_icon"
-        app:layout_constraintStart_toStartOf="@id/avatar_icon"
-        app:layout_constraintTop_toTopOf="@id/avatar_icon" />
+        app:layout_constraintBottom_toBottomOf="@+id/this_avatar"
+        app:layout_constraintEnd_toEndOf="@+id/this_avatar"
+        app:layout_constraintStart_toStartOf="@+id/this_avatar"
+        app:layout_constraintTop_toTopOf="@+id/this_avatar"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/my_avatar_anim2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/search_device"
+        app:layout_constraintBottom_toBottomOf="@+id/this_avatar"
+        app:layout_constraintEnd_toEndOf="@+id/this_avatar"
+        app:layout_constraintStart_toStartOf="@+id/this_avatar"
+        app:layout_constraintTop_toTopOf="@+id/this_avatar" />
+
 
     <include
+        android:id="@+id/this_avatar"
         layout="@layout/avatar_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,19 +39,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!--<androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/appCompatImageView2"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/wifi_search"
+        app:layout_constraintStart_toStartOf="@+id/this_avatar"
+        app:layout_constraintTop_toTopOf="@+id/this_avatar" />-->
+
+
     <TextView
         android:id="@+id/my_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
+        android:layout_marginTop="25dp"
         android:text="@string/app_name"
         android:textColor="@color/notFocused"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/avatar_icon"
-        app:layout_constraintStart_toStartOf="@+id/avatar_icon"
-        app:layout_constraintTop_toBottomOf="@+id/avatar_icon" />
-
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/this_avatar" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/availWifiList"

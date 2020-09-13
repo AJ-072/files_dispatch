@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/itemfile"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/audio_icon"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -23,17 +22,17 @@
         android:id="@+id/video_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="invisible"
         android:layout_margin="5dp"
         android:background="@drawable/buttonbg"
-        android:textColor="#FFF"
-        android:paddingEnd="5dp"
         android:backgroundTint="#4000"
         android:drawableStart="@drawable/ic_play"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/audio_icon" />
+        android:paddingHorizontal="5dp"
+        android:textColor="#FFF"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/audio_icon"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/audio_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -41,22 +40,23 @@
         android:gravity="center_vertical"
         android:maxLines="1"
         android:paddingHorizontal="5dp"
-        android:text="File_Name"
-        android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Subtitle"
+        android:text="@string/file_name"
+        android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/audio_check"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/audio_des"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/audio_name"
         android:gravity="center_vertical"
         android:paddingHorizontal="5dp"
-        android:text="File_Size"
+        android:text="@string/file_size"
+        android:textColor="#828282"
         android:textSize="12sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -66,7 +66,7 @@
         app:layout_constraintTop_toBottomOf="@+id/audio_name"
         app:layout_constraintVertical_bias="0.0" />
 
-    <CheckBox
+    <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/audio_check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

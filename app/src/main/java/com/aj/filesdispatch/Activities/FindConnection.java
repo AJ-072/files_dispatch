@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aj.filesdispatch.ApplicationActivity;
+import com.aj.filesdispatch.BroadcastReceiver.WifiBroadcastReceiver;
 import com.aj.filesdispatch.Entities.FileItem;
 import com.aj.filesdispatch.Entities.FileItemBuilder;
 import com.aj.filesdispatch.Entities.WifiP2pService;
@@ -40,7 +41,6 @@ import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.ServiceListAdapter;
 import com.aj.filesdispatch.Services.DispatchService;
 import com.aj.filesdispatch.common.Converter;
-import com.aj.filesdispatch.BroadcastReceiver.WifiBroadcastReceiver;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,13 +71,13 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     private WifiManager manager;
     private WifiP2pService wifiP2pService;
     private WifiP2pDevice device;
-    private Animation avatar_background;
+    private Animation avatarBackgroundAnim;
     private WifiP2pManager.Channel dispatchChannel;
     private List<FileItem> fileToSend = new ArrayList<>();
     private int retry = 0, myPort, avatarId;
     private String BuddyName;
     private ArrayList<WifiP2pService> services = new ArrayList<>();
-    private ImageView connectionIcon, avatarBg;
+    private ImageView thisAvatarIcon, avatarBg1, avatarBg2;
     private Intent service;
     private SharedPreferences preferences;
     private Map<String, String> record = new HashMap<>();
@@ -165,13 +165,21 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         avatarId = preferences.getInt(AVATAR, ApplicationActivity.OptnlAvatarName);
         BuddyName = preferences.getString(BUDDY_NAME, ApplicationActivity.OptnlUserName);
-        connectionIcon = findViewById(R.id.avatar_icon);
-        avatarBg = findViewById(R.id.my_avatar_anim);
-        connectionIcon.setImageResource(avatarId);
+        thisAvatarIcon = findViewById(R.id.avatar_icon);
+        avatarBg1 = findViewById(R.id.my_avatar_anim1);
+        avatarBg2 = findViewById(R.id.my_avatar_anim2);
+        thisAvatarIcon.setImageResource(avatarId);
         TextView myDisplayName = findViewById(R.id.my_name);
         myDisplayName.setText(BuddyName);
-        avatar_background = AnimationUtils.loadAnimation(this, R.anim.searching_connection);
-        avatarBg.setAnimation(avatar_background);
+        avatarBackgroundAnim = AnimationUtils.loadAnimation(this, R.anim.searching_connection);
+        avatarBg1.setAnimation(avatarBackgroundAnim);
+        try {
+            Thread.sleep(200);
+            avatarBg2.setAnimation(avatarBackgroundAnim);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void setLocalService() {

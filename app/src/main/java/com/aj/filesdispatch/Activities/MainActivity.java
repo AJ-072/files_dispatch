@@ -115,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         TabMenu();
-        setNav();
 
         alertDialog = new androidx.appcompat.app.AlertDialog.Builder(this);
 
@@ -209,8 +208,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         viewPager.setCurrentItem(currentTab);
         bindService(serviceIntent, connection, 0);
-        super.onResume();
         drawerLayout.closeDrawer(GravityCompat.START);
+        setNav();
+        super.onResume();
     }
 
     @Override
