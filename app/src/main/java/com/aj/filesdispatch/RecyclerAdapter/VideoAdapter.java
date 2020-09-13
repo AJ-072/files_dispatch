@@ -1,7 +1,6 @@
 package com.aj.filesdispatch.RecyclerAdapter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -104,9 +103,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
                 .centerCrop()
                 .into(holder.viewImage);
         holder.check_item.setChecked(videoItems.get(position).isChecked());
-        holder.itemView.setOnClickListener(view -> {
-            playVideo(position);
-        });
+        holder.itemView.setOnClickListener(view -> playVideo(position));
 
     }
 

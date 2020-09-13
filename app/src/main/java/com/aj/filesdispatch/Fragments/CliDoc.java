@@ -38,7 +38,7 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
     private static final String ARG_PARAM2 = "param2";
     public static final int DOC_LOADER_ID = 201;
     public static final int DOC_FILE_LOADER_ID = 101;
-    public static final String DOCUMENT= "Documents";
+    public static final String DOCUMENT = "Documents";
     private List<String> type = new ArrayList<>();
     public static int current_id = DOC_LOADER_ID;
     private static final String TAG = "Doc fragment";
@@ -70,7 +70,7 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter = new DocAdapter(this, current_id,getActivity());
+        adapter = new DocAdapter(this, current_id, getActivity());
         Log.d(TAG, "onCreate: ");
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -120,9 +120,7 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
                                 this.remove();
                                 requireActivity().getOnBackPressedDispatcher().onBackPressed();
                             })
-                            .setNegativeButton("No", (dialog, which) -> {
-                                dialog.dismiss();
-                            })
+                            .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                             .create().show();
                 } else {
                     recyclerView.removeItemDecoration(itemDecoration);
@@ -177,7 +175,7 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
         documentLoading.setVisibility(View.GONE);
         current_id = DOC_FILE_LOADER_ID;
         if (data != null && data.getCount() > 0) {
-            setAdapter(linearLayout,current_id);
+            setAdapter(linearLayout, current_id);
             adapter.setData(data);
             recyclerView.addItemDecoration(itemDecoration);
             recyclerView.setVisibility(View.VISIBLE);
@@ -218,7 +216,7 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
 
     }
 
-    private void setAdapter(RecyclerView.LayoutManager layoutManager,int current_id) {
+    private void setAdapter(RecyclerView.LayoutManager layoutManager, int current_id) {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
         adapter.setId(current_id);
@@ -229,7 +227,7 @@ public class CliDoc extends Fragment implements LoaderManager.LoaderCallbacks<Cu
         type = null;
         recyclerView.setVisibility(View.VISIBLE);
         noDocText.setVisibility(View.GONE);
-        setAdapter(gridLayout,current_id);
+        setAdapter(gridLayout, current_id);
 
     }
 }

@@ -1,26 +1,35 @@
 package com.aj.filesdispatch.nav_optn;
 
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.preference.EditTextPreference;
+import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.aj.filesdispatch.R;
+import com.aj.filesdispatch.RecyclerAdapter.AvatarRecyclerView;
 
 import java.util.Objects;
 
+import static com.aj.filesdispatch.Activities.FindConnection.AVATAR;
+import static com.aj.filesdispatch.Activities.FindConnection.BUDDY_NAME;
+import static com.aj.filesdispatch.ApplicationActivity.OptnlAvatarName;
+import static com.aj.filesdispatch.ApplicationActivity.OptnlUserName;
+
 public class SettingsFragment extends PreferenceFragmentCompat {
-    EditTextPreference visible_name;
-    private static final String TAG = "SettingsFragment";
+    private Preference setUser;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
-        visible_name = findPreference("UserName");
+        setUser = findPreference("setUser");
     }
+
 }

@@ -1,28 +1,27 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference
-        android:id="@+id/account"
-        app:icon="@drawable/ic_profile_default"
-        app:key="UserName"
-        android:onClick="Click"
-        app:title="@string/username"
-        app:useSimpleSummaryProvider="true" />
-    <EditTextPreference
-        app:allowDividerAbove="true"
-        app:iconSpaceReserved="false"
-        app:key="destination_folder"
-        app:title="@string/des_folder"
-        app:useSimpleSummaryProvider="true" />
-    <Preference
-        app:allowDividerAbove="true"
-        app:iconSpaceReserved="false"
-        app:key="clear_history"
-        app:title="Clear All History" />
-    <CheckBoxPreference
-        app:allowDividerAbove="true"
-        app:iconSpaceReserved="false"
-        app:key="update_while_share"
-        app:summary="Receive FilesDispatch updates During Transfer "
-        app:title="Update Without Internet"/>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory
+        app:icon="@drawable/ic_setting"
+        app:title="@string/settings"
+        app:widgetLayout="@layout/change_user_view">
+        <ListPreference
+            app:allowDividerAbove="true"
+            app:entries="@array/storage_entries"
+            app:entryValues="@array/storage_entry_values"
+            app:iconSpaceReserved="false"
+            app:key="destination_folder"
+            app:title="@string/destination"
+            app:useSimpleSummaryProvider="true" />
+        <Preference
+            app:allowDividerAbove="true"
+            app:iconSpaceReserved="false"
+            app:key="clear_history"
+            app:title="Clear All History" />
+        <CheckBoxPreference
+            app:allowDividerAbove="true"
+            app:iconSpaceReserved="false"
+            app:key="update_while_share"
+            app:summary="Receive FilesDispatch updates During Transfer "
+            app:title="Update Without Internet" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

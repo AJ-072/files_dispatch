@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.SharedPreferences;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.NotificationManagerCompat;
@@ -27,7 +28,7 @@ public class ApplicationActivity extends Application {
     public static int OptnlAvatarName;
     private static final String TAG = "ApplicationActivity";
     private NotificationChannel showConnected;
-    public static final int[] Avatars={R.drawable.ic_avatar1,R.drawable.ic_avatar2,R.drawable.ic_avatar3,R.drawable.ic_avatar4,R.drawable.ic_avatar5,R.drawable.ic_avatar6,R.drawable.ic_avatar7};
+    public static final Integer[] Avatars={R.drawable.ic_avatar1,R.drawable.ic_avatar2,R.drawable.ic_avatar3,R.drawable.ic_avatar4,R.drawable.ic_avatar5,R.drawable.ic_avatar6,R.drawable.ic_avatar7};
     public static SharedPreferences sharedPreferences, defaultPreference;
     public static final String show = "DEVICE_CONNECTED";
     public static final String DARK_MODE = "DARK_MODE";
@@ -61,8 +62,10 @@ public class ApplicationActivity extends Application {
         OptnlAvatarName = Avatars[new Random().nextInt(6)];
         if (defaultPreference.getString(BUDDY_NAME, null) == null)
             defaultPreference.edit().putString(BUDDY_NAME, OptnlUserName).apply();
-        if (sharedPreferences.getInt(AVATAR, -1) == -1)
-            sharedPreferences.edit().putInt(AVATAR,OptnlAvatarName).apply();
+        if (defaultPreference.getInt(AVATAR, -1) == -1) {
+            Log.d(TAG, "setUser: ");
+            defaultPreference.edit().putInt(AVATAR, OptnlAvatarName).apply();
+        }
     }
 }
 

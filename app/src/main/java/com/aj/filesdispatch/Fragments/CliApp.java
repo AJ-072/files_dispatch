@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.aj.filesdispatch.Interface.AddItemToShare;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.AppAdapter;
 import com.aj.filesdispatch.ViewModels.AppListViewModel;
@@ -28,7 +27,7 @@ public class CliApp extends Fragment {
     private AppListViewModel viewModel;
     private ProgressBar appLoader;
 
-    public CliApp(){
+    public CliApp() {
 
     }
 

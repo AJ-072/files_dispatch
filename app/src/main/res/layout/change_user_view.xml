@@ -4,54 +4,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="20dp">
+    android:background="#2000"
+    android:padding="20dp">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="0dp"
-        android:layout_height="200dp"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/avatar_icon_list"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_alignParentTop="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.07999998"
-        app:spanCount="4"
-        tools:itemCount="7"
-        tools:listitem="@layout/avatar_icon" />
-
-    <androidx.constraintlayout.widget.Placeholder
-        android:id="@+id/icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/appCompatSeekBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_height="64dp"
-        tools:layout_width="64dp" />
-
+        tools:listitem="@layout/avatar_icon_layout" />
 
     <androidx.appcompat.widget.AppCompatSeekBar
-        android:id="@+id/appCompatSeekBar"
+        android:id="@+id/change_bg_color"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:layout_marginVertical="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerView"
-        app:layout_constraintVertical_bias="0.0" />
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/username"
+        app:layout_constraintTop_toBottomOf="@+id/avatar_icon_list"
+        tools:layout_editor_absoluteX="20dp" />
 
-    <com.google.android.material.textfield.TextInputEditText
+    <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/username"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:inputType="text"
+        android:background="@drawable/search_bar_background"
+        android:drawablePadding="5dp"
         android:hint="@string/username"
-        android:drawableStart="@drawable/ic_profile_default"
+        android:inputType="text"
+        android:padding="5dp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appCompatSeekBar" />
+        app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

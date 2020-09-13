@@ -10,7 +10,7 @@
 
     <!-- Preference Titles -->
     <string name="des_folder">Destination Folder</string>
-    <string name="username">Visible name</string>
+    <string name="username">Display name</string>
     <string name="default_folder">Default</string>
 
     <!-- permission popup -->
@@ -34,6 +34,19 @@
     <string name="disconnect">disconnect</string>
     <string name="add_members">Add members</string>
 
+    <!--storage entry values-->
+    <string-array name="storage_entry_values">
+        <item>sd_card</item>
+        <item>internal_storage</item>
+    </string-array>
+
+    <!-- storage entries-->
+    <string-array name="storage_entries">
+        <item>Sd Card</item>
+        <item>Internal Storage</item>
+    </string-array>
+
+    <!--file Types-->
     <string-array name="FileType">
         <item>Applications</item>
         <item>videos</item>
@@ -80,4 +93,6 @@
     <string name="size">Size</string>
     <string name="file_name">File_Name</string>
     <string name="file_size">File_Size</string>
+    <string name="destination">Destination Storage</string>
+    <string name="general">General</string>
 </resources>
