@@ -7,67 +7,18 @@
     android:layout_height="match_parent"
     tools:context=".Activities.MainActivity">
 
-    <RelativeLayout
+    <include
+        android:id="@+id/include"
+        layout="@layout/home"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:duplicateParentState="true">
-
-        <include
-            layout="@layout/home"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="20dp"
-            android:duplicateParentState="true">
-
-            <RelativeLayout
-                android:id="@+id/send_large"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingEnd="3dp"
-                tools:ignore="RtlSymmetry">
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/send"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/buttonbg"
-                    android:contentDescription="@string/send"
-                    android:drawableStart="@drawable/ic_send"
-                    android:drawablePadding="10dp"
-                    android:paddingStart="15dp"
-                    android:paddingEnd="15dp"
-                    android:text="@string/connect"
-                    android:textAllCaps="false"
-                    android:textColor="@color/colorFileShade"
-                    android:textStyle="bold"
-                    android:theme="@style/AppTheme"
-                    android:visibility="invisible" />
-            </RelativeLayout>
-
-            <TextView
-                android:id="@+id/selected_item_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignEnd="@id/send_large"
-                android:background="@drawable/itemcount"
-                android:visibility="gone" />
-
-        </RelativeLayout>
-
-    </RelativeLayout>
+        android:layout_height="match_parent" />
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_header"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
+        android:elevation="4dp"
         app:headerLayout="@layout/nav"
         app:menu="@menu/home_menu" />
 </androidx.drawerlayout.widget.DrawerLayout>

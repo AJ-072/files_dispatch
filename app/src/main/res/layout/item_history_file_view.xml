@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/itemfile"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:weightSum="100">
+    android:paddingVertical="5dp"
+    android:layout_height="wrap_content">
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/file_icon"
-        android:layout_width="0dp"
+        android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginVertical="10dp"
-        android:layout_weight="15"
+        android:paddingHorizontal="10dp"
+        android:scaleType="centerCrop"
         android:contentDescription="@string/file_icon"
         android:paddingVertical="5dp"
         android:src="@drawable/ic_file_doc"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/viewGuideline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,7 +35,7 @@
         app:layout_constraintBottom_toTopOf="@+id/file_size"
         app:layout_constraintEnd_toStartOf="@+id/action_button"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/file_icon"
+        app:layout_constraintStart_toEndOf="@+id/viewGuideline"
         app:layout_constraintTop_toTopOf="@+id/action_button" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -49,7 +49,8 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/action_button"
         app:layout_constraintEnd_toEndOf="@+id/file_name"
-        app:layout_constraintStart_toStartOf="@+id/file_name" />
+        app:layout_constraintStart_toStartOf="@+id/file_name"
+        app:layout_constraintTop_toBottomOf="@id/file_name" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/action_button"
@@ -57,8 +58,19 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/layout_background"
+        android:backgroundTint="@color/notFocused"
+        android:padding="10dp"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/viewGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.2" />
 </androidx.constraintlayout.widget.ConstraintLayout>

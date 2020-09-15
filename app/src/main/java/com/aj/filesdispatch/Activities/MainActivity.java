@@ -34,9 +34,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ShareCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RecyclerView listRecycler;
     private NavigationView navigationView;
     private ViewPager viewPager;
-    private Integer currentTab=3;
+    private Integer currentTab = 3;
     private TabLayout tabLayout;
     private ServiceConnection connection;
     private Button send;
@@ -93,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ProgressDialog progressDialog;
     private Dialog listDialog;
     private TextView tv;
-    private TextView count_text;
+    private Button count_text;
     private Intent dispatchActivity, sendFileIntent;
     private Switch dms;
     private BroadcastReceiver wifiBroadcastReceiver;
@@ -157,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });*/
         sharedPreferences.edit().putBoolean(LOCATION_PERMISSION_REPEAT, false).apply();
         count_text = findViewById(R.id.selected_item_count);
+        count_text.setOnClickListener(this);
         drawerLayout = findViewById(R.id.drawer);
         navigationView = findViewById(R.id.nav_header);
         dispatchActivity = new Intent(MainActivity.this, FindConnection.class);
@@ -233,7 +236,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 //setAlertDialog();
                 break;
-
+            case R.id.selected_item_count:
+                showSelectedList();
         }
     }
 
@@ -458,13 +462,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void setAlertDialog() {
-        SelectedFileList fileList = new SelectedFileList(fileToTransfer, this);
+    private void showSelectedList() {
+        SelectedFileList fileList = new SelectedFileList(this);
+        fileList.submitList(fileToTransfer);
         listRecycler = new RecyclerView(this);
         listRecycler.setLayoutManager(new LinearLayoutManager(this));
-        listRecycler.setPadding(10, 5, 10, 0);
+        listRecycler.setPadding(5, 10, 5, 0);
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        itemDecoration.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(this, R.drawable.line_divider)));
+        listRecycler.addItemDecoration(itemDecoration);
         listRecycler.setAdapter(fileList);
         listDialog = alertDialog.setView(listRecycler)
+                .setTitle("File To Share")
+                .setIcon(ContextCompat.getDrawable(this, R.drawable.ic_share))
                 .setPositiveButton(getText(R.string.close), (dialog, which) -> dialog.cancel())
                 .setNeutralButton(("Remove All"), (dialog, which) -> {
                     onMultiItemAdded(fileToTransfer);

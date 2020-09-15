@@ -17,9 +17,11 @@ import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,7 +73,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     private WifiManager manager;
     private WifiP2pService wifiP2pService;
     private WifiP2pDevice device;
-    private Animation avatarBackgroundAnim;
+    private Animation avatarBackgroundAnim1, avatarBackgroundAnim2;
     private WifiP2pManager.Channel dispatchChannel;
     private List<FileItem> fileToSend = new ArrayList<>();
     private int retry = 0, myPort, avatarId;
@@ -165,21 +167,18 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         avatarId = preferences.getInt(AVATAR, ApplicationActivity.OptnlAvatarName);
         BuddyName = preferences.getString(BUDDY_NAME, ApplicationActivity.OptnlUserName);
-        thisAvatarIcon = findViewById(R.id.avatar_icon);
+        thisAvatarIcon = findViewById(R.id.this_avatar);
         avatarBg1 = findViewById(R.id.my_avatar_anim1);
         avatarBg2 = findViewById(R.id.my_avatar_anim2);
         thisAvatarIcon.setImageResource(avatarId);
         TextView myDisplayName = findViewById(R.id.my_name);
         myDisplayName.setText(BuddyName);
-        avatarBackgroundAnim = AnimationUtils.loadAnimation(this, R.anim.searching_connection);
-        avatarBg1.setAnimation(avatarBackgroundAnim);
-        try {
-            Thread.sleep(200);
-            avatarBg2.setAnimation(avatarBackgroundAnim);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        avatarBackgroundAnim1 = AnimationUtils.loadAnimation(this, R.anim.search_device_anim);
+        avatarBackgroundAnim2 = AnimationUtils.loadAnimation(this, R.anim.search_device_anim);
+        avatarBackgroundAnim1.setInterpolator(new DecelerateInterpolator());
+        avatarBackgroundAnim2.setInterpolator(new DecelerateInterpolator());
+        avatarBg1.setAnimation(avatarBackgroundAnim1);
+        new Handler().postDelayed(() -> avatarBg2.setAnimation(avatarBackgroundAnim2), 900);
     }
 
     public void setLocalService() {

@@ -15,5 +15,7 @@
     <color name="videoThumb">#EF5350</color>
     <color name="pointer">#D1D1D1</color>
     <color name="TEXT_COLOR">#000000</color>
+
+    <color name="navItemColor">#44000000</color>
 </resources>
 
