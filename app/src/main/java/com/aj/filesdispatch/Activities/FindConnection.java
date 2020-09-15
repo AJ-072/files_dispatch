@@ -55,6 +55,7 @@ import java.util.Objects;
 
 import static com.aj.filesdispatch.Activities.MainActivity.LOCATION;
 import static com.aj.filesdispatch.Activities.MainActivity.LOCATION_PERMISSION_REPEAT;
+import static com.aj.filesdispatch.ApplicationActivity.Avatars;
 import static com.aj.filesdispatch.ApplicationActivity.FILE_TO_SEND;
 
 

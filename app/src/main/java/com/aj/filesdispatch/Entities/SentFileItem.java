@@ -2,6 +2,8 @@ package com.aj.filesdispatch.Entities;
 
 import android.graphics.drawable.Drawable;
 
+import androidx.annotation.NonNull;
+
 import com.aj.filesdispatch.ApplicationActivity;
 
 import java.io.Serializable;
@@ -97,5 +99,11 @@ public class SentFileItem implements Serializable, Item {
 
     public Drawable getDrawable() {
         return drawable;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return fileName;
     }
 }

@@ -363,9 +363,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 isPermissionGranted = true;
                 if (fileToTransfer.size() > 0)
                     dispatchActivity.putParcelableArrayListExtra(FILE_TO_SEND, fileToTransfer);
-                Log.d(TAG, "onRequestPermissionsResult: starting service");
                 startActivityForResult(dispatchActivity, CONNECTED_DEVICE);
-
             }
         }
     }
@@ -498,6 +496,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void getConnectedDeviceInfo(UserInfo info) {
         isConnected = true;
+        fileToTransfer.clear();
+        setCount();
         /* status.setText(String.format("Connected to %s !", info.getUserName()));*/
         //status.setCompoundDrawablesRelativeWithIntrinsicBounds();
     }

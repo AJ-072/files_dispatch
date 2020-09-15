@@ -8,10 +8,11 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/file_icon"
-        android:layout_width="48dp"
+        android:layout_width="0dp"
         android:layout_height="48dp"
         android:paddingHorizontal="10dp"
         android:scaleType="centerCrop"
+        android:background="@color/navItemColor"
         android:contentDescription="@string/file_icon"
         android:paddingVertical="5dp"
         android:src="@drawable/ic_file_doc"

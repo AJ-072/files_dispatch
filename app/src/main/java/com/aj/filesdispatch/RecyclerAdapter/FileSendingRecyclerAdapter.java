@@ -10,18 +10,15 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.aj.filesdispatch.ApplicationActivity;
 import com.aj.filesdispatch.Entities.SentFileItem;
 import com.aj.filesdispatch.Interface.setClickListener;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.common.Converter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.aj.filesdispatch.Activities.FindConnection.BUDDY_NAME;
 import static com.aj.filesdispatch.ApplicationActivity.defaultPreference;
@@ -32,17 +29,32 @@ import static com.aj.filesdispatch.Fragments.CliMusic.AUDIOS;
 import static com.aj.filesdispatch.Fragments.CliVideos.VIDEOS;
 import static com.aj.filesdispatch.Repository.AppListRepository.APPLICATION;
 
-public class FileSendingRecyclerAdapter extends RecyclerView.Adapter<FileSendingRecyclerAdapter.ViewHolder> {
-    private List<SentFileItem> TransferingFile = new ArrayList<>();
+public class FileSendingRecyclerAdapter extends ListAdapter<SentFileItem, FileSendingRecyclerAdapter.ViewHolder> {
     private static final String TAG = "FileSendingRecyclerAdap";
     private static String me = defaultPreference.getString(BUDDY_NAME, null);
     private Context context;
     private setClickListener cancelListener;
 
     public FileSendingRecyclerAdapter(Activity activity) {
-        context=activity;
-        cancelListener= (setClickListener) activity;
+        super(diffUtil);
+        context = activity;
+        cancelListener = (setClickListener) activity;
     }
+
+    private static final DiffUtil.ItemCallback<SentFileItem> diffUtil = new DiffUtil.ItemCallback<SentFileItem>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull SentFileItem oldItem, @NonNull SentFileItem newItem) {
+            return oldItem.getSender().equals(newItem.getSender())
+                    && oldItem.getFileName().equals(newItem.getFileName());
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull SentFileItem oldItem, @NonNull SentFileItem newItem) {
+            return oldItem.getFileName().equals(newItem.getFileName())
+                    && oldItem.getProgress() == newItem.getProgress()
+                    && oldItem.isCompleted() == newItem.isCompleted();
+        }
+    };
 
     @NonNull
     @Override
@@ -53,7 +65,7 @@ public class FileSendingRecyclerAdapter extends RecyclerView.Adapter<FileSending
 
     @Override
     public int getItemViewType(int position) {
-        if (me.equals(TransferingFile.get(position).getSender()))
+        if (me.equals(getItem(position).getSender()))
             return R.layout.send_file_view;
         return R.layout.recieve_file_view;
     }
@@ -61,39 +73,36 @@ public class FileSendingRecyclerAdapter extends RecyclerView.Adapter<FileSending
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         int drawableId = R.drawable.ic_launcher_foreground;
-        holder.mSize.setText(Converter.SizeInGMK(TransferingFile.get(position).getFileSize()));
-        holder.mIdView.setText(TransferingFile.get(position).getFileName());
-        holder.progressBar.setMax((int) TransferingFile.get(position).getFileSize());
-        holder.progressBar.setProgress((int) TransferingFile.get(position).getProgress());
-        if (TransferingFile.get(position).getFileType().equals(APPLICATION))
-            drawableId = R.drawable.ic_android;
-        else if (TransferingFile.get(position).getFileType().equals(VIDEOS))
-            drawableId= R.drawable.ic_play;
-        else if (TransferingFile.get(position).getFileType().equals(IMAGES))
-            drawableId=R.drawable.ic_image;
-        else if (TransferingFile.get(position).getFileType().equals(AUDIOS))
-            drawableId=R.drawable.ic_music_icon;
-        else if (TransferingFile.get(position).getFileType().equals(DOCUMENT))
-            drawableId=R.drawable.ic_document_24;
-        else if (TransferingFile.get(position).getFileType().equals(FOLDER))
-            drawableId=R.drawable.ic_file_doc;
+        holder.mSize.setText(Converter.SizeInGMK(getItem(position).getFileSize()));
+        holder.mIdView.setText(getItem(position).getFileName());
+        holder.progressBar.setMax((int) getItem(position).getFileSize());
+        holder.progressBar.setProgress((int) getItem(position).getProgress());
+        switch (getItem(position).getFileType()) {
+            case APPLICATION:
+                drawableId = R.drawable.ic_android;
+                break;
+            case VIDEOS:
+                drawableId = R.drawable.ic_play;
+                break;
+            case IMAGES:
+                drawableId = R.drawable.ic_image;
+                break;
+            case AUDIOS:
+                drawableId = R.drawable.ic_music_icon;
+                break;
+            case DOCUMENT:
+                drawableId = R.drawable.ic_document_24;
+                break;
+            case FOLDER:
+                drawableId = R.drawable.ic_file_doc;
+                break;
+        }
         holder.icon.setImageResource(drawableId);
-        if (TransferingFile.get(position).isCompleted()) {
+        if (getItem(position).isCompleted()) {
             holder.progressBar.setVisibility(View.INVISIBLE);
             holder.cancel.setText(context.getText(R.string.open));
         }
-        holder.cancel.setOnClickListener(v -> cancelListener.onClick(TransferingFile.get(position)));
-    }
-
-    @Override
-    public int getItemCount() {
-        return TransferingFile != null ? TransferingFile.size() : 0;
-    }
-
-    @MainThread
-    public void setFilePacks(List<SentFileItem> TransferingFile) {
-        this.TransferingFile = TransferingFile;
-        notifyDataSetChanged();
+        holder.cancel.setOnClickListener(v -> cancelListener.onClick(getItem(position)));
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

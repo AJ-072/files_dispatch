@@ -44,6 +44,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -247,6 +248,7 @@ public class DispatchService extends Service {
             sign = 1;
             TransferFile.addAll(items);
         } else {
+            Log.d(TAG, "alterTransferFile: "+items.toString());
             sentFileItems = items;
             TransferFile.removeAll(items);
             sign = -1;
@@ -279,16 +281,17 @@ public class DispatchService extends Service {
     private static class asyncFileSender extends AsyncTask<Void, Integer, Boolean> {
         private ObjectOutputStream sending;
         private List<FileItem> sendingFileItems;
-        private List<SentFileItem> newItems;
-        private List<SentFileItem> sendingViews;
+        private  ArrayList<SentFileItem> newItems, itemsToSend;
+        private ArrayList<SentFileItem> sendingViews;
         private BufferedInputStream fileInput;
-        private Action action = null;
+        private  Action action = null, itemAction;
         int count = 0;
 
         public asyncFileSender(ObjectOutputStream outputStream, List<FileItem> fileItems) {
             this.sending = outputStream;
             sendingFileItems = new ArrayList<>();
             newItems = new ArrayList<>();
+            itemsToSend = new ArrayList<>();
             sendingViews = new ArrayList<>();
             addShareItems(fileItems);
         }
@@ -307,12 +310,13 @@ public class DispatchService extends Service {
             MsgData data;
             try {
                 Log.d(TAG, "doInBackground: create sending");
-                //sending = new ObjectOutputStream(outputStream);
+                itemsToSend = (ArrayList<SentFileItem>) newItems.clone();
                 if (sendingFileItems.size() != 0) {
-                    data = new MsgData(newItems, null, ACTION_ADD, 0);
+                    data = new MsgData(itemsToSend, null, ACTION_ADD, 0);
                     sending.writeUnshared(data);
                     sending.flush();
                     sending.reset();
+                    newItems.clear();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -331,13 +335,18 @@ public class DispatchService extends Service {
                 }
                 while (true) {
                     try {
-                        newItems.clear();
-                        action = null;
+                        if (itemAction == null) {
+                            itemsToSend = (ArrayList<SentFileItem>) newItems.clone();
+                            itemAction = action;
+                            action = null;
+                            newItems.clear();
+                        }
+
                         if ((bytes = fileInput.read(buffer)) == -1) {
                             closeFile(fileInput);
                             break;
                         }
-                        data = new MsgData(newItems, buffer, action, bytes);
+                        data = new MsgData(itemsToSend, buffer, itemAction, bytes);
                         sending.writeUnshared(data);
                         sending.flush();
                         sending.reset();
@@ -349,9 +358,10 @@ public class DispatchService extends Service {
                     }
 
                 }
+                currentSendingFile.setFileUri(currentItem.getFileUri());
+                publishProgress(0);
                 count++;
                 helper.addItem(currentItem);
-                currentSendingFile.setFileUri(currentItem.getFileUri());
             }
             try {
                 sending.writeUnshared(null);
@@ -366,11 +376,9 @@ public class DispatchService extends Service {
 
         @Override
         protected void onProgressUpdate(Integer... values) {
-            Log.d(TAG, "onProgressUpdate: ");
             currentSendingFile.setProgress(currentSendingFile.getProgress() + values[0]);
-            if (fileListener != null) {
+            if (fileListener != null)
                 fileListener.onFileProgress(TransferFile.indexOf(currentSendingFile));
-            }
             if (bindToService != null)
                 bindToService.setTotalProgress((totalProgress = totalProgress + values[0]));
         }
@@ -397,12 +405,10 @@ public class DispatchService extends Service {
         }
 
         public void addShareItems(List<FileItem> shareItems) {
-            if (newItems != null)
-                newItems.clear();
+            newItems.clear();
             action = null;
             this.sendingFileItems.addAll(shareItems);
             for (FileItem item : shareItems) {
-                Log.d(TAG, "addShareItems: " + item.getFileName());
                 newItems.add(new SentFileItem(item));
             }
             sendingViews.addAll(newItems);
@@ -423,7 +429,7 @@ public class DispatchService extends Service {
 
     public static class ReceivingFileTask extends AsyncTask<Void, Integer, Void> {
         private InputStream inputStream;
-        private List<SentFileItem> receivingFiles;
+        private volatile List<SentFileItem> receivingFiles;
         private boolean pause = false;
         private Context context;
         private ObjectInputStream fileInput;
@@ -452,7 +458,7 @@ public class DispatchService extends Service {
                     setAction(data);
                     if (data.getAction() == ACTION_STOP) break;
                     for (SentFileItem item : receivingFiles) {
-                        Log.d(TAG, "doInBackground: still in log");
+                        Log.d(TAG, "item="+item.toString());
                         currentReceivingFile = item;
                         int total = 0;
                         File file = getLocation(item.getFileType(), item.getFileName());
@@ -470,6 +476,7 @@ public class DispatchService extends Service {
                                 Log.d(TAG, "doInBackground: is null");
                         }
                         currentReceivingFile.setFileUri(file.getPath());
+                        publishProgress(0);
                         helper.addItem(currentReceivingFile);
                         bufferedOutputStream.close();
                     }
@@ -491,6 +498,7 @@ public class DispatchService extends Service {
                         alterTransferFile(inputPack.getAction(), inputPack.getFileList());
                         break;
                     case ACTION_REMOVE:
+                        Log.d(TAG, "setAction: "+receivingFiles.containsAll(inputPack.getFileList()));
                         receivingFiles.removeAll(inputPack.getFileList());
                         alterTransferFile(inputPack.getAction(), inputPack.getFileList());
                         break;
@@ -537,7 +545,7 @@ public class DispatchService extends Service {
                 if (count == 0)
                     file = new File(uri.toString());
                 else
-                    file = new File(uri.insert(uri.lastIndexOf("."), "("+count + ")").toString());
+                    file = new File(uri.insert(uri.lastIndexOf("."), "(" + count + ")").toString());
                 count++;
             } while (file.exists());
             Log.d(TAG, "getLocation: " + file.getPath());

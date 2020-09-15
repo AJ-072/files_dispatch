@@ -119,7 +119,10 @@ public class FileSendingProgress extends AppCompatActivity implements OnBindToSe
 
     @Override
     public void onFileListChanged(List<SentFileItem> fileItems) {
-        runOnUiThread(() -> adapter.setFilePacks(fileItems));
+        runOnUiThread(() ->{
+            adapter.submitList(fileItems);
+            adapter.notifyDataSetChanged();
+        });
     }
 
     @Override

@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:background="@color/audioPlayer"
         android:minHeight="45sp"
-        android:src="@drawable/ic_music_icon"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintHorizontal_bias="0.0"

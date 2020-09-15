@@ -62,7 +62,7 @@ public class ServiceListAdapter extends ListAdapter<WifiP2pService, ServiceListA
             super(itemView);
             visiblename = itemView.findViewById(R.id.icon_name);
             status = itemView.findViewById(R.id.status_view);
-            avatar=itemView.findViewById(R.id.my_avatar);
+            avatar=itemView.findViewById(R.id.avatar_icon);
             view = itemView;
         }
     }
