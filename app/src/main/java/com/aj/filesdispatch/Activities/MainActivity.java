@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,6 +31,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -80,9 +82,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Toolbar toolbar;
     public static final String LOCATION_PERMISSION_REPEAT = "NEVER_AGAIN";
     public static final int CONNECTED_DEVICE = 2;
-    private ActionBarDrawerToggle toggle;
     private DrawerLayout drawerLayout;
-    private RecyclerView listRecycler;
     private NavigationView navigationView;
     private ViewPager viewPager;
     private Integer currentTab = 3;
@@ -90,14 +90,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ServiceConnection connection;
     private Button send;
     private boolean isPermissionGranted = false, isConnected = false;
-    private PagerAdapter adapter;
     private androidx.appcompat.app.AlertDialog.Builder alertDialog;
     private ProgressDialog progressDialog;
     private Dialog listDialog;
     private TextView tv;
     private Button count_text;
     private Intent dispatchActivity, sendFileIntent;
-    private Switch dms;
+    private SwitchCompat dms;
     private BroadcastReceiver wifiBroadcastReceiver;
     private DispatchService dispatchService = null;
     private Intent serviceIntent;
@@ -222,9 +221,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.send:
                 isPermissionGranted = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
                 if (isPermissionGranted && !isConnected) {
-                    Log.d(TAG, "onClick: not connected with permission");
-                    dispatchActivity.putParcelableArrayListExtra(FILE_TO_SEND, fileToTransfer);
-                    Log.d(TAG, "onClick: " + dispatchActivity.getParcelableArrayListExtra(FILE_TO_SEND));
+                    Log.d(TAG, "onClick: not connected & with permission");
+                    dispatchActivity.putParcelableArrayListExtra(FILE_TO_SEND, (ArrayList<? extends Parcelable>) fileToTransfer.clone());
+                    fileToTransfer.clear();
                     startActivityForResult(dispatchActivity, CONNECTED_DEVICE);
                 } else if (!isPermissionGranted) {
                     Log.d(TAG, "onClick: permission not granted");
@@ -252,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void TabMenu() {
-        adapter = new pager(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, tabLayout.getTabCount());
+        PagerAdapter adapter = new pager(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, tabLayout.getTabCount());
         //viewPager.onRestoreInstanceState(viewPager.onSaveInstanceState());
         viewPager.setAdapter(adapter);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -278,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setNav() {
-        toggle = new ActionBarDrawerToggle(
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.open, R.string.close);
         drawerLayout.addDrawerListener(toggle);
         toggle.setDrawerIndicatorEnabled(true);
@@ -361,8 +360,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 RequestPermission(MainActivity.this);
             } else {
                 isPermissionGranted = true;
-                if (fileToTransfer.size() > 0)
-                    dispatchActivity.putParcelableArrayListExtra(FILE_TO_SEND, fileToTransfer);
+                if (fileToTransfer.size() > 0) {
+                    dispatchActivity.putParcelableArrayListExtra(FILE_TO_SEND, (ArrayList<? extends Parcelable>) fileToTransfer.clone());
+                    fileToTransfer.clear();
+                }
                 startActivityForResult(dispatchActivity, CONNECTED_DEVICE);
             }
         }
@@ -387,14 +388,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         currentTab = savedInstanceState.getInt(CURRENT_TAB, 3);
-        fileToTransfer = savedInstanceState.getParcelableArrayList(FILE_TO_SEND);
         setCount();
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(FILE_TO_SEND, fileToTransfer);
         outState.putInt(CURRENT_TAB, currentTab);
 
     }
@@ -463,7 +462,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void showSelectedList() {
         SelectedFileList fileList = new SelectedFileList(this);
         fileList.submitList(fileToTransfer);
-        listRecycler = new RecyclerView(this);
+        RecyclerView listRecycler = new RecyclerView(this);
         listRecycler.setLayoutManager(new LinearLayoutManager(this));
         listRecycler.setPadding(5, 10, 5, 0);
         DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
@@ -496,9 +495,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void getConnectedDeviceInfo(UserInfo info) {
         isConnected = true;
-        fileToTransfer.clear();
         setCount();
-        /* status.setText(String.format("Connected to %s !", info.getUserName()));*/
-        //status.setCompoundDrawablesRelativeWithIntrinsicBounds();
     }
 }

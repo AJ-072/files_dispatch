@@ -73,7 +73,6 @@ public class FileSendingProgress extends AppCompatActivity implements OnBindToSe
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "run: " + count + " " + speed);
                 Objects.requireNonNull(getSupportActionBar()).setTitle(Converter.SizeInGMK(count - speed) + "/s");
                 speed = count;
                 handler.postDelayed(this, 1000);

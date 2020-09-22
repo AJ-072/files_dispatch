@@ -30,7 +30,6 @@ import static com.aj.filesdispatch.Fragments.CliVideos.VIDEOS;
 import static com.aj.filesdispatch.Repository.AppListRepository.APPLICATION;
 
 public class FileSendingRecyclerAdapter extends ListAdapter<SentFileItem, FileSendingRecyclerAdapter.ViewHolder> {
-    private static final String TAG = "FileSendingRecyclerAdap";
     private static String me = defaultPreference.getString(BUDDY_NAME, null);
     private Context context;
     private setClickListener cancelListener;

@@ -47,6 +47,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static com.aj.filesdispatch.Activities.FindConnection.IP_ADDRESS;
 import static com.aj.filesdispatch.Activities.FindConnection.PORT;
@@ -72,14 +75,17 @@ public class DispatchService extends Service {
     private static final String TAG = "DispatchService";
     private Thread staringThread;
     private asyncFileSender fileSender;
+    public static String APP_NAME;
     private static UserInfo connectedDevice, myDevice;
     private static OnBindToService bindToService = null;
+    private ExecutorService threadPool;
     private static SendingFIleListener fileListener = null;
     private static int total = 0, totalProgress = 0, receiveBuffer, mySendBuffer, bufferSize;
     private static DatabaseHelper helper;
 
     public DispatchService() {
         super();
+        APP_NAME=this.getString(R.string.app_name);
     }
 
     public List<SentFileItem> getReceivedFile() {
@@ -95,6 +101,7 @@ public class DispatchService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        threadPool= Executors.newScheduledThreadPool(2);
         helper = new DatabaseHelper(this, 1);
         connected = new NotificationCompat.Builder(this, ApplicationActivity.show)
                 .setSmallIcon(R.drawable.ic_logo)
@@ -149,7 +156,7 @@ public class DispatchService extends Service {
                             helper.setIdValue(connectedDevice.getUserName() + "_" + Converter.GetDate(0));
                             receiveBuffer = connectedDevice.getByteReceiverSpeed();
                             bufferSize = Math.min(receiveBuffer, mySendBuffer);
-                            fileTask = new ReceivingFileTask(input, this);
+                            fileTask = new ReceivingFileTask(input);
                             fileTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                             objectOutputStream = new ObjectOutputStream(output);
                             if (fileToSend != null && fileToSend.size() > 0)
@@ -280,9 +287,9 @@ public class DispatchService extends Service {
 
     private static class asyncFileSender extends AsyncTask<Void, Integer, Boolean> {
         private ObjectOutputStream sending;
-        private List<FileItem> sendingFileItems;
+        private volatile List<FileItem> sendingFileItems;
         private  ArrayList<SentFileItem> newItems, itemsToSend;
-        private ArrayList<SentFileItem> sendingViews;
+        private volatile ArrayList<SentFileItem> sendingViews;
         private BufferedInputStream fileInput;
         private  Action action = null, itemAction;
         int count = 0;
@@ -431,14 +438,9 @@ public class DispatchService extends Service {
         private InputStream inputStream;
         private volatile List<SentFileItem> receivingFiles;
         private boolean pause = false;
-        private Context context;
-        private ObjectInputStream fileInput;
 
-        ReceivingFileTask(InputStream input, Context context) {
+        ReceivingFileTask(InputStream input) {
             this.inputStream = input;
-            Log.d(TAG, "ReceivingFileTask: ");
-            WeakReference<Context> weakContext = new WeakReference<>(context);
-            this.context = weakContext.get();
         }
 
         @Override
@@ -451,7 +453,7 @@ public class DispatchService extends Service {
         protected Void doInBackground(Void... voids) {
             MsgData data;
             try {
-                fileInput = new ObjectInputStream(inputStream);
+                ObjectInputStream fileInput = new ObjectInputStream(inputStream);
                 while (true) {
                     Log.d(TAG, "doInBackground: fileinput waiting");
                     data = (MsgData) fileInput.readUnshared();
@@ -464,7 +466,6 @@ public class DispatchService extends Service {
                         File file = getLocation(item.getFileType(), item.getFileName());
                         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file));
                         while (total < item.getFileSize()) {
-                            Log.d(TAG, "doInBackground: lopping");
                             data = (MsgData) fileInput.readUnshared();
                             if (data != null) {
                                 setAction(data);
@@ -472,8 +473,7 @@ public class DispatchService extends Service {
                                 bufferedOutputStream.write(data.getBytes(), 0, data.getLength());
                                 bufferedOutputStream.flush();
                                 publishProgress(data.getLength());
-                            } else
-                                Log.d(TAG, "doInBackground: is null");
+                            }
                         }
                         currentReceivingFile.setFileUri(file.getPath());
                         publishProgress(0);
@@ -536,7 +536,7 @@ public class DispatchService extends Service {
             do {
                 StringBuilder uri = new StringBuilder();
                 uri = uri.append(Environment.getExternalStorageDirectory().getPath()).append("//")
-                        .append(context.getString(R.string.app_name))
+                        .append(APP_NAME)
                         .append("//").append(Extension);
                 if (Extension.equals(APPLICATION))
                     uri.append("//").append(fileName).append(".apk");
