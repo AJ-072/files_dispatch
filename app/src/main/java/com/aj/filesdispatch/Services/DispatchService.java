@@ -285,6 +285,9 @@ public class DispatchService extends Service {
         }).start();
     }
 
+    private void sendFile(){
+    }
+
     private static class asyncFileSender extends AsyncTask<Void, Integer, Boolean> {
         private ObjectOutputStream sending;
         private volatile List<FileItem> sendingFileItems;

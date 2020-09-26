@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,7 +44,7 @@ public class Settings extends AppCompatActivity implements AvatarRecyclerView.on
     private EditText editUserName;
     private int currentId;
     private RecyclerView recyclerView;
-    private String currentUserName;
+    private String currentUserName,randomUserName;
     private AvatarRecyclerView adapter;
     private WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
     private SharedPreferences defaultPreference;
@@ -116,8 +117,8 @@ public class Settings extends AppCompatActivity implements AvatarRecyclerView.on
     }
 
     private void createRandom() {
-        currentUserName=String.format("User%s", format(Locale.ROOT, "%04d", new Random().nextInt(100000)));
-        editUserName.setText(currentUserName);
+        randomUserName=String.format("User%s", format(Locale.ROOT, "%04d", new Random().nextInt(100000)));
+        editUserName.setText(randomUserName);
         currentId = Avatars[new Random().nextInt(6)];
         recyclerView.scrollToPosition(Arrays.asList(Avatars).indexOf(currentId));
         adapter.setSelected(currentId);
@@ -129,4 +130,10 @@ public class Settings extends AppCompatActivity implements AvatarRecyclerView.on
         currentId = id;
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(dialog.isShowing())
+            dialog.dismiss();
+    }
 }
