@@ -17,10 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aj.filesdispatch.DatabaseHelper.DatabaseHelper;
 import com.aj.filesdispatch.Entities.SentFileItem;
+import com.aj.filesdispatch.Entities.UserInfo;
 import com.aj.filesdispatch.Interface.OnBindToService;
 import com.aj.filesdispatch.Interface.SendingFIleListener;
 import com.aj.filesdispatch.Interface.setClickListener;
-import com.aj.filesdispatch.Entities.UserInfo;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.FileSendingRecyclerAdapter;
 import com.aj.filesdispatch.Services.DispatchService;
@@ -28,6 +28,12 @@ import com.aj.filesdispatch.common.Converter;
 
 import java.util.List;
 import java.util.Objects;
+
+import static com.aj.filesdispatch.Enums.Action.ACTION_ADD;
+import static com.aj.filesdispatch.Enums.Action.ACTION_FINISHED;
+import static com.aj.filesdispatch.Enums.Action.ACTION_PAUSE;
+import static com.aj.filesdispatch.Enums.Action.ACTION_REMOVE;
+import static com.aj.filesdispatch.Enums.Action.ACTION_RESUME;
 
 public class FileSendingProgress extends AppCompatActivity implements OnBindToService, SendingFIleListener, setClickListener {
     private FileSendingRecyclerAdapter adapter;
@@ -46,7 +52,7 @@ public class FileSendingProgress extends AppCompatActivity implements OnBindToSe
         totalProgressBar = findViewById(R.id.total_progress);
         RecyclerView sendFileView = findViewById(R.id.dispatchList);
 
-        helper= new DatabaseHelper(this,1);
+        helper = new DatabaseHelper(this, 1);
 
         adapter = new FileSendingRecyclerAdapter(this);
         sendFileView.setLayoutManager(new LinearLayoutManager(this));
@@ -118,7 +124,7 @@ public class FileSendingProgress extends AppCompatActivity implements OnBindToSe
 
     @Override
     public void onFileListChanged(List<SentFileItem> fileItems) {
-        runOnUiThread(() ->{
+        runOnUiThread(() -> {
             adapter.submitList(fileItems);
             adapter.notifyDataSetChanged();
         });
@@ -135,13 +141,27 @@ public class FileSendingProgress extends AppCompatActivity implements OnBindToSe
     }
 
     @Override
-    public void onClick(SentFileItem item) {
-        if (item.getProgress() == 0 && !item.isCompleted())
-            dispatchService.removeItem(item);
-        else if ((0L) != item.getProgress()) {
+    public void onClick(SentFileItem item,int position) {
+        switch (item.getWhat()) {
+            case ACTION_FINISHED:
 
-        } else if (item.isCompleted()) {
-
+                break;
+            case ACTION_PAUSE:
+                item.setWhat(ACTION_RESUME);
+                break;
+            case ACTION_RESUME:
+                item.setWhat(ACTION_PAUSE);
+                break;
+            case ACTION_REMOVE:
+                item.setWhat(ACTION_ADD);
+                break;
+            case ACTION_ADD:
+                item.setWhat(ACTION_REMOVE);
+                break;
+        }
+        if (item.getWhat() != ACTION_FINISHED) {
+            runOnUiThread(() -> adapter.notifyItemChanged(position));
+            dispatchService.changeAction(item);
         }
     }
 }

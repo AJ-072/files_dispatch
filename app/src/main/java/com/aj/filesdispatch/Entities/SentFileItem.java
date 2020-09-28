@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 
 import com.aj.filesdispatch.ApplicationActivity;
+import com.aj.filesdispatch.Enums.Action;
 
 import java.io.Serializable;
 
@@ -19,15 +20,20 @@ public class SentFileItem implements Serializable, Item {
     private String showDes;
     private Drawable drawable;
     private String sender;
-    private long progress;
-    private boolean completed;
+    private long progress,time;
+    private Action what=Action.ACTION_ADD;
 
     public SentFileItem(FileItem item){
         setFileName(item.getFileName());
         setFileSize(item.getFileSize());
         setFileType(item.getFileType());
         setShowDes(item.getShowDes());
+        setFileUri(item.getFileUri());
         sender= defaultPreference.getString(BUDDY_NAME, null);
+        time=System.currentTimeMillis();
+    }
+    public long getTime(){
+        return time;
     }
 
     public String getSender() {
@@ -42,10 +48,6 @@ public class SentFileItem implements Serializable, Item {
         this.progress = progress;
     }
 
-    public boolean isCompleted() {
-        return completed;
-    }
-
     @Override
     public void setFileName(String fileName) {
         this.fileName = fileName;
@@ -58,7 +60,14 @@ public class SentFileItem implements Serializable, Item {
 
     public void setFileUri(String fileUri) {
         this.fileUri = fileUri;
-        this.completed=true;
+    }
+
+    public Action getWhat() {
+        return what;
+    }
+
+    public void setWhat(Action what) {
+        this.what = what;
     }
 
     @Override

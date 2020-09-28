@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.aj.filesdispatch.Entities.SentFileItem;
+import com.aj.filesdispatch.Enums.Action;
 import com.aj.filesdispatch.Interface.setClickListener;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.common.Converter;
@@ -51,7 +52,7 @@ public class FileSendingRecyclerAdapter extends ListAdapter<SentFileItem, FileSe
         public boolean areContentsTheSame(@NonNull SentFileItem oldItem, @NonNull SentFileItem newItem) {
             return oldItem.getFileName().equals(newItem.getFileName())
                     && oldItem.getProgress() == newItem.getProgress()
-                    && oldItem.isCompleted() == newItem.isCompleted();
+                    && oldItem.getWhat().equals(newItem.getWhat());
         }
     };
 
@@ -76,6 +77,9 @@ public class FileSendingRecyclerAdapter extends ListAdapter<SentFileItem, FileSe
         holder.mIdView.setText(getItem(position).getFileName());
         holder.progressBar.setMax((int) getItem(position).getFileSize());
         holder.progressBar.setProgress((int) getItem(position).getProgress());
+        if (holder.progressBar.getProgress()==holder.progressBar.getMax()){
+            getItem(position).setWhat(Action.ACTION_FINISHED);
+        }
         switch (getItem(position).getFileType()) {
             case APPLICATION:
                 drawableId = R.drawable.ic_android;
@@ -97,11 +101,26 @@ public class FileSendingRecyclerAdapter extends ListAdapter<SentFileItem, FileSe
                 break;
         }
         holder.icon.setImageResource(drawableId);
-        if (getItem(position).isCompleted()) {
-            holder.progressBar.setVisibility(View.INVISIBLE);
-            holder.cancel.setText(context.getText(R.string.open));
+        switch (getItem(position).getWhat()){
+            case ACTION_FINISHED:
+                holder.progressBar.setVisibility(View.INVISIBLE);
+                holder.cancel.setText(context.getText(R.string.open));
+                break;
+            case ACTION_PAUSE:
+                holder.cancel.setText(context.getText(R.string.resume));
+                break;
+            case ACTION_RESUME:
+                holder.cancel.setText(context.getText(R.string.pause));
+                break;
+            case ACTION_STOP:
+            case ACTION_REMOVE:
+                holder.cancel.setText(context.getText(R.string.retry));
+                break;
+            case ACTION_ADD:
+                holder.cancel.setText(context.getText(R.string.remove));
+                break;
         }
-        holder.cancel.setOnClickListener(v -> cancelListener.onClick(getItem(position)));
+        holder.cancel.setOnClickListener(v -> cancelListener.onClick(getItem(position),position));
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

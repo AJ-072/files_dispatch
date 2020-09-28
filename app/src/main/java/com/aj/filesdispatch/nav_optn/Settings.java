@@ -131,8 +131,8 @@ public class Settings extends AppCompatActivity implements AvatarRecyclerView.on
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onDestroy() {
+        super.onDestroy();
         if(dialog.isShowing())
             dialog.dismiss();
     }

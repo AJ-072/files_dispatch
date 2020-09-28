@@ -6,4 +6,5 @@ public enum Action {
     ACTION_PAUSE,
     ACTION_STOP,
     ACTION_RESUME,
+    ACTION_FINISHED
 }

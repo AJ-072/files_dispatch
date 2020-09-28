@@ -95,4 +95,6 @@
     <string name="file_size">File_Size</string>
     <string name="destination">Destination Storage</string>
     <string name="general">General</string>
+    <string name="resume">Resume</string>
+    <string name="retry">Retry</string>
 </resources>
