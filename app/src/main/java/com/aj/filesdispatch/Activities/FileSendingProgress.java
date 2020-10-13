@@ -144,7 +144,6 @@ public class FileSendingProgress extends AppCompatActivity implements OnBindToSe
     public void onClick(SentFileItem item,int position) {
         switch (item.getWhat()) {
             case ACTION_FINISHED:
-
                 break;
             case ACTION_PAUSE:
                 item.setWhat(ACTION_RESUME);

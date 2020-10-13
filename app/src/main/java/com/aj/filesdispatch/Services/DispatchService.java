@@ -83,14 +83,13 @@ public class DispatchService extends Service {
     public static String APP_NAME;
     private static UserInfo connectedDevice, myDevice;
     private static OnBindToService bindToService = null;
-    private ExecutorService fileSenderThread,fileReceiverThread;
+    private ExecutorService fileSenderThread, fileReceiverThread;
     private static SendingFIleListener fileListener = null;
     private static int total = 0, totalProgress = 0, receiveBuffer, mySendBuffer, bufferSize;
     private static DatabaseHelper helper;
 
     public DispatchService() {
         super();
-        APP_NAME=this.getString(R.string.app_name);
     }
 
     public List<SentFileItem> getReceivedFile() {
@@ -106,8 +105,8 @@ public class DispatchService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        fileSenderThread= Executors.newSingleThreadExecutor();
-        fileReceiverThread= Executors.newSingleThreadExecutor();
+        fileSenderThread = Executors.newSingleThreadExecutor();
+        fileReceiverThread = Executors.newSingleThreadExecutor();
         helper = new DatabaseHelper(this, 1);
         connected = new NotificationCompat.Builder(this, ApplicationActivity.show)
                 .setSmallIcon(R.drawable.ic_logo)
@@ -115,6 +114,7 @@ public class DispatchService extends Service {
                 .setPriority(NotificationManagerCompat.IMPORTANCE_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .build();
+        APP_NAME = this.getString(R.string.app_name);
     }
 
     @Override
@@ -192,7 +192,7 @@ public class DispatchService extends Service {
         if (items != null && items.size() > 0) {
             if (socket != null && socket.isConnected()) {
                 if (fileSender == null) {
-                    fileSender=FileSender.getInstance(objectOutputStream,items);
+                    fileSender = FileSender.getInstance(objectOutputStream, items);
                     fileSenderThread.submit(fileSender);
                 } else
                     fileSender.addShareItems(items);
@@ -237,11 +237,11 @@ public class DispatchService extends Service {
     protected void stopSocket() {
         new Thread(() -> {
             try {
-                if ((fileSender == null )){
+                if ((fileSender == null)) {
                     ObjectOutputStream objectOutputStream = new ObjectOutputStream(output);
                     objectOutputStream.writeUnshared(new MsgData(null, null, ACTION_STOP, 0));
                     objectOutputStream.flush();
-                } else if (socket.isConnected()){
+                } else if (socket.isConnected()) {
                     fileSender.setAction(ACTION_STOP);
                 }
                 Thread.sleep(3000);
@@ -256,13 +256,13 @@ public class DispatchService extends Service {
     protected static void alterTransferFile(Action action, List<SentFileItem> items) {
         List<SentFileItem> sentFileItems = new ArrayList<>();
         int sign = +1;
-        switch (action){
+        switch (action) {
             case ACTION_PAUSE:
             case ACTION_RESUME:
-                changeAction(action,items,TransferFile);
+                changeAction(action, items, TransferFile);
                 break;
             case ACTION_REMOVE:
-                changeAction(action,items,TransferFile);
+                changeAction(action, items, TransferFile);
                 sentFileItems = items;
                 sign = -1;
                 break;
@@ -286,10 +286,11 @@ public class DispatchService extends Service {
 
         }).start();
     }
-    public static void changeAction(Action action,List<SentFileItem> from,List<SentFileItem> to){
+
+    public static void changeAction(Action action, List<SentFileItem> from, List<SentFileItem> to) {
         for (SentFileItem item : from) {
-            for (SentFileItem item1:to) {
-                if (item.getFileName().equals(item1.getFileName())&&item.getTime()==item1.getTime()){
+            for (SentFileItem item1 : to) {
+                if (item.getFileName().equals(item1.getFileName()) && item.getTime() == item1.getTime()) {
                     item1.setWhat(action);
                 }
             }
@@ -310,11 +311,11 @@ public class DispatchService extends Service {
     public static class FileSender implements Runnable {
         private ObjectOutputStream sending;
         private volatile List<FileItem> sendingFileItems;
-        private  ArrayList<SentFileItem> newItems, itemsToSend;
+        private ArrayList<SentFileItem> newItems, itemsToSend;
         private volatile ArrayList<SentFileItem> sendingViews;
         private BufferedInputStream fileInput;
-        private  Action action = null, itemAction;
-        private static FileSender fileSender=null;
+        private Action action = null, itemAction;
+        private static FileSender fileSender = null;
 
         public FileSender(ObjectOutputStream outputStream, List<FileItem> fileItems) {
             this.sending = outputStream;
@@ -325,10 +326,10 @@ public class DispatchService extends Service {
             addShareItems(fileItems);
         }
 
-        public static FileSender getInstance(ObjectOutputStream outputStream, List<FileItem> fileItems){
-            if (fileSender==null){
-                synchronized (FileSender.class){
-                    fileSender= new FileSender(outputStream,fileItems);
+        public static FileSender getInstance(ObjectOutputStream outputStream, List<FileItem> fileItems) {
+            if (fileSender == null) {
+                synchronized (FileSender.class) {
+                    fileSender = new FileSender(outputStream, fileItems);
                 }
             }
             return fileSender;
@@ -350,7 +351,7 @@ public class DispatchService extends Service {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            for (SentFileItem item:sendingViews) {
+            for (SentFileItem item : sendingViews) {
                 currentSendingFile = item;
                 int bytes;
                 byte[] buffer = new byte[bufferSize];
@@ -360,17 +361,16 @@ public class DispatchService extends Service {
                     closeFile(fileInput);
                     e.printStackTrace();
                 }
-                if (currentSendingFile.getWhat()==ACTION_REMOVE)
+                if (currentSendingFile.getWhat() == ACTION_REMOVE)
                     continue;
                 while (true) {
                     try {
-                        if (itemAction == null) {
+                        if (action != null) {
                             itemsToSend = (ArrayList<SentFileItem>) newItems.clone();
                             itemAction = action;
                             action = null;
                             newItems.clear();
                         }
-
                         if ((bytes = fileInput.read(buffer)) == -1) {
                             closeFile(fileInput);
                             break;
@@ -380,6 +380,8 @@ public class DispatchService extends Service {
                         sending.flush();
                         sending.reset();
                         onProgressUpdate(bytes);
+                        itemsToSend.clear();
+                        itemAction = null;
                     } catch (IOException e) {
                         e.printStackTrace();
                         closeFile(fileInput);
@@ -446,283 +448,19 @@ public class DispatchService extends Service {
 
     }
 
-   /* private static class asyncFileSender extends AsyncTask<Void, Integer, Boolean> {
-        private ObjectOutputStream sending;
-        private volatile List<FileItem> sendingFileItems;
-        private  ArrayList<SentFileItem> newItems, itemsToSend;
-        private volatile ArrayList<SentFileItem> sendingViews;
-        private BufferedInputStream fileInput;
-        private  Action action = null, itemAction;
-        int count = 0;
-
-        public asyncFileSender(ObjectOutputStream outputStream, List<FileItem> fileItems) {
-            this.sending = outputStream;
-            sendingFileItems = new ArrayList<>();
-            newItems = new ArrayList<>();
-            itemsToSend = new ArrayList<>();
-            sendingViews = new ArrayList<>();
-            addShareItems(fileItems);
-        }
-
-        @Override
-        protected void onPreExecute() {
-
-            Log.d(TAG, "onPreExecute: ");
-
-            Log.d(TAG, "onPreExecute: " + (newItems != null ? (newItems.size() + newItems.get(0).getFileName()) : 0));
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            Log.d(TAG, "doInBackground: ");
-            MsgData data;
-            try {
-                Log.d(TAG, "doInBackground: create sending");
-                itemsToSend = (ArrayList<SentFileItem>) newItems.clone();
-                if (sendingFileItems.size() != 0) {
-                    data = new MsgData(itemsToSend, null, ACTION_ADD, 0);
-                    sending.writeUnshared(data);
-                    sending.flush();
-                    sending.reset();
-                    newItems.clear();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            while (count < sendingFileItems.size()) {
-                FileItem currentItem = sendingFileItems.get(count);
-                currentSendingFile = sendingViews.get(count);
-                int bytes;
-                byte[] buffer = new byte[bufferSize];
-                try {
-                    fileInput = new BufferedInputStream(new FileInputStream(new File(currentItem.getFileUri())));
-                } catch (FileNotFoundException e) {
-                    closeFile(fileInput);
-                    e.printStackTrace();
-                }
-                while (true) {
-                    try {
-                        if (itemAction == null) {
-                            itemsToSend = (ArrayList<SentFileItem>) newItems.clone();
-                            itemAction = action;
-                            action = null;
-                            newItems.clear();
-                        }
-
-                        if ((bytes = fileInput.read(buffer)) == -1) {
-                            closeFile(fileInput);
-                            break;
-                        }
-                        data = new MsgData(itemsToSend, buffer, itemAction, bytes);
-                        sending.writeUnshared(data);
-                        sending.flush();
-                        sending.reset();
-                        publishProgress(bytes);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        closeFile(fileInput);
-                        break;
-                    }
-
-                }
-                currentSendingFile.setFileUri(currentItem.getFileUri());
-                publishProgress(0);
-                count++;
-                helper.addItem(currentItem);
-            }
-            try {
-                sending.writeUnshared(null);
-                sending.flush();
-                sending.reset();
-                Log.d(TAG, "doInBackground: send null");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return true;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            currentSendingFile.setProgress(currentSendingFile.getProgress() + values[0]);
-            if (fileListener != null)
-                fileListener.onFileProgress(TransferFile.indexOf(currentSendingFile));
-            if (bindToService != null)
-                bindToService.setTotalProgress((totalProgress = totalProgress + values[0]));
-        }
-
-        protected void closeFile(BufferedInputStream fileInput) {
-            try {
-                fileInput.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void setAction(Action action) {
-            this.action = action;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            this.cancel(false);
-            sendingViews.clear();
-            sendingFileItems.clear();
-            currentSendingFile = null;
-            newItems.clear();
-        }
-
-        public void addShareItems(List<FileItem> shareItems) {
-            newItems.clear();
-            action = null;
-            this.sendingFileItems.addAll(shareItems);
-            for (FileItem item : shareItems) {
-                newItems.add(new SentFileItem(item));
-            }
-            sendingViews.addAll(newItems);
-            Log.d(TAG, "addShareItems: add");
-            action = ACTION_ADD;
-            alterTransferFile(action, newItems);
-        }
-
-        public void removeShareItem(SentFileItem fileItem) {
-            newItems.add(fileItem);
-            action = ACTION_REMOVE;
-            sendingFileItems.remove(sendingViews.indexOf(fileItem));
-            sendingViews.remove(fileItem);
-            alterTransferFile(action, newItems);
-        }
-
-    }
-*/
     public static class FileReceiver implements Runnable {
         private InputStream inputStream;
         private volatile List<SentFileItem> receivingFiles;
         private boolean pause = false;
 
-       public FileReceiver(InputStream input) {
+        public FileReceiver(InputStream input) {
             this.inputStream = input;
-            receivingFiles = new ArrayList<>();
-           currentReceivingFile = null;
-        }
-
-       @Override
-       public void run() {
-           MsgData data;
-           try {
-               ObjectInputStream fileInput = new ObjectInputStream(inputStream);
-               while (true) {
-                   Log.d(TAG, "doInBackground: fileinput waiting");
-                   data = (MsgData) fileInput.readUnshared();
-                   setAction(data);
-                   if (data.getAction() == ACTION_STOP) break;
-                   for (SentFileItem item : receivingFiles) {
-                       currentReceivingFile = item;
-                       if (item.getWhat()==ACTION_REMOVE)
-                           continue;
-                       int total = 0;
-                       File file = getLocation(item.getFileType(), item.getFileName());
-                       BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file));
-                       while (total < item.getFileSize()) {
-                           data = (MsgData) fileInput.readUnshared();
-                           if (data != null) {
-                               setAction(data);
-                               total = total + data.getLength();
-                               bufferedOutputStream.write(data.getBytes(), 0, data.getLength());
-                               bufferedOutputStream.flush();
-                               onProgressUpdate(data.getLength());
-                           }
-                       }
-                       currentReceivingFile.setFileUri(file.getPath());
-                       onProgressUpdate(0);
-                       helper.addItem(currentReceivingFile);
-                       bufferedOutputStream.close();
-                   }
-                   currentReceivingFile = null;
-                   receivingFiles.clear();
-                   fileInput.readUnshared();
-               }
-               inputStream.close();
-           } catch (IOException | ClassNotFoundException e) {
-               e.printStackTrace();
-           }
-       }
-
-        private void setAction(MsgData inputPack) {
-            if (inputPack != null && inputPack.getAction() != null)
-                switch (inputPack.getAction()) {
-                    case ACTION_ADD:
-                        receivingFiles.addAll(inputPack.getFileList());
-                        alterTransferFile(inputPack.getAction(), inputPack.getFileList());
-                        break;
-                    case ACTION_REMOVE:
-                        Log.d(TAG, "setAction: "+receivingFiles.containsAll(inputPack.getFileList()));
-                        DispatchService.changeAction(inputPack.getAction(),inputPack.getFileList(),receivingFiles);
-                        alterTransferFile(inputPack.getAction(), inputPack.getFileList());
-                        break;
-                    case ACTION_PAUSE:
-                        DispatchService.changeAction(inputPack.getAction(),inputPack.getFileList(),receivingFiles);
-                        pause = true;
-                        break;
-                    case ACTION_RESUME:
-                        DispatchService.changeAction(inputPack.getAction(),inputPack.getFileList(),receivingFiles);
-                        pause = false;
-                        break;
-                }
-        }
-
-        protected void onProgressUpdate(Integer... values) {
-            currentReceivingFile.setProgress(currentReceivingFile.getProgress() + values[0]);
-            if (fileListener != null)
-                fileListener.onFileProgress(TransferFile.indexOf(currentReceivingFile));
-            if (bindToService != null)
-                bindToService.setTotalProgress((totalProgress = totalProgress + values[0]));
-
-        }
-        private File getLocation(String Extension, String fileName) {
-            int count = 0;
-            File file;
-            do {
-                StringBuilder uri = new StringBuilder();
-                uri = uri.append(Environment.getExternalStorageDirectory().getPath()).append("//")
-                        .append(APP_NAME)
-                        .append("//").append(Extension);
-                if (Extension.equals(APPLICATION))
-                    uri.append("//").append(fileName).append(".apk");
-                else
-                    uri.append("//").append(fileName);
-                if (count == 0)
-                    file = new File(uri.toString());
-                else
-                    file = new File(uri.insert(uri.lastIndexOf("."), "(" + count + ")").toString());
-                count++;
-            } while (file.exists());
-            Log.d(TAG, "getLocation: " + file.getPath());
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return file;
-        }
-   }
-    /*public static class ReceivingFileTask extends AsyncTask<Void, Integer, Void> {
-        private InputStream inputStream;
-        private volatile List<SentFileItem> receivingFiles;
-        private boolean pause = false;
-
-        ReceivingFileTask(InputStream input) {
-            this.inputStream = input;
-        }
-
-        @Override
-        protected void onPreExecute() {
             receivingFiles = new ArrayList<>();
             currentReceivingFile = null;
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        public void run() {
             MsgData data;
             try {
                 ObjectInputStream fileInput = new ObjectInputStream(inputStream);
@@ -732,8 +470,9 @@ public class DispatchService extends Service {
                     setAction(data);
                     if (data.getAction() == ACTION_STOP) break;
                     for (SentFileItem item : receivingFiles) {
-                        Log.d(TAG, "item="+item.toString());
                         currentReceivingFile = item;
+                        if (item.getWhat() == ACTION_REMOVE)
+                            continue;
                         int total = 0;
                         File file = getLocation(item.getFileType(), item.getFileName());
                         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(file));
@@ -744,11 +483,11 @@ public class DispatchService extends Service {
                                 total = total + data.getLength();
                                 bufferedOutputStream.write(data.getBytes(), 0, data.getLength());
                                 bufferedOutputStream.flush();
-                                publishProgress(data.getLength());
+                                onProgressUpdate(data.getLength());
                             }
                         }
                         currentReceivingFile.setFileUri(file.getPath());
-                        publishProgress(0);
+                        onProgressUpdate(0);
                         helper.addItem(currentReceivingFile);
                         bufferedOutputStream.close();
                     }
@@ -756,10 +495,10 @@ public class DispatchService extends Service {
                     receivingFiles.clear();
                     fileInput.readUnshared();
                 }
+                inputStream.close();
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            return null;
         }
 
         private void setAction(MsgData inputPack) {
@@ -770,20 +509,21 @@ public class DispatchService extends Service {
                         alterTransferFile(inputPack.getAction(), inputPack.getFileList());
                         break;
                     case ACTION_REMOVE:
-                        Log.d(TAG, "setAction: "+receivingFiles.containsAll(inputPack.getFileList()));
-                        receivingFiles.removeAll(inputPack.getFileList());
+                        Log.d(TAG, "setAction: " + receivingFiles.containsAll(inputPack.getFileList()));
+                        DispatchService.changeAction(inputPack.getAction(), inputPack.getFileList(), receivingFiles);
                         alterTransferFile(inputPack.getAction(), inputPack.getFileList());
                         break;
                     case ACTION_PAUSE:
+                        DispatchService.changeAction(inputPack.getAction(), inputPack.getFileList(), receivingFiles);
                         pause = true;
                         break;
                     case ACTION_RESUME:
+                        DispatchService.changeAction(inputPack.getAction(), inputPack.getFileList(), receivingFiles);
                         pause = false;
                         break;
                 }
         }
 
-        @Override
         protected void onProgressUpdate(Integer... values) {
             currentReceivingFile.setProgress(currentReceivingFile.getProgress() + values[0]);
             if (fileListener != null)
@@ -793,23 +533,16 @@ public class DispatchService extends Service {
 
         }
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         private File getLocation(String Extension, String fileName) {
             int count = 0;
             File file;
+            StringBuilder uri = new StringBuilder();
+            uri = uri.append(Environment.getExternalStorageDirectory().getPath()).append("//")
+                    .append(APP_NAME)
+                    .append("//")
+                    .append(Extension);
+            new File(String.valueOf(uri)).mkdirs();
             do {
-                StringBuilder uri = new StringBuilder();
-                uri = uri.append(Environment.getExternalStorageDirectory().getPath()).append("//")
-                        .append(APP_NAME)
-                        .append("//").append(Extension);
                 if (Extension.equals(APPLICATION))
                     uri.append("//").append(fileName).append(".apk");
                 else
@@ -828,6 +561,6 @@ public class DispatchService extends Service {
             }
             return file;
         }
-    }*/
+    }
 }
 
