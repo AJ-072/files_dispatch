@@ -9,6 +9,7 @@ public class MsgData implements Serializable {
     private List<SentFileItem> filesToSend;
     private byte[] bytes;
     private Action Action;
+    public int count=-1;
     private int length;
 
     public int getLength() {
