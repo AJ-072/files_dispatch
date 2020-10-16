@@ -147,6 +147,8 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
             return false;
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && !manager.isWifiEnabled()) {
             manager.setWifiEnabled(true);
+        }else{
+            Log.d(TAG, "isSupported: turn on wifi");
         }
         MainActivity.RequestPermission(this);
         return true;
@@ -214,7 +216,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
                 }
                 setLocalService();
 
-                Log.d(TAG, "onFailure: add local" + reason);
+                Log.d(TAG, "onFailure: add local " + reason);
             }
         });
     }
@@ -365,7 +367,7 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
     }
 
     private void register() {
-        Log.d(TAG, "register: " + (dispatchChannel == null) + (p2pManager == null));
+        //Log.d(TAG, "register: " + (dispatchChannel == null) + (p2pManager == null));
         wifiBroadcastReceiver = new WifiBroadcastReceiver(p2pManager, dispatchChannel, this);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);

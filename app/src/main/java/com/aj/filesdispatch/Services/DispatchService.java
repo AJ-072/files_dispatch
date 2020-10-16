@@ -77,6 +77,7 @@ public class DispatchService extends Service {
     private static SendingFIleListener fileListener = null;
     private static int total = 0, totalProgress = 0, receiveBuffer, mySendBuffer, bufferSize;
     private static DatabaseHelper helper;
+    private static boolean isFileSending = false;
 
     public DispatchService() {
         super();
@@ -153,6 +154,7 @@ public class DispatchService extends Service {
                             receiveBuffer = connectedDevice.getByteReceiverSpeed();
                             bufferSize = Math.min(receiveBuffer, mySendBuffer);
                             fileReceiver = new FileReceiver(input);
+                            fileSender = new FileSender(objectOutputStream);
                             fileReceiverThread.submit(fileReceiver);
                             objectOutputStream = new ObjectOutputStream(output);
                             if (fileToSend != null && fileToSend.size() > 0)
@@ -181,14 +183,12 @@ public class DispatchService extends Service {
     public void setTransferFile(List<FileItem> items) {
         if (items != null && items.size() > 0) {
             if (socket != null && socket.isConnected()) {
-                if (fileSender == null) {
-                    fileSender = FileSender.getInstance(objectOutputStream, items);
+                if (!isFileSending) {
                     fileSenderThread.submit(fileSender);
                     Log.d(TAG, "setTransferFile: file sender is null");
-                } else {
+                } else
                     Log.d(TAG, "setTransferFile: file sender is not null");
-                    fileSender.addShareItems(items);
-                }
+                fileSender.addShareItems(items);
             }
         }
     }
@@ -301,39 +301,24 @@ public class DispatchService extends Service {
         }).start();
     }
 
+
+
+
     public static class FileSender implements Runnable {
         private ObjectOutputStream sending;
-        private volatile List<FileItem> sendingFileItems;
-        private ArrayList<SentFileItem> newItems, itemsToSend;
+        private ArrayList<SentFileItem> newItems;
         private volatile ArrayList<SentFileItem> sendingViews;
         private BufferedInputStream fileInput;
         private Action action = null, itemAction;
-        private static FileSender fileSender = null;
 
-        public FileSender(ObjectOutputStream outputStream, List<FileItem> fileItems) {
+        public FileSender(ObjectOutputStream outputStream) {
             this.sending = outputStream;
-            sendingFileItems = new ArrayList<>();
-            newItems = new ArrayList<>();
-            itemsToSend = new ArrayList<>();
-            sendingViews = new ArrayList<>();
-            addShareItems(fileItems);
-        }
-
-        public static FileSender getInstance(ObjectOutputStream outputStream, List<FileItem> fileItems) {
-            if (fileSender == null) {
-                synchronized (FileSender.class) {
-                    if (fileSender == null)
-                        fileSender = new FileSender(outputStream, fileItems);
-                    else
-                        fileSender.addShareItems(fileItems);
-                }
-            }else
-                fileSender.addShareItems(fileItems);
-            return fileSender;
         }
 
         @Override
         public void run() {
+            isFileSending=true;
+            ArrayList<SentFileItem> itemsToSend = new ArrayList<>();
             MsgData data;
             try {
                 Log.d(TAG, "doInBackground: create sending");
@@ -400,9 +385,9 @@ public class DispatchService extends Service {
                 e.printStackTrace();
             }
             sendingViews.clear();
-            sendingFileItems.clear();
             currentSendingFile = null;
             newItems.clear();
+            isFileSending=false;
         }
 
         private void onProgressUpdate(Integer... values) {
@@ -426,13 +411,16 @@ public class DispatchService extends Service {
         }
 
         public void addShareItems(List<FileItem> shareItems) {
+            if (newItems==null)
+                newItems= new ArrayList<>();
+            if (sendingViews==null)
+                sendingViews= new ArrayList<>();
             newItems.clear();
             action = null;
             for (FileItem item : shareItems) {
                 newItems.add(new SentFileItem(item));
             }
             sendingViews.addAll(newItems);
-            Log.d(TAG, "addShareItems: add");
             action = ACTION_ADD;
             alterTransferFile(action, newItems);
         }
@@ -440,7 +428,6 @@ public class DispatchService extends Service {
         public void removeShareItem(SentFileItem fileItem) {
             newItems.add(fileItem);
             action = ACTION_REMOVE;
-            sendingFileItems.remove(sendingViews.indexOf(fileItem));
             sendingViews.remove(fileItem);
             alterTransferFile(action, newItems);
         }
