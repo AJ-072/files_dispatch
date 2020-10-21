@@ -221,7 +221,7 @@ public class DispatchService extends Service {
                 e.printStackTrace();
             }
             if (staringThread.isAlive()) {
-                staringThread.stop();
+                staringThread.interrupt();
             }
         }
         super.onDestroy();

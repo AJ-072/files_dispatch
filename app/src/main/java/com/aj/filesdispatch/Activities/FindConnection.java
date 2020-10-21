@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.preference.PreferenceManager;
@@ -126,9 +127,8 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
 
         if (!isSupported()) {
             finish();
-        } else {
-            initialise();
         }
+
     }
 
     public boolean isSupported() {
@@ -148,10 +148,12 @@ public class FindConnection extends AppCompatActivity implements WifiP2pManager.
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && !manager.isWifiEnabled()) {
             manager.setWifiEnabled(true);
         }else{
-            Log.d(TAG, "isSupported: turn on wifi");
+
         }
         MainActivity.RequestPermission(this);
+        initialise();
         return true;
+
     }
 
     public void initialise() {
