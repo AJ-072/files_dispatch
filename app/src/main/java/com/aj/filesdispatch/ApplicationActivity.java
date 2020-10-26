@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.SharedPreferences;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
+import android.os.Environment;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
@@ -65,6 +66,16 @@ public class ApplicationActivity extends Application {
         if (defaultPreference.getInt(AVATAR, -1) == -1) {
             Log.d(TAG, "setUser: ");
             defaultPreference.edit().putInt(AVATAR, OptnlAvatarName).apply();
+        }
+        if(defaultPreference.getString("destination_folder",null)==null) {
+            Log.d(TAG, "setUser: change destination folder");
+            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                defaultPreference.edit().putString("destination_folder",getResources().getStringArray(R.array.storage_entries)[0]).apply();
+                Log.d(TAG, "setUser: setting s it to 0");
+            }else{
+                defaultPreference.edit().putString("destination_folder",getResources().getStringArray(R.array.storage_entries)[1]).apply();
+                Log.d(TAG, "setUser: setting s it to 1");
+            }
         }
     }
 }
