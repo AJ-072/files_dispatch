@@ -13,6 +13,8 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.AsyncTaskLoader;
@@ -26,52 +28,35 @@ import com.aj.filesdispatch.RecyclerAdapter.HistoryAdapter;
 
 public class History extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "History";
     private OnBackPressedCallback backPressedCallback;
-    private TextView noHistory;
-    private RecyclerView historyRecycler;
-    private ProgressBar historyProgress;
+    private RecyclerView contentRecyclerView;
+    private ContentLoadingProgressBar contentLoading;
+    private AppCompatTextView noContentText;
     private HistoryAdapter adapter;
-
-    private String mParam1;
-    private String mParam2;
-
-    public History() {
-        // Required empty public constructor
-    }
-
-    public static History newInstance(String param1, String param2) {
-        History fragment = new History();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_cli_history, container, false);
-        historyRecycler=view.findViewById(R.id.history_recycler_view);
-        noHistory=view.findViewById(R.id.no_history_text);
-        historyProgress=view.findViewById(R.id.history_progress);
-        historyRecycler.setLayoutManager(new LinearLayoutManager(this.getContext(),RecyclerView.VERTICAL,false));
+        View view = inflater.inflate(R.layout.fragment_content, container, false);
+        contentRecyclerView = view.findViewById(R.id.content_recycler);
+        contentLoading = view.findViewById(R.id.progress_bar);
+        noContentText = view.findViewById(R.id.no_content_text);
+        contentLoading.setVisibility(View.VISIBLE);
+        noContentText.setVisibility(View.GONE);
+        noContentText.setText(getText(R.string.no_installed_apps));
+        contentRecyclerView.setVisibility(View.GONE);
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        contentRecyclerView.setLayoutManager(new LinearLayoutManager(this.getContext(),RecyclerView.VERTICAL,false));
         adapter= new HistoryAdapter(this);
         LoaderManager.getInstance(this).initLoader(1,null,this);
-        historyRecycler.setAdapter(adapter);
-        return view;
+        contentRecyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -139,10 +124,10 @@ public class History extends Fragment implements LoaderManager.LoaderCallbacks<C
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         adapter.setCursor(data);
-        historyProgress.setVisibility(View.GONE);
+        contentLoading.setVisibility(View.GONE);
         if (data!=null&&data.getCount()>0) {
-            historyRecycler.setVisibility(View.VISIBLE);
-            noHistory.setVisibility(View.GONE);
+            contentRecyclerView.setVisibility(View.VISIBLE);
+            noContentText.setVisibility(View.GONE);
         }
     }
 

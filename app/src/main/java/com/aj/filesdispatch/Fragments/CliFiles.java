@@ -13,6 +13,8 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.AsyncTaskLoader;
@@ -38,76 +40,54 @@ import static com.aj.filesdispatch.Fragments.CliDoc.DOCUMENT;
 
 public class CliFiles extends Fragment implements LoaderManager.LoaderCallbacks<ArrayList<FileItem>>, FileAdapter.OnItemClickToOpen, AddItemToShare {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "CliFiles";
     public static final int FILE_LOADER_ID = 101;
     public static final String FOLDER = "Folder";
-    private RecyclerView fileRecycler;
-    private TextView noFileText;
-    private ProgressBar filesLoading;
+    private RecyclerView contentRecyclerView;
+    private AppCompatTextView noContentText;
+    private ContentLoadingProgressBar contentLoading;
     private FileAdapter adapter;
     private File dir;
     private List<FileItem> selectedFiles = new ArrayList<>();
     private ArrayList<FileItem> fileData = new ArrayList<>();
     private AddItemToShare fileToShare;
     private LoaderManager loaderManager;
-    private ViewGroup container;
     private OnBackPressedCallback OnBackPressedCallback;
-
-    private String mParam1;
-    private String mParam2;
-
-    public CliFiles() {
-        // Required empty public constructor
-    }
-
-
-    public static CliFiles newInstance(String param1, String param2) {
-        CliFiles fragment = new CliFiles();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        this.container = container;
         fileToShare= (AddItemToShare) getActivity();
-        View view = inflater.inflate(R.layout.fragment_cli_files, container, false);
-        fileRecycler = view.findViewById(R.id.file_recycler);
-        noFileText = view.findViewById(R.id.no_file_text);
-        filesLoading = view.findViewById(R.id.file_loading);
+        View view = inflater.inflate(R.layout.fragment_content, container, false);
+        contentRecyclerView = view.findViewById(R.id.content_recycler);
+        contentLoading = view.findViewById(R.id.progress_bar);
+        noContentText = view.findViewById(R.id.no_content_text);
+        contentLoading.setVisibility(View.VISIBLE);
+        noContentText.setVisibility(View.GONE);
+        noContentText.setText(getText(R.string.no_file_found));
+        contentRecyclerView.setVisibility(View.GONE);
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         dir = new File(String.valueOf(Environment.getExternalStorageDirectory()));
         loaderManager = LoaderManager.getInstance(this);
         loaderManager.initLoader(FILE_LOADER_ID, null, this);
-        RecyclerView.LayoutManager file_layoutManger = new LinearLayoutManager(container.getContext());
-        fileRecycler.setLayoutManager(file_layoutManger);
-        DividerItemDecoration itemDecoration = new DividerItemDecoration(container.getContext(), DividerItemDecoration.VERTICAL);
-        itemDecoration.setDrawable(getDrawable(container.getContext(), R.drawable.line_divider));
-        fileRecycler.addItemDecoration(itemDecoration);
-        adapter = new FileAdapter(container.getContext(), this, this);
-        fileRecycler.setAdapter(adapter);
-        return view;
+        RecyclerView.LayoutManager file_layoutManger = new LinearLayoutManager(requireContext());
+        contentRecyclerView.setLayoutManager(file_layoutManger);
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL);
+        itemDecoration.setDrawable(Objects.requireNonNull(getDrawable(requireContext(), R.drawable.line_divider)));
+        contentRecyclerView.addItemDecoration(itemDecoration);
+        adapter = new FileAdapter(requireContext(), this, this);
+        contentRecyclerView.setAdapter(adapter);
     }
 
     @NonNull
     @Override
     public Loader<ArrayList<FileItem>> onCreateLoader(int id, @Nullable Bundle args) {
-        return new AsyncTaskLoader<ArrayList<FileItem>>(container.getContext()) {
+        return new AsyncTaskLoader<ArrayList<FileItem>>(requireContext()) {
             @Override
             protected void onStartLoading() {
                 forceLoad();
@@ -145,14 +125,14 @@ public class CliFiles extends Fragment implements LoaderManager.LoaderCallbacks<
 
     @Override
     public void onLoadFinished(@NonNull Loader<ArrayList<FileItem>> loader, ArrayList<FileItem> data) {
-        filesLoading.setVisibility(View.GONE);
+        contentLoading.setVisibility(View.GONE);
         if (data.size() > 0) {
             adapter.setData(data);
-            fileRecycler.setVisibility(View.VISIBLE);
-            noFileText.setVisibility(View.INVISIBLE);
+            contentRecyclerView.setVisibility(View.VISIBLE);
+            noContentText.setVisibility(View.INVISIBLE);
         } else {
-            noFileText.setVisibility(View.VISIBLE);
-            fileRecycler.setVisibility(View.INVISIBLE);
+            noContentText.setVisibility(View.VISIBLE);
+            contentRecyclerView.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -220,7 +200,7 @@ public class CliFiles extends Fragment implements LoaderManager.LoaderCallbacks<
             } else {
                 dir = clicked_file;
                 loaderManager.restartLoader(FILE_LOADER_ID, null, this);
-                filesLoading.setVisibility(View.VISIBLE);
+                contentLoading.setVisibility(View.VISIBLE);
             }
         } else {
             selectedFiles.add(item);

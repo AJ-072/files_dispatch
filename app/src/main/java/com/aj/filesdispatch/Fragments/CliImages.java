@@ -19,7 +19,9 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.FileProvider;
+import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
@@ -40,68 +42,46 @@ import java.util.ArrayList;
 
 public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnItemClickToOpen {
 
-
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     public static final String IMAGES = "Images";
     private final static int MEDIASTORE_LOADER_ID = 101;
     private static final String TAG = "Cli_images";
-    private Context context;
-    private RecyclerView imageRecycler;
+    private RecyclerView contentRecyclerView;
     private GridLayoutManager layoutManager;
     private ImageAdapter imageAdapter;
-    private ProgressBar imageLoading;
-    private TextView noImageText;
+    private ContentLoadingProgressBar contentLoading;
+    private AppCompatTextView noContentText;
     private OnBackPressedCallback backPressedCallback;
     private ArrayList<FileItem> imageItems;
 
-    private String mParam1;
-    private String mParam2;
-
-    public CliImages() {
-        // Required empty public constructor
-    }
-
-    public static CliImages newInstance(String param1, String param2) {
-        CliImages fragment = new CliImages();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        imageItems = new ArrayList<>();
-        context = requireContext().getApplicationContext();
-        DisplayMetrics metrics = new DisplayMetrics();
-        requireActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-        imageAdapter = new ImageAdapter(this, getActivity(), metrics.widthPixels, metrics.heightPixels);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_cli_images, container, false);
+        View view = inflater.inflate(R.layout.fragment_content, container, false);
+        contentRecyclerView = view.findViewById(R.id.content_recycler);
+        contentLoading = view.findViewById(R.id.progress_bar);
+        noContentText = view.findViewById(R.id.no_content_text);
+        contentLoading.setVisibility(View.VISIBLE);
+        noContentText.setVisibility(View.GONE);
+        noContentText.setText(getText(R.string.no_images));
+        contentRecyclerView.setVisibility(View.GONE);
 
-        imageLoading = view.findViewById(R.id.image_loading);
-        imageRecycler = view.findViewById(R.id.image_view_list);
-        imageRecycler.setVisibility(View.INVISIBLE);
-        imageLoading.setVisibility(View.VISIBLE);
-        noImageText = view.findViewById(R.id.no_images_text);
-        layoutManager = new GridLayoutManager(context, 3);
-        LoaderManager.getInstance(this).initLoader(MEDIASTORE_LOADER_ID, null, this);
-        imageRecycler.setLayoutManager(layoutManager);
-        imageRecycler.setHasFixedSize(true);
-        Log.d(TAG, "onCreateView: OncreateView");
-        imageRecycler.setAdapter(imageAdapter);
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        imageItems = new ArrayList<>();
+        DisplayMetrics metrics = new DisplayMetrics();
+        requireActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+        imageAdapter = new ImageAdapter(this, getActivity(), metrics.widthPixels, metrics.heightPixels);
+        layoutManager = new GridLayoutManager(requireContext(), 3);
+        LoaderManager.getInstance(this).initLoader(MEDIASTORE_LOADER_ID, null, this);
+        contentRecyclerView.setLayoutManager(layoutManager);
+        contentRecyclerView.setHasFixedSize(true);
+        Log.d(TAG, "onCreateView: OncreateView");
+        contentRecyclerView.setAdapter(imageAdapter);
     }
 
     @NonNull
@@ -116,7 +96,7 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
                 MediaStore.Files.FileColumns.DISPLAY_NAME
         };
         return new CursorLoader(
-                context,
+                requireContext(),
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection,
                 null,
@@ -127,7 +107,7 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        imageLoading.setVisibility(View.GONE);
+        contentLoading.setVisibility(View.GONE);
         if (data.getCount() > 0) {
             if (imageItems.size() < Math.min(data.getCount(), 30))
                 for (int i = 0; i < Math.min(data.getCount(), 30); i++) {
@@ -143,11 +123,11 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
                 }
             imageAdapter.setImageList(imageItems);
             imageAdapter.setImageList(data);
-            imageRecycler.setVisibility(View.VISIBLE);
-            noImageText.setVisibility(View.GONE);
+            contentRecyclerView.setVisibility(View.VISIBLE);
+            noContentText.setVisibility(View.GONE);
         } else {
-            imageRecycler.setVisibility(View.GONE);
-            noImageText.setVisibility(View.VISIBLE);
+            contentRecyclerView.setVisibility(View.GONE);
+            noContentText.setVisibility(View.VISIBLE);
         }
     }
 
@@ -199,7 +179,7 @@ public class CliImages extends Fragment implements LoaderManager.LoaderCallbacks
     public void OnClick(FileItem item) {
         File file = new File(String.valueOf(item.getFileUri()));
         Uri fileUri = FileProvider.getUriForFile(
-                context,
+                requireContext(),
                 "com.aj.filesdispatch.fileProvider",
                 file);
         Intent intent = new Intent();

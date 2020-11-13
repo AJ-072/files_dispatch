@@ -252,7 +252,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void TabMenu() {
         PagerAdapter adapter = new pager(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, tabLayout.getTabCount());
-        //viewPager.onRestoreInstanceState(viewPager.onSaveInstanceState());
         viewPager.setAdapter(adapter);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override

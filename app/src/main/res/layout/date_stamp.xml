@@ -5,8 +5,8 @@
     android:layout_height="wrap_content"
     android:background="@drawable/layout_background">
 
-    <RadioButton
-        android:id="@+id/radioButton"
+    <androidx.appcompat.widget.AppCompatRadioButton
+        android:id="@+id/select_all"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -16,9 +16,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/date_stamp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="5dp"
@@ -27,7 +27,7 @@
         android:text="Date"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/radioButton"
+        app:layout_constraintEnd_toStartOf="@+id/select_all"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

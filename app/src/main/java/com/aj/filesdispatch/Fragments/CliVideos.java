@@ -1,6 +1,5 @@
 package com.aj.filesdispatch.Fragments;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -8,13 +7,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
@@ -25,7 +24,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aj.filesdispatch.Entities.FileItem;
 import com.aj.filesdispatch.Entities.FileItemBuilder;
-import com.aj.filesdispatch.Interface.AddItemToShare;
 import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.VideoAdapter;
 import com.aj.filesdispatch.common.Converter;
@@ -35,66 +33,47 @@ import java.util.ArrayList;
 
 public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "videos";
     public static final String VIDEOS = "Videos";
     private final static int MEDIASTORE_LOADER_ID = 0;
-    private Context context;
-    private RecyclerView videoRecycler;
+    private RecyclerView contentRecyclerView;
     private RecyclerView.LayoutManager layoutManager;
-    private TextView noVideoText;
-    private ProgressBar videoLoading;
+    private AppCompatTextView noContentText;
+    private ContentLoadingProgressBar contentLoading;
     private OnBackPressedCallback backPressedCallback;
     private VideoAdapter videoAdapter;
     private ArrayList<FileItem> videoItems;
 
-    private String mParam1;
-    private String mParam2;
-
-    public CliVideos() {
-        // Required empty public constructor
-    }
-
-    public static CliVideos newInstance(String param1, String param2) {
-        CliVideos fragment = new CliVideos();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        videoItems = new ArrayList<>();
-        context = requireContext().getApplicationContext();
-        videoAdapter = new VideoAdapter(getActivity());
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_cli_videos, container, false);
-        videoRecycler = view.findViewById(R.id.video_list);
-        noVideoText = view.findViewById(R.id.no_videos_text);
-        videoLoading = view.findViewById(R.id.video_loading);
-        layoutManager = new LinearLayoutManager(context);
-        LoaderManager.getInstance(this).initLoader(MEDIASTORE_LOADER_ID, null, this);
-        DividerItemDecoration itemDecoration = new DividerItemDecoration(context, DividerItemDecoration.VERTICAL);
-        itemDecoration.setDrawable(getResources().getDrawable(R.drawable.line_divider, getActivity().getTheme()));
-        videoRecycler.addItemDecoration(itemDecoration);
-        videoRecycler.setLayoutManager(layoutManager);
-        videoRecycler.setHasFixedSize(true);
-        Log.d(TAG, "onCreateView: OncreateView");
-        videoRecycler.setAdapter(videoAdapter);
+        View view = inflater.inflate(R.layout.fragment_content, container, false);
+        contentRecyclerView = view.findViewById(R.id.content_recycler);
+        contentLoading = view.findViewById(R.id.progress_bar);
+        noContentText = view.findViewById(R.id.no_content_text);
+        contentLoading.setVisibility(View.VISIBLE);
+        noContentText.setVisibility(View.GONE);
+        noContentText.setText(getText(R.string.no_videos_found));
+        contentRecyclerView.setVisibility(View.GONE);
+
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        videoItems = new ArrayList<>();
+        videoAdapter = new VideoAdapter(getActivity());
+        layoutManager = new LinearLayoutManager(requireContext());
+        LoaderManager.getInstance(this).initLoader(MEDIASTORE_LOADER_ID, null, this);
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL);
+        itemDecoration.setDrawable(getResources().getDrawable(R.drawable.line_divider, getActivity().getTheme()));
+        contentRecyclerView.addItemDecoration(itemDecoration);
+        contentRecyclerView.setLayoutManager(layoutManager);
+        contentRecyclerView.setHasFixedSize(true);
+        Log.d(TAG, "onCreateView: OncreateView");
+        contentRecyclerView.setAdapter(videoAdapter);
     }
 
     @Override
@@ -158,7 +137,7 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
                 MediaStore.Files.FileColumns.TITLE
         };
         return new CursorLoader(
-                context,
+                requireContext(),
                 MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                 projection,
                 null,
@@ -169,7 +148,7 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        videoLoading.setVisibility(View.GONE);
+        contentLoading.setVisibility(View.GONE);
         if (data.getCount() > 0) {
             if (videoItems.size() < Math.min(data.getCount(), 30))
                 for (int i = 0; i < Math.min(data.getCount(), 30); i++) {
@@ -184,13 +163,13 @@ public class CliVideos extends Fragment implements LoaderManager.LoaderCallbacks
                             .build());
                 }
             videoAdapter.setVideoItems(videoItems);
-            noVideoText.setVisibility(View.GONE);
-            videoRecycler.setVisibility(View.VISIBLE);
+            noContentText.setVisibility(View.GONE);
+            contentRecyclerView.setVisibility(View.VISIBLE);
             videoAdapter.setVideoItems(data);
 
         } else {
-            noVideoText.setVisibility(View.VISIBLE);
-            videoRecycler.setVisibility(View.GONE);
+            noContentText.setVisibility(View.VISIBLE);
+            contentRecyclerView.setVisibility(View.GONE);
         }
     }
 

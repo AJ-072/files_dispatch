@@ -7,6 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -18,51 +22,50 @@ import com.aj.filesdispatch.ViewModels.AppListViewModel;
 
 public class CliApp extends Fragment {
 
-
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "CliApp";
-    private RecyclerView recyclerView;
+    private RecyclerView contentRecyclerView;
     private AppAdapter appAdapter;
     private AppListViewModel viewModel;
-    private ProgressBar appLoader;
+    private ContentLoadingProgressBar contentLoading;
+    private AppCompatTextView noContentText;
 
-    public CliApp() {
 
-    }
-
-    /*public static CliApp newInstance(String param1, String param2) {
-        CliApp fragment = new CliApp();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }*/
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-
-        viewModel = new ViewModelProvider(this).get(AppListViewModel.class);
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_cli_app, container, false);
-        recyclerView = view.findViewById(R.id.app_recycler);
-        appLoader = view.findViewById(R.id.app_loading);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
+        View view = inflater.inflate(R.layout.fragment_content, container, false);
+        contentRecyclerView = view.findViewById(R.id.content_recycler);
+        contentLoading = view.findViewById(R.id.progress_bar);
+        noContentText = view.findViewById(R.id.no_content_text);
+        contentLoading.setVisibility(View.VISIBLE);
+        noContentText.setVisibility(View.GONE);
+        noContentText.setText(getText(R.string.no_installed_apps));
+        contentRecyclerView.setVisibility(View.GONE);
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        viewModel = new ViewModelProvider(this).get(AppListViewModel.class);
+        contentRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         appAdapter = new AppAdapter(getActivity());
-        recyclerView.setAdapter(appAdapter);
+        contentRecyclerView.setAdapter(appAdapter);
         viewModel.getFileItems().observe(getViewLifecycleOwner(), fileItems -> {
+            contentLoading.setVisibility(View.GONE);
+            if (fileItems.size()==0){
+                noContentText.setVisibility(View.VISIBLE);
+                contentRecyclerView.setVisibility(View.GONE);
+            }else{
+                noContentText.setVisibility(View.GONE);
+                contentRecyclerView.setVisibility(View.VISIBLE);
+            }
             appAdapter.submitList(fileItems);
             viewModel.UpdateList(fileItems);
-            appLoader.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
+
             Log.d(TAG, "onCreateView: " + fileItems.size());
         });
-        return view;
     }
 }

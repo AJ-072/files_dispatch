@@ -22,6 +22,7 @@ import com.aj.filesdispatch.common.Converter;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -114,7 +115,7 @@ public class AppListRepository {
                     } else {
                         fileItemDao.deleteFileItem(item);
                     }
-                    packageNames.remove(packageName);
+                    packageNames.removeAll(Collections.singleton(packageName));
                 }
                 Log.d(TAG, "doInBackground: " + packageNames.size());
                 if (packageNames.size() > 0) {

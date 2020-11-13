@@ -15,8 +15,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/this_avatar"
         app:layout_constraintEnd_toEndOf="@+id/this_avatar"
         app:layout_constraintStart_toStartOf="@+id/this_avatar"
-        app:layout_constraintTop_toTopOf="@+id/this_avatar"
-        />
+        app:layout_constraintTop_toTopOf="@+id/this_avatar" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/my_avatar_anim2"
@@ -31,7 +30,7 @@
 
     <include
         android:id="@+id/this_avatar"
-        layout="@layout/avatar_icon"
+        layout="@layout/avatar_icon_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/availWifiList"
