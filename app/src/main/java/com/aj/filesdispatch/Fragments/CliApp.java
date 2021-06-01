@@ -20,6 +20,8 @@ import com.aj.filesdispatch.R;
 import com.aj.filesdispatch.RecyclerAdapter.AppAdapter;
 import com.aj.filesdispatch.ViewModels.AppListViewModel;
 
+import java.util.Objects;
+
 public class CliApp extends Fragment {
 
     private static final String TAG = "CliApp";
@@ -49,7 +51,7 @@ public class CliApp extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(AppListViewModel.class);
+        viewModel = new ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().getApplication())).get(AppListViewModel.class);
         contentRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         appAdapter = new AppAdapter(getActivity());
         contentRecyclerView.setAdapter(appAdapter);

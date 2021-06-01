@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import com.aj.filesdispatch.Entities.FileItem;
@@ -15,6 +17,10 @@ import java.util.List;
 public interface FileItemDao {
     @Insert
     void insertFileItem(FileItem item);
+
+    @Transaction
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(List<FileItem> items);
 
     @Update
     void updateFileItem(FileItem item);
